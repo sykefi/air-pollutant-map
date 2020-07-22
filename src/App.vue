@@ -5,24 +5,24 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
-  import OlMap from './components/OlMap.vue';
+import { Component, Vue } from "vue-property-decorator";
+import OlMap from "./components/OlMap.vue";
 
-  @Component({
-    components: {
-      OlMap,
-    },
-  })
-  export default class App extends Vue {}
+@Component({
+  components: {
+    OlMap
+  }
+})
+export default class App extends Vue {}
 </script>
 
 <style>
-  #paastokartta-div {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
+#paastokartta-div {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
 </style>
