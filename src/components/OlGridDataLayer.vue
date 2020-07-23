@@ -27,10 +27,13 @@ const cqlFilter = (extent: Extent, projection: Projection, vuosi: number) => {
 }
 
 const getColor = (feature: FeatureLike) => {
-  const pollutantValue = feature.get("s16");
-  return pollutantValue < 0.01
-    ? "rgba(89, 255, 0, 0.5)"
-    : "rgba(255, 0, 0, 0.5)";
+  const value = feature.get("s16");
+  if (value < 0.01) return "#fef0d9"
+  if (value < 0.03) return "#fdcc8a"
+  if (value < 0.07) return "#fc8d59"
+  if (value < 5) return "#e34a33"
+  if (value < 2576) return "#b30000"
+  return 'grey'
 };
 
 export default Vue.extend({
