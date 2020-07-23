@@ -18,20 +18,20 @@ const outputFormat = "&outputFormat=application%2Fjson";
 const typeName = (table: string): string => "&typeName=paastotkartalla%3A" + table;
 const propFilter = (prop: string): string => "&propertyName=geom," + prop;
 const cqlFilter = (extent: Extent, projection: Projection, vuosi: number) => {
-  return `&cql_filter=(bbox(geom,${extent.join(",")},%27EPSG:${projection.getCode()}%27)and
-  (vuosi=%27 ${vuosi.toString()}%27))`;
+  return `&cql_filter=(bbox(geom,${extent.join(",")},%27EPSG:${projection.getCode()}%27)
+  and(vuosi=%27 ${vuosi.toString()}%27))`;
 };
 
 export default Vue.extend({
   props: {
     map: Map,
     year: Number,
-    pollutant: String,
+    pollutant: String
   },
   mounted() {
     const gsUri = process.env.VUE_APP_GEOSERVER_URI;
     console.log("Using geoserver at:", gsUri);
-    console.log("initializing grid data layer of pollutant", this.pollutant,"and year",this.year);
+    console.log("mounting grid data:", this.pollutant, "of year", this.year);
 
     const pollutantSampleSource = new VectorSource({
       format: new GeoJSON(),
@@ -43,7 +43,7 @@ export default Vue.extend({
           propFilter(this.pollutant) +
           outputFormat +
           cqlFilter(extent, projection, this.year);
-        
+
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         const onError = () => {
@@ -64,7 +64,7 @@ export default Vue.extend({
         };
         xhr.send();
       },
-      strategy: bboxStrategy,
+      strategy: bboxStrategy
     });
 
     const colorFunction = getColorFunction(this.pollutant);
@@ -73,12 +73,12 @@ export default Vue.extend({
       style: (feature) => {
         return new Style({
           fill: new Fill({
-            color: colorFunction ? colorFunction(feature) : "grey",
-          }),
+            color: colorFunction ? colorFunction(feature) : "grey"
+          })
         });
-      },
+      }
     });
     this.map.addLayer(pollutantVector);
-  },
+  }
 });
 </script>
