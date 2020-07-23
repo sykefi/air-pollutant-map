@@ -1,7 +1,7 @@
 <template>
   <div id="ol-map">
     <div v-if="isReady">
-      <OlGridDataLayer v-bind:map="map" />
+      <OlGridDataLayer v-bind:year="year" v-bind:pollutant="pollutant" v-bind:map="map" />
     </div>
   </div>
 </template>
@@ -15,6 +15,10 @@ import { Tile as TileLayer } from "ol/layer";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 
 export default Vue.extend({
+  props: {
+    year: Number,
+    pollutant: String,
+  },
   components: {
     OlGridDataLayer
   },
