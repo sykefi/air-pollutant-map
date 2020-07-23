@@ -17,6 +17,12 @@ import Map from "ol/Map.js";
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 console.log("Using geoserver at:", gsUri);
 
+const typeName = (table: string): string => '&typeName=paastotkartalla%3A'+ table
+const propFilter = (prop: string): string =>  '&propertyName=geom,'+ prop
+const bboxFilter = (extent: Extent): string => "&bbox="+ extent.join(",")
+const proj = (projection: Projection): string => ','+ projection.getCode();
+const outputFormat = "&outputFormat=application%2Fjson"
+
 const getColor = (feature: FeatureLike) => {
   const pollutantValue = feature.get("s16");
   return pollutantValue < 0.01
@@ -32,15 +38,9 @@ export default Vue.extend({
     const pollutantSampleSource = new VectorSource({
       format: new GeoJSON(),
       loader: (extent: Extent, resolution: number, projection: Projection) => {
-        const proj = projection.getCode();
         const url =
-          gsUri +
-          "ows?service=WFS&version=1.0.0&request=GetFeature&typeName=paastotkartalla%3Ap_gd_sample_2015_a&" +
-          "outputFormat=application%2Fjson&" +
-          "bbox=" +
-          extent.join(",") +
-          "," +
-          proj;
+          gsUri + "ows?service=WFS&version=1.0.0&request=GetFeature" +
+          typeName('p_gd_sample_2015_a') + propFilter('s16') + outputFormat + bboxFilter(extent) + proj(projection);
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         const onError = () => {
