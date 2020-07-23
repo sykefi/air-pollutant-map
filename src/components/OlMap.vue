@@ -29,8 +29,8 @@ export default Vue.extend({
       target: "ol-map",
       layers: [new TileLayer({ source: new OSM() })],
       view: new View({
-        projection: "EPSG:4326",
-        center: [24.56, 61.24],
+        projection: "EPSG:3857",
+        center: [2587716,8599901],
         zoom: 8
       })
     });
