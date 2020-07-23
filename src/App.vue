@@ -1,6 +1,6 @@
 <template>
   <div id="paastokartta-div">
-    <OlMap v-bind:year="2015" pollutant="s16"/>
+    <OlMap v-bind:year="2015" pollutant="s16" />
   </div>
 </template>
 

@@ -17,7 +17,7 @@ import OlGridDataLayer from "./OlGridDataLayer.vue";
 export default Vue.extend({
   props: {
     year: Number,
-    pollutant: String,
+    pollutant: String
   },
   components: {
     OlGridDataLayer
@@ -34,7 +34,7 @@ export default Vue.extend({
       layers: [new TileLayer({ source: new OSM() })],
       view: new View({
         projection: "EPSG:3857",
-        center: [2587716,8599901],
+        center: [2587716, 8599901],
         zoom: 8
       })
     });
