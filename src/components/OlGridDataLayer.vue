@@ -17,11 +17,14 @@ import Map from "ol/Map.js";
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 console.log("Using geoserver at:", gsUri);
 
+const outputFormat = "&outputFormat=application%2Fjson"
 const typeName = (table: string): string => '&typeName=paastotkartalla%3A'+ table
 const propFilter = (prop: string): string =>  '&propertyName=geom,'+ prop
-const bboxFilter = (extent: Extent): string => "&bbox="+ extent.join(",")
-const proj = (projection: Projection): string => ','+ projection.getCode();
-const outputFormat = "&outputFormat=application%2Fjson"
+const cqlFilter = (extent: Extent, projection: Projection, vuosi: number) => {
+  return '&cql_filter='+ 
+  '(bbox(geom,' + extent.join(",") + ',%27EPSG:'+ projection.getCode() +'%27)'+'and'+
+  '(vuosi=%27'+ vuosi.toString()+ '%27)'+')'
+}
 
 const getColor = (feature: FeatureLike) => {
   const pollutantValue = feature.get("s16");
@@ -40,7 +43,7 @@ export default Vue.extend({
       loader: (extent: Extent, resolution: number, projection: Projection) => {
         const url =
           gsUri + "ows?service=WFS&version=1.0.0&request=GetFeature" +
-          typeName('p_gd_sample_2015_a') + propFilter('s16') + outputFormat + bboxFilter(extent) + proj(projection);
+          typeName('p_gd_sample_2015_a') + propFilter('s16') + outputFormat + cqlFilter(extent, projection, 2015);
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         const onError = () => {
