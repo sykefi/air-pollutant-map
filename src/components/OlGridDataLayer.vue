@@ -28,9 +28,18 @@ export default Vue.extend({
     year: Number,
     pollutant: String
   },
+  data() {
+    return {
+      layerSource: new VectorSource() as VectorSource,
+      vectorLayer: new VectorLayer() as VectorLayer,
+      colorFunction: undefined as Function | undefined
+    };
+  },
   watch: {
     year: function (newVal, oldVal) {
-      console.log("Prop changed: ", newVal, " | was: ", oldVal);
+      console.log(`Year changed to ${newVal} - loading new grid data...`);
+      this.layerSource.clear();
+      this.layerSource.refresh();
     }
   },
   mounted() {
@@ -38,7 +47,7 @@ export default Vue.extend({
     console.log("Using geoserver at:", gsUri);
     console.log("mounting grid data:", this.pollutant, "of year", this.year);
 
-    const pollutantSampleSource = new VectorSource({
+    this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: (extent: Extent, resolution: number, projection: Projection) => {
         const url =
@@ -52,16 +61,15 @@ export default Vue.extend({
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         const onError = () => {
-          // pollutantSampleSource.removeLoadedExtent(extent);
           console.log("error in wfs request");
         };
         xhr.onerror = onError;
         xhr.onload = () => {
           if (xhr.status == 200) {
-            pollutantSampleSource.clear();
-            pollutantSampleSource.addFeatures(
+            this.layerSource.clear();
+            this.layerSource.addFeatures(
               // @ts-ignore
-              pollutantSampleSource.getFormat().readFeatures(xhr.responseText)
+              this.layerSource.getFormat().readFeatures(xhr.responseText)
             );
           } else {
             onError();
@@ -72,18 +80,18 @@ export default Vue.extend({
       strategy: bboxStrategy
     });
 
-    const colorFunction = getColorFunction(this.pollutant);
-    const pollutantVector = new VectorLayer({
-      source: pollutantSampleSource,
+    this.colorFunction = getColorFunction(this.pollutant);
+    this.vectorLayer = new VectorLayer({
+      source: this.layerSource,
       style: (feature) => {
         return new Style({
           fill: new Fill({
-            color: colorFunction ? colorFunction(feature) : "grey"
+            color: this.colorFunction ? this.colorFunction(feature) : "grey"
           })
         });
       }
     });
-    this.map.addLayer(pollutantVector);
+    this.map.addLayer(this.vectorLayer);
   }
 });
 </script>
