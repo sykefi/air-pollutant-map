@@ -12,7 +12,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import Projection from "ol/proj/Projection";
 import Map from "ol/Map.js";
-import { getColorFunction } from "./PollutantStyles";
+import { getColorFunction } from "./../utils/PollutantStyles";
 
 const outputFormat = "&outputFormat=application%2Fjson";
 const typeName = (table: string): string => "&typeName=paastotkartalla%3A" + table;
@@ -27,6 +27,11 @@ export default Vue.extend({
     map: Map,
     year: Number,
     pollutant: String
+  },
+  watch: {
+    year: function (newVal, oldVal) {
+      console.log("Prop changed: ", newVal, " | was: ", oldVal);
+    }
   },
   mounted() {
     const gsUri = process.env.VUE_APP_GEOSERVER_URI;
