@@ -5,22 +5,18 @@
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
 import { Vector as VectorLayer } from "ol/layer";
-import { Extent } from "ol/extent";
 import VectorSource from "ol/source/Vector";
-import { bbox as bboxStrategy } from "ol/loadingstrategy";
+import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
-import Projection from "ol/proj/Projection";
 import Map from "ol/Map.js";
 import { getColorFunction } from "./../utils/PollutantStyles";
 
 const outputFormat = "&outputFormat=application%2Fjson";
 const typeName = (table: string): string => "&typeName=paastotkartalla%3A" + table;
 const propFilter = (prop: string): string => "&propertyName=geom," + prop;
-const cqlFilter = (extent: Extent, projection: Projection, vuosi: number) => {
-  return `&cql_filter=(bbox(geom,${extent.join(",")},%27EPSG:${projection.getCode()}%27)
-  and(vuosi=%27 ${vuosi.toString()}%27))`;
-};
+const cqlFilter = (vuosi: number): string =>
+  `&cql_filter=(vuosi=%27${vuosi.toString()}%27)`;
 
 export default Vue.extend({
   props: {
@@ -37,7 +33,7 @@ export default Vue.extend({
   },
   watch: {
     year: function (newVal, oldVal) {
-      console.log(`Year changed to ${newVal} - loading new grid data...`);
+      console.log(`Year changed to ${newVal} (from ${oldVal}) - loading grid data...`);
       this.layerSource.clear();
       this.layerSource.refresh();
     }
@@ -49,14 +45,14 @@ export default Vue.extend({
 
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
-      loader: (extent: Extent, resolution: number, projection: Projection) => {
+      loader: () => {
         const url =
           gsUri +
           "ows?service=WFS&version=1.0.0&request=GetFeature" +
           typeName("p_gd_sample_2015_a") +
           propFilter(this.pollutant) +
           outputFormat +
-          cqlFilter(extent, projection, this.year);
+          cqlFilter(this.year);
 
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
@@ -77,7 +73,7 @@ export default Vue.extend({
         };
         xhr.send();
       },
-      strategy: bboxStrategy
+      strategy: allStrategy
     });
 
     this.colorFunction = getColorFunction(this.pollutant);
