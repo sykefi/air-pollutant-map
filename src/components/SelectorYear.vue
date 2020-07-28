@@ -117,7 +117,7 @@ export default Vue.extend({
     setState: function (state: string) {
       this.selectorState = state;
     },
-    handleSelectorClick: function (e) {
+    handleSelectorClick: function () {
       const currentFocus = findFocus();
       switch (this.selectorState) {
         case "initial":
@@ -135,7 +135,7 @@ export default Vue.extend({
           }
           break;
         case "filtered": // i.e. year was selected
-          if (currentFocus!.tagName === "LI") {
+          if (currentFocus && currentFocus.tagName === "LI") {
             this.makeChoice(currentFocus);
             this.toggleYearSelector(false);
             this.setState("closed");
@@ -151,7 +151,6 @@ export default Vue.extend({
       }
     },
     makeChoice: function (whichOption) {
-      const optionTitle = whichOption.querySelector("strong");
       this.yearInputValue = parseInt(whichOption.textContent.trim());
       this.$emit("set-selected-year", this.yearInputValue);
     }
@@ -165,7 +164,7 @@ export default Vue.extend({
       }
     });
     selectorElement = document.querySelector("#myCustomSelect");
-    yearInputElement = selectorElement!.querySelector("input");
+    yearInputElement = selectorElement ? selectorElement.querySelector("input") : null;
   }
 });
 </script>
