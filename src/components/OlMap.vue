@@ -1,7 +1,7 @@
 <template>
   <div id="ol-map">
     <div v-if="isReady">
-      <OlGridDataLayer v-bind:year="year" v-bind:pollutant="pollutant" v-bind:map="map" />
+      <OlGridDataLayer :year="year" :pollutant="pollutant" :map="map" />
     </div>
   </div>
 </template>
@@ -12,7 +12,12 @@ import Map from "ol/Map.js";
 import View from "ol/View.js";
 import OSM from "ol/source/OSM";
 import { Tile as TileLayer } from "ol/layer";
+import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
+
+const attribution = new Attribution({
+  collapsible: true
+});
 
 export default Vue.extend({
   props: {
@@ -32,6 +37,7 @@ export default Vue.extend({
     this.map = new Map({
       target: "ol-map",
       layers: [new TileLayer({ source: new OSM() })],
+      controls: defaultControls({ attribution: false }).extend([attribution]),
       view: new View({
         projection: "EPSG:3857",
         center: [2587716, 8599901],
@@ -50,7 +56,7 @@ export default Vue.extend({
 @import "~ol/ol.css";
 #ol-map {
   height: 400px;
-  width: 600px;
+  width: 100%;
   z-index: 0;
 }
 </style>
