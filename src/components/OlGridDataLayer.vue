@@ -34,7 +34,6 @@ export default Vue.extend({
   watch: {
     year: function (newVal, oldVal) {
       console.log(`Year changed to ${newVal} (from ${oldVal}) - loading grid data...`);
-      this.layerSource.clear();
       this.layerSource.refresh();
     }
   },

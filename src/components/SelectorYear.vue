@@ -66,20 +66,8 @@
         id="custom-select-list"
         role="listbox"
       >
-        <li tabindex="-1" role="option">
-          2000
-        </li>
-        <li tabindex="-1" role="option">
-          2005
-        </li>
-        <li tabindex="-1" role="option">
-          2010
-        </li>
-        <li tabindex="-1" role="option">
-          2015
-        </li>
-        <li tabindex="-1" role="option">
-          2018
+        <li v-for="year in yearOptions" :key="year" tabindex="-1" role="option">
+          {{ year }}
         </li>
       </ul>
     </div>
@@ -100,10 +88,10 @@ let yearInputElement: Element | null = null;
 export default Vue.extend({
   data() {
     return {
-      yearOptions: [2000, 2005, 2010, 2015],
-      showOptions: false,
-      yearInputValue: 2015,
-      selectorState: "initial"
+      yearOptions: [1990, 1995, 2000, 2005, 2010, 2015, 2018] as number[],
+      showOptions: false as boolean,
+      yearInputValue: 2015 as number,
+      selectorState: "initial" as string
     };
   },
   methods: {
