@@ -3,6 +3,7 @@
     <div id="app-wrapper">
       <div id="settings-panel">
         <SelectorYear @set-selected-year="setSelectedYear" />
+        <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="paastokartta-div">
         <OlMap :year="year" :pollutant="pollutant" />
@@ -15,6 +16,7 @@
 import { Vue } from "vue-property-decorator";
 import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
+import SelectorPollutant from "./components/SelectorPollutant.vue";
 
 export default Vue.extend({
   data() {
@@ -26,11 +28,15 @@ export default Vue.extend({
   methods: {
     setSelectedYear(year: number) {
       this.year = year;
+    },
+    setSelectedPollutant(pollutant: string) {
+      this.pollutant = pollutant;
     }
   },
   components: {
     OlMap,
-    SelectorYear
+    SelectorYear,
+    SelectorPollutant
   }
 });
 </script>
@@ -52,6 +58,7 @@ export default Vue.extend({
 }
 #settings-panel {
   width: 100%;
+  display: flex;
 }
 #paastokartta-div {
   display: flex;
