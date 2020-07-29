@@ -16,20 +16,21 @@
 import { Vue } from "vue-property-decorator";
 import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
-import SelectorPollutant from "./components/SelectorPollutant.vue";
+import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
+import { Pollutant } from "./types";
 
 export default Vue.extend({
   data() {
     return {
-      year: 2015,
-      pollutant: "s16"
+      year: 2015 as number,
+      pollutant: getDefaultPollutant() as Pollutant
     };
   },
   methods: {
     setSelectedYear(year: number) {
       this.year = year;
     },
-    setSelectedPollutant(pollutant: string) {
+    setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
     }
   },

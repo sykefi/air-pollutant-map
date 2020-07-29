@@ -73,6 +73,7 @@
           role="option"
         >
           {{ pollutant.parlocRyhmaSelite }}
+          <span> ({{ pollutant.dbCol }})</span>
         </li>
       </ul>
     </div>
@@ -84,7 +85,7 @@ import { Vue } from "vue-property-decorator";
 import { Pollutant } from "./../types";
 import pollutantList from "./../pollutants.json";
 
-console.log("pollutantList", pollutantList);
+console.log("Read", pollutantList.length, "pollutants from JSON");
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -94,11 +95,18 @@ const findFocus = () => {
 let selectorElement: Element | null = null;
 let pollutantInputElement: Element | null = null;
 
+export const getDefaultPollutant = (): Pollutant => {
+  const defaultPollutants = pollutantList.filter((po) => po.dbCol === "s16");
+  console.log("Getting default pollutant", defaultPollutants[0]);
+  // @ts-ignore
+  return defaultPollutants[0];
+};
+
 export default Vue.extend({
   data() {
     return {
       pollutantOptions: pollutantList as Pollutant[],
-      selectedPollutant: null as Pollutant | null,
+      selectedPollutant: getDefaultPollutant() as Pollutant | null,
       pollutantInputValue: "" as string,
       showOptions: false as boolean,
       selectorState: "initial" as string
@@ -148,13 +156,26 @@ export default Vue.extend({
           break;
       }
     },
+    getPollutant: function (dbCol: string): Pollutant | undefined {
+      return this.pollutantOptions.filter((po) => po.dbCol === dbCol)[0];
+    },
     makeChoice: function (whichOption) {
-      this.pollutantInputValue = whichOption.textContent.trim();
-      this.$emit("set-selected-pollutant", this.pollutantInputValue);
+      // read pollutant identifier from hidden span element
+      const selectedDbCol = whichOption
+        .querySelector("span")
+        .textContent.replace(/[{()}]/g, "")
+        .trim();
+
+      const selectedPollutant = this.getPollutant(selectedDbCol);
+      if (selectedPollutant) {
+        this.setSelectedPollutant(selectedPollutant);
+      } else {
+        console.log("Could not select pollutant by id", selectedDbCol);
+      }
     },
     setSelectedPollutant: function (po: Pollutant) {
+      this.$emit("set-selected-pollutant", po);
       this.pollutantInputValue = po.parlocRyhmaSelite;
-      this.selectedPollutant = po;
     }
   },
   mounted() {
@@ -166,10 +187,15 @@ export default Vue.extend({
       }
     });
     selectorElement = document.querySelector("#pollutantSelector");
-    pollutantInputElement = selectorElement
-      ? selectorElement.querySelector("input")
-      : null;
+    pollutantInputElement = selectorElement ? selectorElement.querySelector("input") : null;
 
+    // filter pollutants to only the ones for which we have data
+    const dbCols = ["s16", "s15", "s22", "s13", "s28", "s29", "s27", "s43", "s5", "s18", "s3", "s12", "s1", "s7", "s8", "s14", "s19", "s17", "s38", "s40"] // prettier-ignore
+    this.pollutantOptions = this.pollutantOptions.filter((po) => dbCols.includes(po.dbCol));
+    this.pollutantOptions.sort((a, b) =>
+      a.parlocRyhmaSelite.localeCompare(b.parlocRyhmaSelite)
+    );
+    // set default pollutant
     this.pollutantOptions.forEach((po) => {
       if (po.dbCol === "s16") {
         this.setSelectedPollutant(po);
