@@ -1,30 +1,30 @@
 <template>
-  <div class="year-selector-div">
-    <label class="hidden-visually" for="custom-select-input">Vuosi</label>
-    <div class="selector-label" for="custom-select-input">Vuosi</div>
-    <div id="custom-select-status" class="hidden-visually" aria-live="polite"></div>
+  <div class="pollutant-selector-div">
+    <label class="hidden-visually" for="pollutant-select-input">Saastuke</label>
+    <div class="selector-label" for="pollutant-select-input">Saastuke</div>
+    <div id="pollutant-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
-      class="custom-select"
-      id="myCustomSelect"
+      class="pollutant-select"
+      id="pollutantSelector"
       v-on:click="handleSelectorClick"
       role="combobox"
       aria-haspopup="listbox"
-      aria-owns="custom-select-list"
+      aria-owns="pollutant-select-list"
     >
       <input
         type="text"
-        id="custom-select-input"
-        v-model="yearInputValue"
+        id="pollutant-select-input"
+        v-model="pollutantInputValue"
         class="select-css"
-        aria-describedby="custom-select-info"
+        aria-describedby="pollutant-select-info"
         aria-autocomplete="both"
-        aria-controls="custom-select-list"
+        aria-controls="pollutant-select-list"
         readonly
       />
-      <span id="custom-select-info" class="hidden-visually"
+      <span id="pollutant-select-info" class="hidden-visually"
         >Arrow down for options or start typing to filter.</span
       >
-      <span class="custom-select-icons">
+      <span class="pollutant-select-icons">
         <svg
           width="21"
           height="21"
@@ -62,12 +62,18 @@
         </svg>
       </span>
       <ul
-        v-bind:class="[showOptions ? '' : 'hidden-all', 'custom-select-options']"
-        id="custom-select-list"
+        v-bind:class="[showOptions ? '' : 'hidden-all', 'pollutant-select-options']"
+        id="pollutant-select-list"
         role="listbox"
       >
-        <li v-for="year in yearOptions" :key="year" tabindex="-1" role="option">
-          {{ year }}
+        <li
+          v-for="pollutant in pollutantOptions"
+          :key="pollutant.parlocRyhmaTunnus"
+          tabindex="-1"
+          role="option"
+        >
+          {{ pollutant.parlocRyhmaSelite }}
+          <span> ({{ pollutant.dbCol }})</span>
         </li>
       </ul>
     </div>
@@ -76,6 +82,10 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import { Pollutant } from "./../types";
+import pollutantList from "./../pollutants.json";
+
+console.log("Read", pollutantList.length, "pollutants from JSON");
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -83,19 +93,27 @@ const findFocus = () => {
 };
 
 let selectorElement: Element | null = null;
-let yearInputElement: Element | null = null;
+let pollutantInputElement: Element | null = null;
+
+export const getDefaultPollutant = (): Pollutant => {
+  const defaultPollutants = pollutantList.filter((po) => po.dbCol === "s16");
+  console.log("Getting default pollutant", defaultPollutants[0]);
+  // @ts-ignore
+  return defaultPollutants[0];
+};
 
 export default Vue.extend({
   data() {
     return {
-      yearOptions: [1990, 1995, 2000, 2005, 2010, 2015, 2018] as number[],
+      pollutantOptions: pollutantList as Pollutant[],
+      selectedPollutant: getDefaultPollutant() as Pollutant | null,
+      pollutantInputValue: "" as string,
       showOptions: false as boolean,
-      yearInputValue: 2015 as number,
       selectorState: "initial" as string
     };
   },
   methods: {
-    toggleYearSelector: function (open: boolean | undefined = undefined) {
+    togglePollutantSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
       } else {
@@ -109,50 +127,80 @@ export default Vue.extend({
       const currentFocus = findFocus();
       switch (this.selectorState) {
         case "initial":
-          this.toggleYearSelector(true);
+          this.togglePollutantSelector(true);
           this.setState("opened");
           break;
         case "opened":
-          if (currentFocus === yearInputElement) {
-            this.toggleYearSelector(false);
+          if (currentFocus === pollutantInputElement) {
+            this.togglePollutantSelector(false);
             this.setState("initial");
           } else if (currentFocus && currentFocus.tagName === "LI") {
             this.makeChoice(currentFocus);
-            this.toggleYearSelector(false);
+            this.togglePollutantSelector(false);
             this.setState("closed");
           }
           break;
-        case "filtered": // i.e. year was selected
+        case "filtered": // i.e. pollutant was selected
           if (currentFocus && currentFocus.tagName === "LI") {
             this.makeChoice(currentFocus);
-            this.toggleYearSelector(false);
+            this.togglePollutantSelector(false);
             this.setState("closed");
           } else {
-            this.toggleYearSelector();
+            this.togglePollutantSelector();
             this.setState(this.showOptions ? "opened" : "closed");
           }
           break;
         case "closed":
-          this.toggleYearSelector(true);
+          this.togglePollutantSelector(true);
           this.setState("filtered");
           break;
       }
     },
+    getPollutant: function (dbCol: string): Pollutant | undefined {
+      return this.pollutantOptions.filter((po) => po.dbCol === dbCol)[0];
+    },
     makeChoice: function (whichOption) {
-      this.yearInputValue = parseInt(whichOption.textContent.trim());
-      this.$emit("set-selected-year", this.yearInputValue);
+      // read pollutant identifier from hidden span element
+      const selectedDbCol = whichOption
+        .querySelector("span")
+        .textContent.replace(/[{()}]/g, "")
+        .trim();
+
+      const selectedPollutant = this.getPollutant(selectedDbCol);
+      if (selectedPollutant) {
+        this.setSelectedPollutant(selectedPollutant);
+      } else {
+        console.log("Could not select pollutant by id", selectedDbCol);
+      }
+    },
+    setSelectedPollutant: function (po: Pollutant) {
+      this.$emit("set-selected-pollutant", po);
+      this.pollutantInputValue = po.parlocRyhmaSelite;
     }
   },
   mounted() {
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (target && !target.closest("#myCustomSelect")) {
-        this.toggleYearSelector(false);
+      if (target && !target.closest("#pollutantSelector")) {
+        this.togglePollutantSelector(false);
         this.setState("initial");
       }
     });
-    selectorElement = document.querySelector("#myCustomSelect");
-    yearInputElement = selectorElement ? selectorElement.querySelector("input") : null;
+    selectorElement = document.querySelector("#pollutantSelector");
+    pollutantInputElement = selectorElement ? selectorElement.querySelector("input") : null;
+
+    // filter pollutants to only the ones for which we have data
+    const dbCols = ["s16", "s15", "s22", "s13", "s28", "s29", "s27", "s43", "s5", "s18", "s3", "s12", "s1", "s7", "s8", "s14", "s19", "s17", "s38", "s40"] // prettier-ignore
+    this.pollutantOptions = this.pollutantOptions.filter((po) => dbCols.includes(po.dbCol));
+    this.pollutantOptions.sort((a, b) =>
+      a.parlocRyhmaSelite.localeCompare(b.parlocRyhmaSelite)
+    );
+    // set default pollutant
+    this.pollutantOptions.forEach((po) => {
+      if (po.dbCol === "s16") {
+        this.setSelectedPollutant(po);
+      }
+    });
   }
 });
 </script>
@@ -162,12 +210,12 @@ export default Vue.extend({
   font-weight: 550;
   margin: 0 1px 1px 2px;
 }
-.year-selector-div {
+.pollutant-selector-div {
   background: #ffffff;
-  max-width: 6em;
+  max-width: 13em;
   margin: 12px;
 }
-.custom-select {
+.pollutant-select {
   position: relative;
 }
 .select-css {
@@ -203,7 +251,7 @@ export default Vue.extend({
   color: #222;
   outline: none;
 }
-.custom-select-icons {
+.pollutant-select-icons {
   pointer-events: none;
   position: absolute;
   top: 0.5em;
@@ -212,14 +260,14 @@ export default Vue.extend({
   border: 1px solid white;
   background: transparent;
 }
-.custom-select-options {
+.pollutant-select-options {
   border: 1px solid #aaa;
   border-radius: 0 0 0.25em 0.25em;
   line-height: 1.5;
   padding: 0;
   padding-top: 7px;
   margin: 0;
-  margin-top: -0.5em;
+  margin-top: -0.2em;
   list-style-type: none;
   font-weight: normal;
   cursor: pointer;
@@ -227,11 +275,14 @@ export default Vue.extend({
   position: absolute;
   width: calc(100% - 2px);
   background-color: #ffffff;
+  max-height: 400px;
+  overflow: auto;
 }
-.custom-select-options li {
+.pollutant-select-options li {
   padding: 0.5em;
+  font-size: 0.9em;
 }
-.custom-select-options li:hover {
+.pollutant-select-options li:hover {
   background: blue;
   color: #fff;
   border: 1px solid blue;

@@ -8,12 +8,14 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import { PropType } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import OSM from "ol/source/OSM";
 import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
+import { Pollutant } from "../types";
 
 const attribution = new Attribution({
   collapsible: true
@@ -22,7 +24,7 @@ const attribution = new Attribution({
 export default Vue.extend({
   props: {
     year: Number,
-    pollutant: String
+    pollutant: { type: Object as PropType<Pollutant> }
   },
   components: {
     OlGridDataLayer
