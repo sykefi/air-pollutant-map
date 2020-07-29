@@ -1,34 +1,32 @@
 import { FeatureLike } from "ol/Feature";
 
-const pollutantBreakValues: { [key: string]: number[] } = {
+const pollutantBreakPointValues: { [key: string]: number[] } = {
   s16: [0.01, 0.03, 0.07, 5, 2576],
   s17: [0.01, 0.03, 0.07, 5, 2576]
 };
+
+const colors: string[] = ["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"];
 
 const getFeatureColor = (
   breakPoints: number[],
   pollutant: string,
   feature: FeatureLike
-) => {
+): string => {
   const value = feature.get(pollutant);
-  if (value < breakPoints[0]) return "#fef0d9";
-  if (value < breakPoints[1]) return "#fdcc8a";
-  if (value < breakPoints[2]) return "#fc8d59";
-  if (value < breakPoints[3]) return "#e34a33";
-  if (value < breakPoints[4]) return "#b30000";
-  return "grey";
+  for (let i = 0; i <= 4; i++) {
+    if (value < breakPoints[i]) {
+      return colors[i];
+    }
+  }
+  return "grey"; //return default color "grey" if value is outside the breakpoint ranges
 };
 
-export const getColorFunction = (pollutant: string): Function | undefined => {
-  const breakPoints = pollutantBreakValues[pollutant];
+export const getColorFunction = (pollutantIdentifier: string): Function | undefined => {
+  // e.g. getColorFunction("s16")
+  const breakPoints = pollutantBreakPointValues[pollutantIdentifier];
   if (!breakPoints) {
-    console.log("could not find color function for pollutant", pollutant);
+    console.log("could not find color breakpoints for pollutant", pollutantIdentifier);
     return undefined;
   }
-  switch (pollutant) {
-    case "s16":
-      return (feature: FeatureLike) => getFeatureColor(breakPoints, pollutant, feature);
-    default:
-      undefined;
-  }
+  return (feature: FeatureLike) => getFeatureColor(breakPoints, pollutantIdentifier, feature);
 };

@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import { PropType } from "vue";
 import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";
@@ -11,18 +12,18 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
 import { getColorFunction } from "./../utils/PollutantStyles";
+import { Pollutant } from "../types";
 
 const outputFormat = "&outputFormat=application%2Fjson";
 const typeName = (table: string): string => "&typeName=paastotkartalla%3A" + table;
 const propFilter = (prop: string): string => "&propertyName=geom," + prop;
-const cqlFilter = (vuosi: number): string =>
-  `&cql_filter=(vuosi=%27${vuosi.toString()}%27)`;
+const cqlFilter = (vuosi: number): string => `&cql_filter=(vuosi=%27${vuosi.toString()}%27)`;
 
 export default Vue.extend({
   props: {
-    map: Map,
+    map: { type: Object as PropType<Map> },
     year: Number,
-    pollutant: String
+    pollutant: { type: Object as PropType<Pollutant> }
   },
   data() {
     return {
@@ -33,14 +34,21 @@ export default Vue.extend({
   },
   watch: {
     year: function (newVal, oldVal) {
-      console.log(`Year changed to ${newVal} (from ${oldVal}) - loading grid data...`);
+      console.log(`Year changed to ${newVal} (from ${oldVal}) - refreshing grid data...`);
+      this.layerSource.refresh();
+    },
+    pollutant: function (newVal: Pollutant, oldVal: Pollutant) {
+      console.log(
+        `Pollutant changed to ${newVal.parlocRyhmaSelite} (from ${oldVal.parlocRyhmaSelite}) - refreshing grid data...`
+      );
+      this.colorFunction = getColorFunction(newVal.dbCol);
       this.layerSource.refresh();
     }
   },
   mounted() {
     const gsUri = process.env.VUE_APP_GEOSERVER_URI;
     console.log("Using geoserver at:", gsUri);
-    console.log("mounting grid data:", this.pollutant, "of year", this.year);
+    console.log("mounting grid data:", this.pollutant.dbCol, "of year", this.year);
 
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
@@ -49,7 +57,7 @@ export default Vue.extend({
           gsUri +
           "ows?service=WFS&version=1.0.0&request=GetFeature" +
           typeName("p_gd_sample_2015_a") +
-          propFilter(this.pollutant) +
+          propFilter(this.pollutant.dbCol) +
           outputFormat +
           cqlFilter(this.year);
 
@@ -75,7 +83,7 @@ export default Vue.extend({
       strategy: allStrategy
     });
 
-    this.colorFunction = getColorFunction(this.pollutant);
+    this.colorFunction = getColorFunction(this.pollutant.dbCol);
     this.vectorLayer = new VectorLayer({
       source: this.layerSource,
       style: (feature) => {
