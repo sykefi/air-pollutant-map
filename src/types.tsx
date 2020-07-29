@@ -9,5 +9,5 @@ export interface Pollutant {
   kerroinRaportointiin: string;
   seliteRaportoinnissa: string;
   ryhma: string;
-  jarjestusraportissa: number;
+  jarjestusraportissa: number | string;
 }
