@@ -6,7 +6,23 @@ const pollutantBreakPointValues: { [key: string]: number[] } = {
   s17: [0.01, 0.03, 0.07, 5, 2576]
 };
 
+const calculatedBreakPointValues: { [key: string]: number[] } = {};
+
 const colors: string[] = ["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"];
+
+const calculateBreakPoints = (valueList: number[], classCount: number): number[] => {
+  const classSize = Math.round(valueList.length / classCount);
+  const breakPoints: number[] = [];
+  for (let i = 0; i < classCount; i++) {
+    const bp =
+      i !== classCount - 1
+        ? valueList[classSize + classSize * i]
+        : valueList[valueList.length - 1] + 1;
+    breakPoints.push(bp > 10 ? Math.round(bp) : bp);
+  }
+  console.log("Calculated breakPoints:", breakPoints);
+  return breakPoints;
+};
 
 const getFeatureColor = (
   breakPoints: number[],
@@ -22,16 +38,22 @@ const getFeatureColor = (
   return "grey"; //return default color "grey" if value is outside the breakpoint ranges
 };
 
-export const getColorFunction = (pollutant: Pollutant): Function | undefined => {
+export const getColorFunction = (
+  pollutant: Pollutant,
+  valueList: number[]
+): Function | undefined => {
   // e.g. getColorFunction("s16")
-  const breakPoints = pollutantBreakPointValues[pollutant.dbCol];
-  if (!breakPoints) {
-    console.log(
-      "Could not find style function for pollutant",
-      pollutant.parlocRyhmaSelite,
-      pollutant.dbCol
-    );
-    return undefined;
+  let breakPoints;
+  if (pollutantBreakPointValues[pollutant.dbCol]) {
+    breakPoints = pollutantBreakPointValues[pollutant.dbCol];
+    console.log("Found previously defined breakpoints for", pollutant.dbCol);
+  } else if (calculatedBreakPointValues[pollutant.dbCol]) {
+    breakPoints = calculatedBreakPointValues[pollutant.dbCol];
+    console.log("Found previously calculated breakpoints for", pollutant.dbCol);
+  } else {
+    console.log("Could not find breakpoints for pollutant, calculating new...");
+    calculatedBreakPointValues[pollutant.dbCol] = calculateBreakPoints(valueList, 5);
+    breakPoints = calculatedBreakPointValues[pollutant.dbCol];
   }
   return (feature: FeatureLike) => getFeatureColor(breakPoints, pollutant.dbCol, feature);
 };
@@ -51,12 +73,16 @@ export interface PollutantLegend {
 export const getPollutantLegendObject = (
   pollutant: Pollutant
 ): PollutantLegend | undefined => {
-  const breakPoints = pollutantBreakPointValues[pollutant.dbCol];
-  if (!breakPoints) {
+  let breakPoints;
+  if (pollutantBreakPointValues[pollutant.dbCol]) {
+    breakPoints = pollutantBreakPointValues[pollutant.dbCol];
+  } else if (calculatedBreakPointValues[pollutant.dbCol]) {
+    breakPoints = calculatedBreakPointValues[pollutant.dbCol];
+  } else {
     console.log("Failed to load legend for pollutant", pollutant.parlocRyhmaSelite);
     return undefined;
   }
-  const pollutantLegend: PollutantLegend = breakPoints.reduce(
+  return breakPoints.reduce(
     (legend, breakPoint, index) => {
       const prevBreakPoint = index > 0 ? breakPoints[index - 1] : 0;
       legend[index + 1] = { min: prevBreakPoint, max: breakPoint, color: colors[index] };
@@ -67,5 +93,4 @@ export const getPollutantLegendObject = (
       unit: pollutant.yksikko
     }
   );
-  return pollutantLegend;
 };
