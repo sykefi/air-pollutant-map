@@ -6,7 +6,8 @@
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="paastokartta-div">
-        <OlMap :year="year" :pollutant="pollutant" />
+        <OlMap :year="year" :pollutant="pollutant" @update-legend="updateLegend" />
+        <Legend v-if="legend" class="map-legend" :legend="legend" />
       </div>
     </div>
   </div>
@@ -16,14 +17,17 @@
 import { Vue } from "vue-property-decorator";
 import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
+import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
 import { Pollutant } from "./types";
+import { PollutantLegend } from "./utils/PollutantStyles";
 
 export default Vue.extend({
   data() {
     return {
       year: 2015 as number,
-      pollutant: getDefaultPollutant() as Pollutant
+      pollutant: getDefaultPollutant() as Pollutant,
+      legend: undefined as PollutantLegend | undefined
     };
   },
   methods: {
@@ -32,12 +36,16 @@ export default Vue.extend({
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
+    },
+    updateLegend(legend: PollutantLegend) {
+      this.legend = legend;
     }
   },
   components: {
     OlMap,
     SelectorYear,
-    SelectorPollutant
+    SelectorPollutant,
+    Legend
   }
 });
 </script>
@@ -62,13 +70,17 @@ export default Vue.extend({
   display: flex;
 }
 #paastokartta-div {
-  display: flex;
-  align-content: center;
-  justify-content: center;
+  position: relative;
   width: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+.map-legend {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
 }
 </style>
