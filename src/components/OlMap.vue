@@ -1,7 +1,12 @@
 <template>
   <div id="ol-map">
     <div v-if="isReady">
-      <OlGridDataLayer :year="year" :pollutant="pollutant" :map="map" />
+      <OlGridDataLayer
+        :year="year"
+        :pollutant="pollutant"
+        :map="map"
+        @update-legend="updateLegend"
+      />
     </div>
   </div>
 </template>
@@ -16,6 +21,7 @@ import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import { Pollutant } from "../types";
+import { PollutantLegend } from "../utils/PollutantStyles";
 
 const attribution = new Attribution({
   collapsible: true
@@ -28,6 +34,11 @@ export default Vue.extend({
   },
   components: {
     OlGridDataLayer
+  },
+  methods: {
+    updateLegend(legend: PollutantLegend) {
+      this.$emit("update-legend", legend);
+    }
   },
   data() {
     return {

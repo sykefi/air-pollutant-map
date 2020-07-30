@@ -159,7 +159,7 @@ export default Vue.extend({
 
 <style scoped>
 .selector-label {
-  font-weight: 550;
+  font-weight: 500;
   margin: 0 1px 1px 2px;
 }
 .year-selector-div {
