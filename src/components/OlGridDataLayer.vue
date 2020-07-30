@@ -11,7 +11,11 @@ import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
-import { getColorFunction } from "./../utils/PollutantStyles";
+import {
+  getColorFunction,
+  PollutantLegend,
+  getPollutantLegendObject
+} from "./../utils/PollutantStyles";
 import { Pollutant } from "../types";
 
 const outputFormat = "&outputFormat=application%2Fjson";
@@ -29,20 +33,31 @@ export default Vue.extend({
     return {
       layerSource: new VectorSource() as VectorSource,
       vectorLayer: new VectorLayer() as VectorLayer,
-      colorFunction: undefined as Function | undefined
+      colorFunction: undefined as Function | undefined,
+      legend: undefined as PollutantLegend | undefined
     };
   },
   watch: {
     year: function (newVal, oldVal) {
       console.log(`Year changed to ${newVal} (from ${oldVal}) - refreshing grid data...`);
-      this.layerSource.refresh();
+      this.refreshLayer();
     },
     pollutant: function (newVal: Pollutant, oldVal: Pollutant) {
       console.log(
         `Pollutant changed to ${newVal.parlocRyhmaSelite} (from ${oldVal.parlocRyhmaSelite}) - refreshing grid data...`
       );
-      this.colorFunction = getColorFunction(newVal.dbCol);
+      this.refreshLayer();
+    }
+  },
+  methods: {
+    refreshLayer() {
+      this.updateStyle(this.pollutant);
       this.layerSource.refresh();
+    },
+    updateStyle(pollutant: Pollutant) {
+      this.colorFunction = getColorFunction(pollutant);
+      this.legend = getPollutantLegendObject(pollutant);
+      this.$emit("update-legend", this.legend);
     }
   },
   mounted() {
@@ -83,7 +98,7 @@ export default Vue.extend({
       strategy: allStrategy
     });
 
-    this.colorFunction = getColorFunction(this.pollutant.dbCol);
+    this.updateStyle(this.pollutant);
     this.vectorLayer = new VectorLayer({
       source: this.layerSource,
       style: (feature) => {
