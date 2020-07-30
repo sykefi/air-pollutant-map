@@ -40,22 +40,18 @@ export default Vue.extend({
   watch: {
     year: function (newVal, oldVal) {
       console.log(`Year changed to ${newVal} (from ${oldVal}) - refreshing grid data...`);
-      this.refreshLayer();
+      this.layerSource.refresh();
     },
     pollutant: function (newVal: Pollutant, oldVal: Pollutant) {
       console.log(
         `Pollutant changed to ${newVal.parlocRyhmaSelite} (from ${oldVal.parlocRyhmaSelite}) - refreshing grid data...`
       );
-      this.refreshLayer();
+      this.layerSource.refresh();
     }
   },
   methods: {
-    refreshLayer() {
-      this.updateStyle(this.pollutant);
-      this.layerSource.refresh();
-    },
-    updateStyle(pollutant: Pollutant) {
-      this.colorFunction = getColorFunction(pollutant);
+    updateStyle(pollutant: Pollutant, valueList: number[]) {
+      this.colorFunction = getColorFunction(pollutant, valueList);
       this.legend = getPollutantLegendObject(pollutant);
       this.$emit("update-legend", this.legend);
     }
@@ -89,6 +85,12 @@ export default Vue.extend({
               // @ts-ignore
               this.layerSource.getFormat().readFeatures(xhr.responseText)
             );
+            const valueList = this.layerSource
+              .getFeatures()
+              .map((feat) => feat.get(this.pollutant.dbCol))
+              .filter((number) => number !== undefined && number !== null)
+              .sort((a, b) => a - b);
+            this.updateStyle(this.pollutant, valueList);
           } else {
             onError();
           }
@@ -98,7 +100,6 @@ export default Vue.extend({
       strategy: allStrategy
     });
 
-    this.updateStyle(this.pollutant);
     this.vectorLayer = new VectorLayer({
       source: this.layerSource,
       style: (feature) => {
