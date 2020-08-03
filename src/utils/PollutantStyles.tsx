@@ -1,14 +1,19 @@
 import { FeatureLike } from "ol/Feature";
 import { Pollutant, PollutantLegend } from "../types";
 
-const pollutantBreakPointValues: { [key: string]: number[] } = {
-  s16: [0.01, 0.03, 0.07, 5, 2576],
-  s17: [0.01, 0.03, 0.07, 5, 2576]
-};
+const pollutantBreakPointValues: { [key: string]: number[] } = {};
 
 const calculatedBreakPointValues: { [key: string]: number[] } = {};
 
-const colors: string[] = ["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"];
+const colors: string[] = [
+  "#1a9850",
+  "#91cf60",
+  "#d9ef8b",
+  "#ffffbf",
+  "#fee08b",
+  "#fc8d59",
+  "#d73027"
+];
 
 const calculateBreakPoints = (valueList: number[], classCount: number): number[] => {
   const classSize = Math.round(valueList.length / classCount);
@@ -33,7 +38,7 @@ const getFeatureColor = (
   if (!value) {
     return "grey"; // if value is null or undefined
   } else {
-    for (let i = 0; i <= 4; i++) {
+    for (let i = 0; i < breakPoints.length; i++) {
       if (value < breakPoints[i]) {
         return colors[i];
       }
@@ -59,14 +64,21 @@ export const hasBreakPoints = (pollutant: Pollutant): boolean => {
   );
 };
 
-export const setPollutantBreakPoints = (pollutant: Pollutant, valueList: number[]): void => {
+export const setPollutantBreakPoints = (
+  pollutant: Pollutant,
+  valueList: number[],
+  classCount: number
+): void => {
   const validSortedValues = valueList
     .filter((number) => number !== undefined && number !== null)
     .sort((a, b) => a - b);
   if (validSortedValues.length < 2000) {
     console.log(`Found only ${validSortedValues.length} valid values for pollutant`);
   }
-  calculatedBreakPointValues[pollutant.dbCol] = calculateBreakPoints(validSortedValues, 5);
+  calculatedBreakPointValues[pollutant.dbCol] = calculateBreakPoints(
+    validSortedValues,
+    classCount
+  );
 };
 
 export const getColorFunction = (
