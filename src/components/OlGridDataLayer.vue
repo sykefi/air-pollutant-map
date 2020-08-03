@@ -18,6 +18,7 @@ import { FeatureLike } from "ol/Feature";
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 const gridDataTable = "p_gd_sample_2015_a";
 const latestYear = 2018;
+const classCount = 7;
 
 export default Vue.extend({
   props: {
@@ -81,7 +82,7 @@ export default Vue.extend({
           const latestValues = this.layerSource
             .getFeatures()
             .map((feat) => feat.get(this.pollutant.dbCol));
-          styleUtils.setPollutantBreakPoints(pollutant, latestValues);
+          styleUtils.setPollutantBreakPoints(pollutant, latestValues, classCount);
           this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
         } else {
           // latest year needs to be fetched for pollutant for calculating breakpoints
@@ -91,7 +92,7 @@ export default Vue.extend({
           const latestValues = response.features.map(
             (feat) => feat.properties[pollutant.dbCol]
           );
-          styleUtils.setPollutantBreakPoints(pollutant, latestValues);
+          styleUtils.setPollutantBreakPoints(pollutant, latestValues, classCount);
           this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
           // for some reason this async style update needs to be triggered manually
           this.vectorLayer.setStyle(this.getOlStyle("update"));
