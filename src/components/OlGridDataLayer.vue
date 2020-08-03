@@ -30,7 +30,8 @@ export default Vue.extend({
       layerSource: new VectorSource() as VectorSource,
       vectorLayer: new VectorLayer() as VectorLayer,
       colorFunction: undefined as Function | undefined,
-      legend: undefined as PollutantLegend | undefined
+      legend: undefined as PollutantLegend | undefined,
+      cache: {} as { [key: string]: string }
     };
   },
   watch: {
@@ -104,26 +105,39 @@ export default Vue.extend({
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: () => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", this.getLoaderUrl(this.pollutant.dbCol, this.year));
-        const onError = () => {
-          console.log("error in wfs request");
-        };
-        xhr.onerror = onError;
-        xhr.onload = () => {
-          console.log("Fetched features for pollutant", this.pollutant.dbCol);
-          if (xhr.status == 200) {
-            this.layerSource.clear();
-            this.layerSource.addFeatures(
-              // @ts-ignore
-              this.layerSource.getFormat().readFeatures(xhr.responseText)
-            );
-            this.updateStyle(this.pollutant);
-          } else {
-            onError();
-          }
-        };
-        xhr.send();
+        const uri = this.getLoaderUrl(this.pollutant.dbCol, this.year);
+        if (uri in this.cache) {
+          console.log("Reading grid data from cache");
+          this.layerSource.clear();
+          this.layerSource.addFeatures(
+            // @ts-ignore
+            this.layerSource.getFormat().readFeatures(this.cache[uri])
+          );
+          this.updateStyle(this.pollutant);
+        } else {
+          console.log("Fetching grid data from WFS");
+          const xhr = new XMLHttpRequest();
+          xhr.open("GET", uri);
+          const onError = () => {
+            console.log("error in wfs request");
+          };
+          xhr.onerror = onError;
+          xhr.onload = () => {
+            console.log("Fetched features for pollutant", this.pollutant.dbCol);
+            if (xhr.status == 200) {
+              this.layerSource.clear();
+              this.layerSource.addFeatures(
+                // @ts-ignore
+                this.layerSource.getFormat().readFeatures(xhr.responseText)
+              );
+              this.updateStyle(this.pollutant);
+              this.cache[uri] = xhr.responseText;
+            } else {
+              onError();
+            }
+          };
+          xhr.send();
+        }
       },
       strategy: allStrategy
     });
