@@ -20,7 +20,7 @@ import SelectorYear from "./components/SelectorYear.vue";
 import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
 import { Pollutant } from "./types";
-import { PollutantLegend } from "./utils/PollutantStyles";
+import { PollutantLegend } from "./utils/pollutantStyles";
 
 export default Vue.extend({
   data() {
