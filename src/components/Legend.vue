@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { PropType } from "vue";
-import { PollutantLegend } from "./../utils/pollutantStyles";
+import { PollutantLegend } from "./../types";
 
 export default {
   props: {

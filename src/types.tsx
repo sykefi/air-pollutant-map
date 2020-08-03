@@ -11,3 +11,15 @@ export interface Pollutant {
   ryhma: string;
   jarjestusraportissa: number | string;
 }
+
+interface ValueRange {
+  min: number;
+  max: number;
+  color: string;
+}
+
+export interface PollutantLegend {
+  classNames: number[];
+  [key: number]: ValueRange;
+  unit: string;
+}

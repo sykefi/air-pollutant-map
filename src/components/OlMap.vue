@@ -21,7 +21,7 @@ import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import { Pollutant } from "../types";
-import { PollutantLegend } from "../utils/pollutantStyles";
+import { PollutantLegend } from "../types";
 
 const attribution = new Attribution({
   collapsible: true

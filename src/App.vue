@@ -19,8 +19,7 @@ import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
 import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
-import { Pollutant } from "./types";
-import { PollutantLegend } from "./utils/pollutantStyles";
+import { Pollutant, PollutantLegend } from "./types";
 
 export default Vue.extend({
   data() {
