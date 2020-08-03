@@ -67,6 +67,13 @@ export default Vue.extend({
       console.log(
         `Has breakpoints (${pollutant.dbCol})? ${styleUtils.hasBreakPoints(pollutant)}`
       );
+      const maxValue = Math.ceil(
+        Math.max(
+          ...this.layerSource.getFeatures().map((feat) => feat.get(this.pollutant.dbCol))
+        )
+      );
+      console.log("Found max value for the layer", maxValue);
+
       if (!styleUtils.hasBreakPoints(pollutant)) {
         // current layer is latest year, thus breakpoints can be calculated by it
         if (this.year === latestYear) {
@@ -75,7 +82,7 @@ export default Vue.extend({
             .getFeatures()
             .map((feat) => feat.get(this.pollutant.dbCol));
           styleUtils.setPollutantBreakPoints(pollutant, latestValues);
-          this.colorFunction = styleUtils.getColorFunction(pollutant);
+          this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
         } else {
           // latest year needs to be fetched for pollutant for calculating breakpoints
           console.log(`Fetching features of ${latestYear} and calculating breakpoints`);
@@ -85,16 +92,16 @@ export default Vue.extend({
             (feat) => feat.properties[pollutant.dbCol]
           );
           styleUtils.setPollutantBreakPoints(pollutant, latestValues);
-          this.colorFunction = styleUtils.getColorFunction(pollutant);
+          this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
           // for some reason this async style update needs to be triggered manually
           this.vectorLayer.setStyle(this.getOlStyle("update"));
         }
       } else {
-        console.log(`Updating to use previously created style function`);
-        this.colorFunction = styleUtils.getColorFunction(pollutant);
+        this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
+        console.log(`Updated to use previously created style function`);
       }
       // finally update legend to match the new style
-      this.legend = styleUtils.getPollutantLegendObject(pollutant);
+      this.legend = styleUtils.getPollutantLegendObject(pollutant, maxValue);
       this.$emit("update-legend", this.legend);
     }
   },

@@ -69,7 +69,10 @@ export const setPollutantBreakPoints = (pollutant: Pollutant, valueList: number[
   calculatedBreakPointValues[pollutant.dbCol] = calculateBreakPoints(validSortedValues, 5);
 };
 
-export const getColorFunction = (pollutant: Pollutant): Function | undefined => {
+export const getColorFunction = (
+  pollutant: Pollutant,
+  maxValue: number
+): Function | undefined => {
   const breakPoints = getBreakPoints(pollutant);
   if (!breakPoints) {
     console.log(
@@ -79,11 +82,14 @@ export const getColorFunction = (pollutant: Pollutant): Function | undefined => 
     );
     return undefined;
   }
+  // replace last breakpoint with given maxValue
+  breakPoints[breakPoints.length - 1] = maxValue;
   return (feature: FeatureLike) => getFeatureColor(breakPoints, pollutant.dbCol, feature);
 };
 
 export const getPollutantLegendObject = (
-  pollutant: Pollutant
+  pollutant: Pollutant,
+  maxValue: number
 ): PollutantLegend | undefined => {
   const breakPoints = getBreakPoints(pollutant);
   if (!breakPoints) {
@@ -97,8 +103,11 @@ export const getPollutantLegendObject = (
   // create and return legend object
   return breakPoints.reduce(
     (legend, breakPoint, index) => {
-      const prevBreakPoint = index > 0 ? breakPoints[index - 1] : 0;
-      legend[index + 1] = { min: prevBreakPoint, max: breakPoint, color: colors[index] };
+      // set 0 as the min value of the first range
+      const min = index > 0 ? breakPoints[index - 1] : 0;
+      // set given max value as the max value of the last range
+      const max = index < breakPoints.length - 1 ? breakPoint : maxValue;
+      legend[index + 1] = { min, max, color: colors[index] };
       return legend;
     },
     {
