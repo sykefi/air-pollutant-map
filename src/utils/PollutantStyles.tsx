@@ -43,9 +43,9 @@ const getFeatureColor = (
 };
 
 const getBreakPoints = (pollutant: Pollutant): number[] | undefined => {
-  if (pollutantBreakPointValues[pollutant.dbCol]) {
+  if (pollutant.dbCol in pollutantBreakPointValues) {
     return pollutantBreakPointValues[pollutant.dbCol];
-  } else if (calculatedBreakPointValues[pollutant.dbCol]) {
+  } else if (pollutant.dbCol in calculatedBreakPointValues) {
     return calculatedBreakPointValues[pollutant.dbCol];
   } else {
     return undefined;
@@ -53,14 +53,10 @@ const getBreakPoints = (pollutant: Pollutant): number[] | undefined => {
 };
 
 export const hasBreakPoints = (pollutant: Pollutant): boolean => {
-  if (
-    pollutantBreakPointValues[pollutant.dbCol] ||
-    calculatedBreakPointValues[pollutant.dbCol]
-  ) {
-    return true;
-  } else {
-    return false;
-  }
+  return (
+    pollutant.dbCol in pollutantBreakPointValues ||
+    pollutant.dbCol in calculatedBreakPointValues
+  );
 };
 
 export const setPollutantBreakPoints = (pollutant: Pollutant, valueList: number[]): void => {
