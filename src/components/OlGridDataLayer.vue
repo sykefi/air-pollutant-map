@@ -11,17 +11,13 @@ import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
-import {
-  getColorFunction,
-  PollutantLegend,
-  getPollutantLegendObject
-} from "./../utils/pollutantStyles";
-import { Pollutant } from "../types";
+import * as styleUtils from "./../utils/pollutantStyles";
+import { Pollutant, PollutantLegend } from "../types";
+import { FeatureLike } from "ol/Feature";
 
-const outputFormat = "&outputFormat=application%2Fjson";
-const typeName = (table: string): string => "&typeName=paastotkartalla%3A" + table;
-const propFilter = (prop: string): string => "&propertyName=geom," + prop;
-const cqlFilter = (vuosi: number): string => `&cql_filter=(vuosi=%27${vuosi.toString()}%27)`;
+const gsUri = process.env.VUE_APP_GEOSERVER_URI;
+const gridDataTable = "p_gd_sample_2015_a";
+const latestYear = 2018;
 
 export default Vue.extend({
   props: {
@@ -46,55 +42,83 @@ export default Vue.extend({
       console.log(
         `Pollutant changed to ${newVal.parlocRyhmaSelite} (from ${oldVal.parlocRyhmaSelite}) - refreshing grid data...`
       );
+      this.colorFunction = undefined;
       this.layerSource.refresh();
     }
   },
   methods: {
-    updateStyle(pollutant: Pollutant, valueList: number[]) {
-      this.colorFunction = getColorFunction(pollutant, valueList);
-      this.legend = getPollutantLegendObject(pollutant);
+    getLoaderUrl(dbCol: string, year: number): string {
+      const outputFormat = "&outputFormat=application%2Fjson";
+      return `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
+        &typeName=paastotkartalla%3A${gridDataTable}&propertyName=geom,${dbCol}
+        ${outputFormat}&cql_filter=(vuosi=%27${year}%27)`;
+    },
+    getOlStyle(debugMsg?: string) {
+      console.log(`Getting OL style (${debugMsg})`);
+      return (feature: FeatureLike) =>
+        new Style({
+          fill: new Fill({
+            color: this.colorFunction ? this.colorFunction(feature) : "rgba(255,255,255,0)"
+          })
+        });
+    },
+    async updateStyle(pollutant: Pollutant) {
+      console.log(
+        `Has breakpoints (${pollutant.dbCol})? ${styleUtils.hasBreakPoints(pollutant)}`
+      );
+      if (!styleUtils.hasBreakPoints(pollutant)) {
+        // current layer is latest year, thus breakpoints can be calculated by it
+        if (this.year === latestYear) {
+          console.log(`Calculating breakpoints from visible features (${latestYear})`);
+          const latestValues = this.layerSource
+            .getFeatures()
+            .map((feat) => feat.get(this.pollutant.dbCol));
+          styleUtils.setPollutantBreakPoints(pollutant, latestValues);
+          this.colorFunction = styleUtils.getColorFunction(pollutant);
+        } else {
+          // latest year needs to be fetched for pollutant for calculating breakpoints
+          console.log(`Fetching features of ${latestYear} and calculating breakpoints`);
+          const latestFeatures = await fetch(this.getLoaderUrl(pollutant.dbCol, latestYear));
+          const response = await latestFeatures.json();
+          const latestValues = response.features.map(
+            (feat) => feat.properties[pollutant.dbCol]
+          );
+          styleUtils.setPollutantBreakPoints(pollutant, latestValues);
+          this.colorFunction = styleUtils.getColorFunction(pollutant);
+          // for some reason this async style update needs to be triggered manually
+          this.vectorLayer.setStyle(this.getOlStyle("update"));
+        }
+      } else {
+        console.log(`Updating to use previously created style function`);
+        this.colorFunction = styleUtils.getColorFunction(pollutant);
+      }
+      // finally update legend to match the new style
+      this.legend = styleUtils.getPollutantLegendObject(pollutant);
       this.$emit("update-legend", this.legend);
     }
   },
   mounted() {
-    const gsUri = process.env.VUE_APP_GEOSERVER_URI;
     console.log("Using geoserver at:", gsUri);
     console.log("mounting grid data:", this.pollutant.dbCol, "of year", this.year);
 
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: () => {
-        const url =
-          gsUri +
-          "ows?service=WFS&version=1.0.0&request=GetFeature" +
-          typeName("p_gd_sample_2015_a") +
-          propFilter(this.pollutant.dbCol) +
-          outputFormat +
-          cqlFilter(this.year);
-
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
+        xhr.open("GET", this.getLoaderUrl(this.pollutant.dbCol, this.year));
         const onError = () => {
           console.log("error in wfs request");
         };
         xhr.onerror = onError;
         xhr.onload = () => {
+          console.log("Fetched features for pollutant", this.pollutant.dbCol);
           if (xhr.status == 200) {
             this.layerSource.clear();
             this.layerSource.addFeatures(
               // @ts-ignore
               this.layerSource.getFormat().readFeatures(xhr.responseText)
             );
-            const valueList = this.layerSource
-              .getFeatures()
-              .map((feat) => feat.get(this.pollutant.dbCol))
-              .filter((number) => number !== undefined && number !== null)
-              .sort((a, b) => a - b);
-
-            if (valueList.length < 5000) {
-              console.log(`Found only ${valueList.length} non null values for pollutant`);
-            }
-            this.updateStyle(this.pollutant, valueList);
+            this.updateStyle(this.pollutant);
           } else {
             onError();
           }
@@ -106,13 +130,7 @@ export default Vue.extend({
 
     this.vectorLayer = new VectorLayer({
       source: this.layerSource,
-      style: (feature) => {
-        return new Style({
-          fill: new Fill({
-            color: this.colorFunction ? this.colorFunction(feature) : "grey"
-          })
-        });
-      }
+      style: this.getOlStyle("initial")
     });
     this.map.addLayer(this.vectorLayer);
   }
