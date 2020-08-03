@@ -1,5 +1,5 @@
 import { FeatureLike } from "ol/Feature";
-import { Pollutant } from "./../types";
+import { Pollutant } from "../types";
 
 const pollutantBreakPointValues: { [key: string]: number[] } = {
   s16: [0.01, 0.03, 0.07, 5, 2576],
@@ -30,12 +30,16 @@ const getFeatureColor = (
   feature: FeatureLike
 ): string => {
   const value = feature.get(pollutant);
-  for (let i = 0; i <= 4; i++) {
-    if (value < breakPoints[i]) {
-      return colors[i];
+  if (!value) {
+    return "grey"; // if value is null or undefined
+  } else {
+    for (let i = 0; i <= 4; i++) {
+      if (value < breakPoints[i]) {
+        return colors[i];
+      }
     }
+    return "gray"; // if value is outside breakpoint ranges
   }
-  return "grey"; //return default color "grey" if value is outside the breakpoint ranges
 };
 
 export const getColorFunction = (
@@ -89,7 +93,7 @@ export const getPollutantLegendObject = (
       return legend;
     },
     {
-      classNames: [...Array(breakPoints.length).keys()].map((name) => name + 1),
+      classNames: [...Array(breakPoints.length).keys()].map((i) => i + 1),
       unit: pollutant.yksikko
     }
   );

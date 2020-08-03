@@ -15,7 +15,7 @@ import {
   getColorFunction,
   PollutantLegend,
   getPollutantLegendObject
-} from "./../utils/PollutantStyles";
+} from "./../utils/pollutantStyles";
 import { Pollutant } from "../types";
 
 const outputFormat = "&outputFormat=application%2Fjson";
@@ -90,6 +90,10 @@ export default Vue.extend({
               .map((feat) => feat.get(this.pollutant.dbCol))
               .filter((number) => number !== undefined && number !== null)
               .sort((a, b) => a - b);
+
+            if (valueList.length < 5000) {
+              console.log(`Found only ${valueList.length} non null values for pollutant`);
+            }
             this.updateStyle(this.pollutant, valueList);
           } else {
             onError();
