@@ -53,8 +53,8 @@ export default Vue.extend({
       controls: defaultControls({ attribution: false }).extend([attribution]),
       view: new View({
         projection: "EPSG:3857",
-        center: [2587716, 8599901],
-        zoom: 8
+        center: [2897716, 9389901],
+        zoom: 6
       })
     });
     this.map.once("postrender", () => {
@@ -68,7 +68,7 @@ export default Vue.extend({
 <style scoped>
 @import "~ol/ol.css";
 #ol-map {
-  height: 400px;
+  height: 900px;
   width: 100%;
   z-index: 0;
 }
