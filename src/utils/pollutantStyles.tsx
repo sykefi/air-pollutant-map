@@ -19,18 +19,15 @@ const getStandardDeviation = (array: number[], mean: number, n: number) => {
   return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 };
 
-const calculateBreakPoints = (valueList: number[], classCount: number): number[] => {
-  const classSize = Math.round(valueList.length / classCount);
-  const breakPoints: number[] = [];
-  for (let i = 0; i < classCount; i++) {
-    const bp =
-      i !== classCount - 1
-        ? valueList[classSize + classSize * i]
-        : valueList[valueList.length - 1] + 1;
-    breakPoints.push(bp > 10 ? Math.round(bp) : bp);
+const roundBreakPoint = (n: number) => {
+  // round breakpoint values to at least two significant figures
+  for (let i = 1; i < Math.pow(10, 10); i = i * 10) {
+    const divider = 10 / i;
+    if (n > divider) {
+      return Math.round(n * i) / i;
+    }
   }
-  console.log("Calculated breakPoints:", breakPoints);
-  return breakPoints;
+  return n;
 };
 
 const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): number[] => {
@@ -39,58 +36,34 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
   const std = getStandardDeviation(valueList, mean, n);
   const zList = valueList.map((value) => (value - mean) / std);
 
-  console.log("mean", mean);
-  console.log("std", std);
-  console.log("valueList", valueList);
-  console.log("zList", zList);
-
-  let normalValueCount = valueList[n - 1];
+  // calculate 0-2 adjusted breakpoints for classifying outliers, detect outliers by z-scores (1 & 3)
+  let firstOutlierBpIndex = valueList[n - 1];
   const outlierBreakPoints: number[] = [];
   for (let i = 0; i < n; i++) {
-    if (zList[i] > 0.5) {
+    if (zList[i] > 1) {
       if (outlierBreakPoints.length === 0) {
-        normalValueCount = i - 1;
-        outlierBreakPoints.push(valueList[i]);
+        firstOutlierBpIndex = i - 1;
+        outlierBreakPoints.push(roundBreakPoint(valueList[i]));
       }
-      if (zList[i] > 5) {
-        outlierBreakPoints.push(valueList[i]);
+      if (zList[i] > 3) {
+        outlierBreakPoints.push(roundBreakPoint(valueList[i]));
         break;
       }
     }
   }
-  const remainingClassCount = classCount - outlierBreakPoints.length;
-  const classSize = Math.round(normalValueCount / remainingClassCount);
 
+  // calculate normal breakpoints that will be set before the outlier-breakpoints
+  const normalClassCount = classCount - outlierBreakPoints.length;
+  const normalClassSize = Math.round(firstOutlierBpIndex / normalClassCount);
   const breakPoints: number[] = [];
-  for (let i = 0; i < remainingClassCount - 1; i++) {
-    const bp = valueList[classSize + classSize * i];
-    breakPoints[i] = bp > 10 ? Math.round(bp) : bp;
+  for (let i = 0; i < normalClassCount - 1; i++) {
+    const bp = valueList[normalClassSize + normalClassSize * i];
+    breakPoints[i] = roundBreakPoint(bp);
   }
 
+  // combine final breakpoints from normal breakpoints, outlier-adjusted breakpoints and highest value
   const combinedBreakPoints = breakPoints.concat(outlierBreakPoints, [valueList[n - 1]]);
-  console.log("breakPoints", breakPoints);
-  console.log("outlierBreakPoints", outlierBreakPoints);
-  console.log("combinedBreakPoints", combinedBreakPoints);
-
   return combinedBreakPoints;
-};
-
-const getFeatureColor = (
-  breakPoints: number[],
-  pollutant: string,
-  feature: FeatureLike
-): string => {
-  const value = feature.get(pollutant);
-  if (!value) {
-    return "grey"; // if value is null or undefined
-  } else {
-    for (let i = 0; i < breakPoints.length; i++) {
-      if (value < breakPoints[i]) {
-        return colors[i];
-      }
-    }
-    return "gray"; // if value is outside breakpoint ranges
-  }
 };
 
 const getBreakPoints = (pollutant: Pollutant): number[] | undefined => {
@@ -126,11 +99,24 @@ export const setPollutantBreakPoints = (
     validSortedValues,
     classCount
   );
+};
 
-  // calculatedBreakPointValues[pollutant.dbCol] = calculateBreakPoints(
-  //   validSortedValues,
-  //   classCount
-  // );
+const getFeatureColor = (
+  breakPoints: number[],
+  pollutant: string,
+  feature: FeatureLike
+): string => {
+  const value = feature.get(pollutant);
+  if (!value) {
+    return "grey"; // if value is null or undefined
+  } else {
+    for (let i = 0; i < breakPoints.length; i++) {
+      if (value < breakPoints[i]) {
+        return colors[i];
+      }
+    }
+    return "gray"; // if value is outside breakpoint ranges
+  }
 };
 
 export const getColorFunction = (
