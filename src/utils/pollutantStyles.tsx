@@ -5,7 +5,7 @@ const pollutantBreakPointValues: { [key: string]: number[] } = {};
 
 const calculatedBreakPointValues: { [key: string]: number[] } = {};
 
-const colors: string[] = [
+const colorScale: string[] = [
   "#1a9850",
   "#91cf60",
   "#d9ef8b",
@@ -39,15 +39,17 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
   // calculate 0-2 adjusted breakpoints for classifying outliers, detect outliers by z-scores (1 & 3)
   let firstOutlierBpIndex = valueList[n - 1];
   const outlierBreakPoints: number[] = [];
-  for (let i = 0; i < n; i++) {
-    if (zList[i] > 1) {
-      if (outlierBreakPoints.length === 0) {
-        firstOutlierBpIndex = i - 1;
-        outlierBreakPoints.push(roundBreakPoint(valueList[i]));
-      }
-      if (zList[i] > 3) {
-        outlierBreakPoints.push(roundBreakPoint(valueList[i]));
-        break;
+  if (valueList.length > 30) {
+    for (let i = 0; i < n; i++) {
+      if (zList[i] > 1) {
+        if (outlierBreakPoints.length === 0) {
+          firstOutlierBpIndex = i - 1;
+          outlierBreakPoints.push(roundBreakPoint(valueList[i]));
+        }
+        if (zList[i] > 3) {
+          outlierBreakPoints.push(roundBreakPoint(valueList[i]));
+          break;
+        }
       }
     }
   }
@@ -63,7 +65,8 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
 
   // combine final breakpoints from normal breakpoints, outlier-adjusted breakpoints and highest value
   const combinedBreakPoints = breakPoints.concat(outlierBreakPoints, [valueList[n - 1]]);
-  return combinedBreakPoints;
+  // filter out duplicate breakpoints
+  return combinedBreakPoints.filter((value, index, self) => self.indexOf(value) === index);
 };
 
 const getBreakPoints = (pollutant: Pollutant): number[] | undefined => {
@@ -93,6 +96,7 @@ export const setPollutantBreakPoints = (
     .sort((a, b) => a - b);
   if (validSortedValues.length < 2000) {
     console.log(`Found only ${validSortedValues.length} valid values for pollutant`);
+    console.log(validSortedValues);
   }
 
   calculatedBreakPointValues[pollutant.dbCol] = calculateAdjustedBreakPoints(
@@ -101,8 +105,28 @@ export const setPollutantBreakPoints = (
   );
 };
 
+const getColorArray = (colorScale: string[], breakPoints: number[]): string[] => {
+  // return default color scale if number of breakpoints (classes) and color match
+  if (breakPoints.length === colorScale.length) {
+    return colorScale;
+  } else if (breakPoints.length < colorScale.length) {
+    // else create subset of the color scale by the number of breakpoints (classes)
+    const colors: string[] = [];
+    for (let i = 1; i <= breakPoints.length; i++) {
+      const relativeColorPosition =
+        i === 1 ? 1 : Math.round((i / breakPoints.length) * colorScale.length);
+      colors[i - 1] = colorScale[relativeColorPosition - 1];
+    }
+    return colors;
+  } else {
+    console.error("Could not get color array (got more breakpoints than colours)");
+    return [];
+  }
+};
+
 const getFeatureColor = (
   breakPoints: number[],
+  colors: string[],
   pollutant: string,
   feature: FeatureLike
 ): string => {
@@ -132,9 +156,15 @@ export const getColorFunction = (
     );
     return undefined;
   }
-  // replace last breakpoint with given maxValue
-  breakPoints[breakPoints.length - 1] = maxValue;
-  return (feature: FeatureLike) => getFeatureColor(breakPoints, pollutant.dbCol, feature);
+  // replace last breakpoint with given maxValue if it is higher
+  const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
+  if (maxValue > secondLastBreakPoint) {
+    breakPoints[breakPoints.length - 1] = maxValue;
+  }
+  // get color scale by number of breakpoints
+  const colors = getColorArray(colorScale, breakPoints);
+  return (feature: FeatureLike) =>
+    getFeatureColor(breakPoints, colors, pollutant.dbCol, feature);
 };
 
 export const getPollutantLegendObject = (
@@ -150,13 +180,19 @@ export const getPollutantLegendObject = (
     );
     return undefined;
   }
+  const colors = getColorArray(colorScale, breakPoints);
+  // replace last breakpoint with given maxValue if it is higher
+  const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
+  if (maxValue > secondLastBreakPoint) {
+    breakPoints[breakPoints.length - 1] = maxValue;
+  }
   // create and return legend object
   return breakPoints.reduce(
     (legend, breakPoint, index) => {
       // set 0 as the min value of the first range
       const min = index > 0 ? breakPoints[index - 1] : 0;
       // set given max value as the max value of the last range
-      const max = index < breakPoints.length - 1 ? breakPoint : maxValue;
+      const max = breakPoint;
       legend[index + 1] = { min, max, color: colors[index] };
       return legend;
     },
