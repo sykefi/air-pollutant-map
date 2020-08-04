@@ -87,8 +87,10 @@ export default Vue.extend({
         } else {
           // latest year needs to be fetched for pollutant for calculating breakpoints
           console.log(`Fetching features of ${latestYear} and calculating breakpoints`);
-          const latestFeatures = await fetch(this.getLoaderUrl(pollutant.dbCol, latestYear));
+          const uri = this.getLoaderUrl(pollutant.dbCol, latestYear);
+          const latestFeatures = await fetch(uri);
           const response = await latestFeatures.json();
+          this.cache[uri] = response;
           const latestValues = response.features.map(
             (feat) => feat.properties[pollutant.dbCol]
           );
