@@ -16,7 +16,7 @@ import { Pollutant, PollutantLegend } from "../types";
 import { FeatureLike } from "ol/Feature";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
-const gridDataTable = "p_gd_sample_2015_a";
+const gridDataTable = "p_gd_test";
 const latestYear = 2018;
 const classCount = 7;
 
@@ -50,10 +50,11 @@ export default Vue.extend({
   },
   methods: {
     getLoaderUrl(dbCol: string, year: number): string {
-      const outputFormat = "&outputFormat=application%2Fjson";
-      return `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
-        &typeName=paastotkartalla%3A${gridDataTable}&propertyName=geom,${dbCol}
-        ${outputFormat}&cql_filter=(vuosi=%27${year}%27)`;
+      const outputFormat = "&outputFormat=application/json";
+      const uri = `http://kkxgsmapt2:8080/geoserver/paastotkartalla/ows?service=WFS&version=1.0.0
+      &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${dbCol}
+      ${outputFormat}&viewparams=year:${year};class:A_PublicPower`.replace(/ /g, "");
+      return encodeURI(uri);
     },
     getOlStyle(debugMsg?: string) {
       console.log(`Getting OL style (${debugMsg})`);
