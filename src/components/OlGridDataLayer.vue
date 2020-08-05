@@ -12,7 +12,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
-import { Pollutant, PollutantLegend } from "../types";
+import { Pollutant, PollutantLegend, Gnfr } from "../types";
 import { FeatureLike } from "ol/Feature";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
@@ -24,7 +24,8 @@ export default Vue.extend({
   props: {
     map: { type: Object as PropType<Map> },
     year: Number,
-    pollutant: { type: Object as PropType<Pollutant> }
+    pollutant: { type: Object as PropType<Pollutant> },
+    gnfr: { type: String as PropType<Gnfr> }
   },
   data() {
     return {
@@ -49,11 +50,11 @@ export default Vue.extend({
     }
   },
   methods: {
-    getLoaderUrl(dbCol: string, year: number): string {
+    getLoaderUrl(year: number): string {
       const outputFormat = "&outputFormat=application/json";
       const uri = `http://kkxgsmapt2:8080/geoserver/paastotkartalla/ows?service=WFS&version=1.0.0
-      &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${dbCol}
-      ${outputFormat}&viewparams=year:${year};class:A_PublicPower`.replace(/ /g, "");
+      &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${this.pollutant.dbCol}
+      ${outputFormat}&viewparams=year:${year};class:${this.gnfr}`.replace(/ /g, "");
       return encodeURI(uri);
     },
     getOlStyle(debugMsg?: string) {
@@ -65,9 +66,11 @@ export default Vue.extend({
           })
         });
     },
-    async updateStyle(pollutant: Pollutant) {
+    async updateStyle() {
       console.log(
-        `Has breakpoints (${pollutant.dbCol})? ${styleUtils.hasBreakPoints(pollutant)}`
+        `Has breakpoints (${this.pollutant.dbCol})? ${styleUtils.hasBreakPoints(
+          this.pollutant
+        )}`
       );
       const maxValue = Math.ceil(
         Math.max(
@@ -76,36 +79,36 @@ export default Vue.extend({
       );
       console.log("Found max value for the layer", maxValue);
 
-      if (!styleUtils.hasBreakPoints(pollutant)) {
+      if (!styleUtils.hasBreakPoints(this.pollutant)) {
         // current layer is latest year, thus breakpoints can be calculated by it
         if (this.year === latestYear) {
           console.log(`Calculating breakpoints from visible features (${latestYear})`);
           const latestValues = this.layerSource
             .getFeatures()
             .map((feat) => feat.get(this.pollutant.dbCol));
-          styleUtils.setPollutantBreakPoints(pollutant, latestValues, classCount);
-          this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
+          styleUtils.setPollutantBreakPoints(this.pollutant, latestValues, classCount);
+          this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
         } else {
           // latest year needs to be fetched for pollutant for calculating breakpoints
           console.log(`Fetching features of ${latestYear} and calculating breakpoints`);
-          const uri = this.getLoaderUrl(pollutant.dbCol, latestYear);
+          const uri = this.getLoaderUrl(latestYear);
           const latestFeatures = await fetch(uri);
           const response = await latestFeatures.json();
           this.cache[uri] = response;
           const latestValues = response.features.map(
-            (feat) => feat.properties[pollutant.dbCol]
+            (feat) => feat.properties[this.pollutant.dbCol]
           );
-          styleUtils.setPollutantBreakPoints(pollutant, latestValues, classCount);
-          this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
+          styleUtils.setPollutantBreakPoints(this.pollutant, latestValues, classCount);
+          this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
           // for some reason this async style update needs to be triggered manually
           this.vectorLayer.setStyle(this.getOlStyle("update"));
         }
       } else {
-        this.colorFunction = styleUtils.getColorFunction(pollutant, maxValue);
+        this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
         console.log(`Updated to use previously created style function`);
       }
       // finally update legend to match the new style
-      this.legend = styleUtils.getPollutantLegendObject(pollutant, maxValue);
+      this.legend = styleUtils.getPollutantLegendObject(this.pollutant, maxValue);
       this.$emit("update-legend", this.legend);
     }
   },
@@ -116,7 +119,7 @@ export default Vue.extend({
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: () => {
-        const uri = this.getLoaderUrl(this.pollutant.dbCol, this.year);
+        const uri = this.getLoaderUrl(this.year);
         if (uri in this.cache) {
           console.log("Reading grid data from cache");
           this.layerSource.clear();
@@ -124,7 +127,7 @@ export default Vue.extend({
             // @ts-ignore
             this.layerSource.getFormat().readFeatures(this.cache[uri])
           );
-          this.updateStyle(this.pollutant);
+          this.updateStyle();
         } else {
           console.log("Fetching grid data from WFS");
           const xhr = new XMLHttpRequest();
@@ -141,7 +144,7 @@ export default Vue.extend({
                 // @ts-ignore
                 this.layerSource.getFormat().readFeatures(xhr.responseText)
               );
-              this.updateStyle(this.pollutant);
+              this.updateStyle();
               this.cache[uri] = xhr.responseText;
             } else {
               onError();
