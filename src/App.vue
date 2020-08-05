@@ -6,7 +6,12 @@
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="paastokartta-div">
-        <OlMap :year="year" :pollutant="pollutant" @update-legend="updateLegend" />
+        <OlMap
+          :gnfr="gnfr"
+          :year="year"
+          :pollutant="pollutant"
+          @update-legend="updateLegend"
+        />
         <Legend v-if="legend" class="map-legend" :legend="legend" />
       </div>
     </div>
@@ -19,14 +24,15 @@ import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
 import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
-import { Pollutant, PollutantLegend } from "./types";
+import { Pollutant, PollutantLegend, Gnfr } from "./types";
 
 export default Vue.extend({
   data() {
     return {
       year: 2015 as number,
       pollutant: getDefaultPollutant() as Pollutant,
-      legend: undefined as PollutantLegend | undefined
+      legend: undefined as PollutantLegend | undefined,
+      gnfr: Gnfr.A_PublicPower as Gnfr
     };
   },
   methods: {

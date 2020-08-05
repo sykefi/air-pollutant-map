@@ -2,6 +2,7 @@
   <div id="ol-map">
     <div v-if="isReady">
       <OlGridDataLayer
+        :gnfr="gnfr"
         :year="year"
         :pollutant="pollutant"
         :map="map"
@@ -21,7 +22,7 @@ import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import { Pollutant } from "../types";
-import { PollutantLegend } from "../types";
+import { PollutantLegend, Gnfr } from "../types";
 
 const attribution = new Attribution({
   collapsible: true
@@ -30,7 +31,8 @@ const attribution = new Attribution({
 export default Vue.extend({
   props: {
     year: Number,
-    pollutant: { type: Object as PropType<Pollutant> }
+    pollutant: { type: Object as PropType<Pollutant> },
+    gnfr: { type: String as PropType<Gnfr> }
   },
   components: {
     OlGridDataLayer
