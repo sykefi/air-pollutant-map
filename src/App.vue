@@ -3,6 +3,7 @@
     <div id="app-wrapper">
       <div id="settings-panel">
         <SelectorYear @set-selected-year="setSelectedYear" />
+        <SelectorGnfr @set-selected-gnfr="setSelectedGnfr" />
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="paastokartta-div">
@@ -24,20 +25,24 @@ import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
 import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
+import SelectorGnfr from "./components/SelectorGnfr.vue";
 import { Pollutant, PollutantLegend, Gnfr } from "./types";
 
 export default Vue.extend({
   data() {
     return {
       year: 2015 as number,
+      gnfr: Gnfr.A_PUBLICPOWER as Gnfr,
       pollutant: getDefaultPollutant() as Pollutant,
-      legend: undefined as PollutantLegend | undefined,
-      gnfr: Gnfr.A_PublicPower as Gnfr
+      legend: undefined as PollutantLegend | undefined
     };
   },
   methods: {
     setSelectedYear(year: number) {
       this.year = year;
+    },
+    setSelectedGnfr(gnfr: Gnfr) {
+      this.gnfr = gnfr;
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
@@ -49,6 +54,7 @@ export default Vue.extend({
   components: {
     OlMap,
     SelectorYear,
+    SelectorGnfr,
     SelectorPollutant,
     Legend
   }
@@ -73,6 +79,7 @@ export default Vue.extend({
 #settings-panel {
   width: 100%;
   display: flex;
+  z-index: 3;
 }
 #paastokartta-div {
   position: relative;
@@ -86,6 +93,6 @@ export default Vue.extend({
   position: absolute;
   top: 10px;
   right: 10px;
-  z-index: 10;
+  z-index: 2;
 }
 </style>

@@ -37,14 +37,16 @@ export default Vue.extend({
     };
   },
   watch: {
-    year: function (newVal, oldVal) {
-      console.log(`Year changed to ${newVal} (from ${oldVal}) - refreshing grid data...`);
+    year: function (newVal) {
+      console.log(`Year changed to ${newVal}, refreshing grid data...`);
       this.layerSource.refresh();
     },
-    pollutant: function (newVal: Pollutant, oldVal: Pollutant) {
-      console.log(
-        `Pollutant changed to ${newVal.parlocRyhmaSelite} (from ${oldVal.parlocRyhmaSelite}) - refreshing grid data...`
-      );
+    gnfr: function (newVal: Gnfr) {
+      console.log(`Gnfr changed to ${newVal}, refreshing grid data...`);
+      this.layerSource.refresh();
+    },
+    pollutant: function (newVal: Pollutant) {
+      console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing grid data...`);
       this.colorFunction = undefined;
       this.layerSource.refresh();
     }
