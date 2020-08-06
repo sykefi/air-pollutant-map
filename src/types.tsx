@@ -25,16 +25,16 @@ export interface PollutantLegend {
 }
 
 export enum Gnfr {
-  I_Offroad = "I_Offroad",
-  A_PublicPower = "A_PublicPower",
-  K_AgriLivestock = "K_AgriLivestock",
-  G_Shipping = "G_Shipping",
-  H_Aviation = "H_Aviation",
-  F_RoadTransport = "F_RoadTransport",
-  B_Industry = "B_Industry",
-  C_OtherStationaryComb = "C_OtherStationaryComb",
-  L_AgriOther = "L_AgriOther",
-  E_Solvents = "E_Solvents",
-  J_Waste = "J_Waste",
-  D_Fugitive = "D_Fugitive"
+  I_OFFROAD = "I_Offroad",
+  A_PUBLICPOWER = "A_PublicPower",
+  K_AGRILIVESTOCK = "K_AgriLivestock",
+  G_SHIPPING = "G_Shipping",
+  H_AVIATION = "H_Aviation",
+  F_ROADTRANSPORT = "F_RoadTransport",
+  B_INDUSTRY = "B_Industry",
+  C_OTHERSTATIONARYCOMB = "C_OtherStationaryComb",
+  L_AGRIOTHER = "L_AgriOther",
+  E_SOLVENTS = "E_Solvents",
+  J_WASTE = "J_Waste",
+  D_FUGITIVE = "D_Fugitive"
 }

@@ -1,30 +1,30 @@
 <template>
-  <div class="pollutant-selector-div">
-    <label class="hidden-visually" for="pollutant-select-input">Saastuke</label>
-    <div class="selector-label" for="pollutant-select-input">Saastuke</div>
-    <div id="pollutant-select-status" class="hidden-visually" aria-live="polite"></div>
+  <div class="gnfr-selector-div">
+    <label class="hidden-visually" for="gnfr-select-input">Luokka</label>
+    <div class="selector-label" for="gnfr-select-input">Luokka</div>
+    <div id="gnfr-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
-      class="pollutant-select"
-      id="pollutantSelector"
+      class="gnfr-select"
+      id="gnfrSelector"
       v-on:click="handleSelectorClick"
       role="combobox"
       aria-haspopup="listbox"
-      aria-owns="pollutant-select-list"
+      aria-owns="gnfr-select-list"
     >
       <input
         type="text"
-        id="pollutant-select-input"
-        v-model="pollutantInputValue"
+        id="gnfr-select-input"
+        v-model="gnfrInputValue"
         class="select-css"
-        aria-describedby="pollutant-select-info"
+        aria-describedby="gnfr-select-info"
         aria-autocomplete="both"
-        aria-controls="pollutant-select-list"
+        aria-controls="gnfr-select-list"
         readonly
       />
-      <span id="pollutant-select-info" class="hidden-visually"
+      <span id="gnfr-select-info" class="hidden-visually"
         >Arrow down for options or start typing to filter.</span
       >
-      <span class="pollutant-select-icons">
+      <span class="gnfr-select-icons">
         <svg
           width="21"
           height="21"
@@ -62,18 +62,17 @@
         </svg>
       </span>
       <ul
-        v-bind:class="[showOptions ? '' : 'hidden-all', 'pollutant-select-options']"
-        id="pollutant-select-list"
+        v-bind:class="[showOptions ? '' : 'hidden-all', 'gnfr-select-options']"
+        id="gnfr-select-list"
         role="listbox"
       >
         <li
-          v-for="pollutant in pollutantOptions"
-          :key="pollutant.parlocRyhmaTunnus"
+          v-for="gnfr in gnfrOptions"
+          :key="gnfr.parlocRyhmaTunnus"
           tabindex="-1"
           role="option"
         >
-          {{ pollutant.parlocRyhmaSelite }}
-          <span> ({{ pollutant.dbCol }})</span>
+          <span> {{ gnfr }}</span>
         </li>
       </ul>
     </div>
@@ -82,10 +81,7 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
-import { Pollutant } from "./../types";
-import pollutantList from "./../pollutants.json";
-
-console.log("Read", pollutantList.length, "pollutants from JSON");
+import { Gnfr } from "./../types";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -93,27 +89,19 @@ const findFocus = () => {
 };
 
 let selectorElement: Element | null = null;
-let pollutantInputElement: Element | null = null;
-
-export const getDefaultPollutant = (): Pollutant => {
-  const defaultPollutants = pollutantList.filter((po) => po.dbCol === "s16");
-  console.log("Getting default pollutant", defaultPollutants[0]);
-  // @ts-ignore
-  return defaultPollutants[0];
-};
+let gnfrInputElement: Element | null = null;
 
 export default Vue.extend({
   data() {
     return {
-      pollutantOptions: pollutantList as Pollutant[],
-      selectedPollutant: getDefaultPollutant() as Pollutant | null, // TODO: this is not used?
-      pollutantInputValue: "" as string,
+      gnfrOptions: Object.values(Gnfr).sort() as Gnfr[],
+      gnfrInputValue: Gnfr.A_PUBLICPOWER as Gnfr,
       showOptions: false as boolean,
       selectorState: "initial" as string
     };
   },
   methods: {
-    togglePollutantSelector: function (open: boolean | undefined = undefined) {
+    toggleGnfrSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
       } else {
@@ -127,80 +115,60 @@ export default Vue.extend({
       const currentFocus = findFocus();
       switch (this.selectorState) {
         case "initial":
-          this.togglePollutantSelector(true);
+          this.toggleGnfrSelector(true);
           this.setState("opened");
           break;
         case "opened":
-          if (currentFocus === pollutantInputElement) {
-            this.togglePollutantSelector(false);
+          if (currentFocus === gnfrInputElement) {
+            this.toggleGnfrSelector(false);
             this.setState("initial");
           } else if (currentFocus && currentFocus.tagName === "LI") {
             this.makeChoice(currentFocus);
-            this.togglePollutantSelector(false);
+            this.toggleGnfrSelector(false);
             this.setState("closed");
           }
           break;
-        case "filtered": // i.e. pollutant was selected
+        case "filtered": // i.e. gnfr was selected
           if (currentFocus && currentFocus.tagName === "LI") {
             this.makeChoice(currentFocus);
-            this.togglePollutantSelector(false);
+            this.toggleGnfrSelector(false);
             this.setState("closed");
           } else {
-            this.togglePollutantSelector();
+            this.toggleGnfrSelector();
             this.setState(this.showOptions ? "opened" : "closed");
           }
           break;
         case "closed":
-          this.togglePollutantSelector(true);
+          this.toggleGnfrSelector(true);
           this.setState("filtered");
           break;
       }
     },
-    getPollutant: function (dbCol: string): Pollutant | undefined {
-      return this.pollutantOptions.filter((po) => po.dbCol === dbCol)[0];
-    },
     makeChoice: function (whichOption) {
-      // read pollutant identifier from hidden span element
-      const selectedDbCol = whichOption
+      // read gnfr identifier from span element
+      const selectedGnfr = whichOption
         .querySelector("span")
         .textContent.replace(/[{()}]/g, "")
         .trim();
 
-      const selectedPollutant = this.getPollutant(selectedDbCol);
-      if (selectedPollutant) {
-        this.setSelectedPollutant(selectedPollutant);
+      if (selectedGnfr) {
+        this.$emit("set-selected-gnfr", selectedGnfr);
+        this.gnfrInputValue = selectedGnfr;
       } else {
-        console.log("Could not select pollutant by id", selectedDbCol);
+        console.log("Could not select gnfr by id", selectedGnfr);
       }
-    },
-    setSelectedPollutant: function (po: Pollutant) {
-      this.$emit("set-selected-pollutant", po);
-      this.pollutantInputValue = po.parlocRyhmaSelite;
     }
   },
   mounted() {
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (target && !target.closest("#pollutantSelector")) {
-        this.togglePollutantSelector(false);
+      if (target && !target.closest("#gnfrSelector")) {
+        this.toggleGnfrSelector(false);
         this.setState("initial");
       }
     });
-    selectorElement = document.querySelector("#pollutantSelector");
-    pollutantInputElement = selectorElement ? selectorElement.querySelector("input") : null;
-
-    // filter pollutants to only the ones for which we have data
-    const dbCols = ["s16", "s15", "s22", "s13", "s28", "s29", "s27", "s43", "s5", "s18", "s3", "s12", "s1", "s7", "s8", "s14", "s19", "s17", "s38", "s40"] // prettier-ignore
-    this.pollutantOptions = this.pollutantOptions.filter((po) => dbCols.includes(po.dbCol));
-    this.pollutantOptions.sort((a, b) =>
-      a.parlocRyhmaSelite.localeCompare(b.parlocRyhmaSelite)
-    );
-    // set default pollutant
-    this.pollutantOptions.forEach((po) => {
-      if (po.dbCol === "s16") {
-        this.setSelectedPollutant(po);
-      }
-    });
+    selectorElement = document.querySelector("#gnfrSelector");
+    gnfrInputElement = selectorElement ? selectorElement.querySelector("input") : null;
   }
 });
 </script>
@@ -210,12 +178,12 @@ export default Vue.extend({
   font-weight: 500;
   margin: 0 1px 1px 2px;
 }
-.pollutant-selector-div {
+.gnfr-selector-div {
   background: #ffffff;
-  max-width: 13em;
+  max-width: 14em;
   margin: 12px;
 }
-.pollutant-select {
+.gnfr-select {
   position: relative;
 }
 .select-css {
@@ -251,7 +219,7 @@ export default Vue.extend({
   color: #222;
   outline: none;
 }
-.pollutant-select-icons {
+.gnfr-select-icons {
   pointer-events: none;
   position: absolute;
   top: 0.5em;
@@ -260,7 +228,7 @@ export default Vue.extend({
   border: 1px solid white;
   background: transparent;
 }
-.pollutant-select-options {
+.gnfr-select-options {
   border: 1px solid #aaa;
   border-radius: 0 0 0.25em 0.25em;
   line-height: 1.5;
@@ -278,11 +246,11 @@ export default Vue.extend({
   max-height: 400px;
   overflow: auto;
 }
-.pollutant-select-options li {
+.gnfr-select-options li {
   padding: 0.5em;
   font-size: 0.9em;
 }
-.pollutant-select-options li:hover {
+.gnfr-select-options li:hover {
   background: blue;
   color: #fff;
   border: 1px solid blue;
