@@ -132,13 +132,14 @@ const getFeatureColor = (
 ): string => {
   const value = feature.get(pollutant);
   if (!value) {
-    return "grey"; // if value is null or undefined
+    return "transparent"; // if value is null or undefined
   } else {
     for (let i = 0; i < breakPoints.length; i++) {
       if (value < breakPoints[i]) {
         return colors[i];
       }
     }
+    console.error("Feature value is outside breakpoint ranges");
     return "gray"; // if value is outside breakpoint ranges
   }
 };
