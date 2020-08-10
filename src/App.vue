@@ -27,12 +27,13 @@ import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import { Pollutant, PollutantLegend, Gnfr } from "./types";
+import * as constants from "./constants";
 
 export default Vue.extend({
   data() {
     return {
-      year: 2015 as number,
-      gnfr: Gnfr.A_PUBLICPOWER as Gnfr,
+      year: constants.initialYear as number,
+      gnfr: constants.initialGnfr as Gnfr,
       pollutant: getDefaultPollutant() as Pollutant,
       legend: undefined as PollutantLegend | undefined
     };

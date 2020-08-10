@@ -76,6 +76,7 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import * as constants from "./../constants";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -90,7 +91,7 @@ export default Vue.extend({
     return {
       yearOptions: [1990, 1995, 2000, 2005, 2010, 2015, 2018] as number[],
       showOptions: false as boolean,
-      yearInputValue: 2015 as number,
+      yearInputValue: constants.initialYear as number,
       selectorState: "initial" as string
     };
   },

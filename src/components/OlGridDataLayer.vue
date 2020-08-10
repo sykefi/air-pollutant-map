@@ -15,8 +15,8 @@ import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
 import { Pollutant, PollutantLegend, Gnfr } from "../types";
 import { FeatureLike } from "ol/Feature";
+import * as constants from "./../constants";
 
-const latestYear = 2018;
 const classCount = 7;
 
 export default Vue.extend({
@@ -74,20 +74,24 @@ export default Vue.extend({
       console.log("Found max value for the layer", maxValue);
 
       if (!styleUtils.hasBreakPoints(this.pollutant)) {
-        if (this.year === latestYear) {
-          // current layer is latest year, thus breakpoints can be calculated by it
-          console.log(`Calculating breakpoints from visible features (${latestYear})`);
+        if (this.gnfr === Gnfr.COMBINED && this.year === constants.latestYear) {
+          // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
+          console.log(
+            `Calculating breakpoints from visible features (${constants.latestYear})`
+          );
           const latestValues = this.layerSource
             .getFeatures()
             .map((feat) => feat.get(this.pollutant.dbCol));
           styleUtils.setPollutantBreakPoints(this.pollutant, latestValues, classCount);
           this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
         } else {
-          // latest year needs to be fetched for pollutant for calculating breakpoints
-          console.log(`Fetching features of ${latestYear} and calculating breakpoints`);
+          // combined pollutants from latest year need to be fetched for calculating breakpoints
+          console.log(
+            `Fetching features of ${constants.latestYear} and calculating breakpoints`
+          );
           const fc = await pollutantService.fetchFeatures(
-            latestYear,
-            this.gnfr,
+            constants.latestYear,
+            Gnfr.COMBINED,
             this.pollutant
           );
           const latestValues = fc.features.map(
