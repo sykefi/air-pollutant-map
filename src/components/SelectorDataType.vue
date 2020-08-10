@@ -90,8 +90,8 @@ export default Vue.extend({
 .selected-data-type {
   z-index: 3;
   cursor: auto;
-  color: #14a7fc;
-  border-color: #14a7fc;
-  background-color: #eefffe;
+  color: white;
+  border-color: rgba(0, 60, 136, 0.5);
+  background-color: rgba(0, 60, 136, 0.5);
 }
 </style>
