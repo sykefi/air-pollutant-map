@@ -25,6 +25,7 @@ export interface PollutantLegend {
 }
 
 export enum Gnfr {
+  COMBINED = "Combined",
   I_OFFROAD = "I_Offroad",
   A_PUBLICPOWER = "A_PublicPower",
   K_AGRILIVESTOCK = "K_AgriLivestock",

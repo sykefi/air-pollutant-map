@@ -82,10 +82,25 @@
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
 import { Gnfr } from "./../types";
+import * as constants from "./../constants";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
   return focusPoint;
+};
+
+const sortGnfrOptions = (a: Gnfr, b: Gnfr): number => {
+  if (a === Gnfr.COMBINED) {
+    return -1;
+  } else if (b === Gnfr.COMBINED) {
+    return 1;
+  }
+  if (a < b) {
+    return -1;
+  } else if (a > b) {
+    return 1;
+  }
+  return 0;
 };
 
 let selectorElement: Element | null = null;
@@ -94,8 +109,8 @@ let gnfrInputElement: Element | null = null;
 export default Vue.extend({
   data() {
     return {
-      gnfrOptions: Object.values(Gnfr).sort() as Gnfr[],
-      gnfrInputValue: Gnfr.A_PUBLICPOWER as Gnfr,
+      gnfrOptions: Object.values(Gnfr).sort(sortGnfrOptions) as Gnfr[],
+      gnfrInputValue: constants.initialGnfr as Gnfr,
       showOptions: false as boolean,
       selectorState: "initial" as string
     };
