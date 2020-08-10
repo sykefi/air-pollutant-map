@@ -39,3 +39,8 @@ export enum Gnfr {
   J_WASTE = "J_Waste",
   D_FUGITIVE = "D_Fugitive"
 }
+
+export enum MapDataType {
+  MUNICIPALITY = "Municipality",
+  GRID = "Grid"
+}
