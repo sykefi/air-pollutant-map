@@ -1,7 +1,7 @@
 import { FeatureLike } from "ol/Feature";
 import { Pollutant, PollutantLegend } from "../types";
 
-const pollutantBreakPointValues: { [key: string]: number[] } = {};
+const pollutantBreakPointValues: { [key: string]: number[] } = {}; // TODO this is deprecated -> remove?
 
 const calculatedBreakPointValues: { [key: string]: number[] } = {};
 
@@ -70,13 +70,13 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
 };
 
 const getBreakPoints = (pollutant: Pollutant): number[] | undefined => {
+  let breakPoints: number[] | undefined = undefined;
   if (pollutant.dbCol in pollutantBreakPointValues) {
-    return pollutantBreakPointValues[pollutant.dbCol];
+    breakPoints = pollutantBreakPointValues[pollutant.dbCol];
   } else if (pollutant.dbCol in calculatedBreakPointValues) {
-    return calculatedBreakPointValues[pollutant.dbCol];
-  } else {
-    return undefined;
+    breakPoints = calculatedBreakPointValues[pollutant.dbCol];
   }
+  return breakPoints ? [...breakPoints] : breakPoints;
 };
 
 export const hasBreakPoints = (pollutant: Pollutant): boolean => {
@@ -186,6 +186,9 @@ export const getPollutantLegendObject = (
   const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
   if (maxValue > secondLastBreakPoint) {
     breakPoints[breakPoints.length - 1] = maxValue;
+  } else {
+    // no values belong to the last class -> remove it from legend
+    breakPoints.splice(-1, 1);
   }
   // create and return legend object
   return breakPoints.reduce(
