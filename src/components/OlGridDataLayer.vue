@@ -12,11 +12,10 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
+import * as pollutantService from "./../services/pollutants";
 import { Pollutant, PollutantLegend, Gnfr } from "../types";
 import { FeatureLike } from "ol/Feature";
 
-const gsUri = process.env.VUE_APP_GEOSERVER_URI;
-const gridDataTable = "p_gd_test";
 const latestYear = 2018;
 const classCount = 7;
 
@@ -52,13 +51,6 @@ export default Vue.extend({
     }
   },
   methods: {
-    getLoaderUrl(year: number): string {
-      const outputFormat = "&outputFormat=application/json";
-      const uri = `http://kkxgsmapt2:8080/geoserver/paastotkartalla/ows?service=WFS&version=1.0.0
-      &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${this.pollutant.dbCol}
-      ${outputFormat}&viewparams=year:${year};class:${this.gnfr}`.replace(/ /g, "");
-      return encodeURI(uri);
-    },
     getOlStyle(debugMsg?: string) {
       console.log(`Getting OL style (${debugMsg})`);
       return (feature: FeatureLike) =>
@@ -82,8 +74,8 @@ export default Vue.extend({
       console.log("Found max value for the layer", maxValue);
 
       if (!styleUtils.hasBreakPoints(this.pollutant)) {
-        // current layer is latest year, thus breakpoints can be calculated by it
         if (this.year === latestYear) {
+          // current layer is latest year, thus breakpoints can be calculated by it
           console.log(`Calculating breakpoints from visible features (${latestYear})`);
           const latestValues = this.layerSource
             .getFeatures()
@@ -93,11 +85,12 @@ export default Vue.extend({
         } else {
           // latest year needs to be fetched for pollutant for calculating breakpoints
           console.log(`Fetching features of ${latestYear} and calculating breakpoints`);
-          const uri = this.getLoaderUrl(latestYear);
-          const latestFeatures = await fetch(uri);
-          const response = await latestFeatures.json();
-          this.cache[uri] = response;
-          const latestValues = response.features.map(
+          const fc = await pollutantService.fetchFeatures(
+            latestYear,
+            this.gnfr,
+            this.pollutant
+          );
+          const latestValues = fc.features.map(
             (feat) => feat.properties[this.pollutant.dbCol]
           );
           styleUtils.setPollutantBreakPoints(this.pollutant, latestValues, classCount);
@@ -115,45 +108,17 @@ export default Vue.extend({
     }
   },
   mounted() {
-    console.log("Using geoserver at:", gsUri);
     console.log("mounting grid data:", this.pollutant.dbCol, "of year", this.year);
-
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
-      loader: () => {
-        const uri = this.getLoaderUrl(this.year);
-        if (uri in this.cache) {
-          console.log("Reading grid data from cache");
-          this.layerSource.clear();
-          this.layerSource.addFeatures(
-            // @ts-ignore
-            this.layerSource.getFormat().readFeatures(this.cache[uri])
-          );
-          this.updateStyle();
-        } else {
-          console.log("Fetching grid data from WFS");
-          const xhr = new XMLHttpRequest();
-          xhr.open("GET", uri);
-          const onError = () => {
-            console.log("error in wfs request");
-          };
-          xhr.onerror = onError;
-          xhr.onload = () => {
-            console.log("Fetched features for pollutant", this.pollutant.dbCol);
-            if (xhr.status == 200) {
-              this.layerSource.clear();
-              this.layerSource.addFeatures(
-                // @ts-ignore
-                this.layerSource.getFormat().readFeatures(xhr.responseText)
-              );
-              this.updateStyle();
-              this.cache[uri] = xhr.responseText;
-            } else {
-              onError();
-            }
-          };
-          xhr.send();
-        }
+      loader: async () => {
+        const fc = await pollutantService.fetchFeatures(this.year, this.gnfr, this.pollutant);
+        this.layerSource.clear();
+        this.layerSource.addFeatures(
+          // @ts-ignore
+          this.layerSource.getFormat().readFeatures(fc)
+        );
+        this.updateStyle();
       },
       strategy: allStrategy
     });
