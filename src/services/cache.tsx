@@ -29,14 +29,14 @@ const removeCachedItem = (key: string): void => {
   }
 };
 
-export const setToCache = (key: string, data: any): void => {
-  setToCacheWithExpiry(key, data, null);
-};
-
 export const setToCacheWithExpiry = (key: string, data: any, maxAgeS: number | null) => {
   const timestamp = new Date().getTime();
   cache[key] = { data, timestamp, maxAgeS };
   keepCacheUnderMaxSize(key);
+};
+
+export const setToCache = (key: string, data: any): void => {
+  setToCacheWithExpiry(key, data, null);
 };
 
 export const getFromCache = (key: string): any | null => {
