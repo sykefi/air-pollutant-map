@@ -132,6 +132,11 @@ export default Vue.extend({
       style: this.getOlStyle("initial")
     });
     this.map.addLayer(this.vectorLayer);
+  },
+  destroyed() {
+    console.log("Removing grid data layer from the map");
+    this.$emit("update-legend", undefined);
+    this.map.removeLayer(this.vectorLayer);
   }
 });
 </script>

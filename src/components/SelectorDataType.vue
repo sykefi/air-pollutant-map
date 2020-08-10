@@ -57,7 +57,7 @@ export default Vue.extend({
 .map-data-type-selector-wrapper {
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.57);
-  padding: 6px;
+  padding: 5px;
   font-size: 0.9em;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
