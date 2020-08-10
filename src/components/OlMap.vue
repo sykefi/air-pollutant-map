@@ -1,6 +1,6 @@
 <template>
   <div id="ol-map">
-    <div v-if="isReady">
+    <div v-if="isReady && mapDataType === mapDataTypes.GRID">
       <OlGridDataLayer
         :gnfr="gnfr"
         :year="year"
@@ -21,7 +21,7 @@ import OSM from "ol/source/OSM";
 import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
-import { Pollutant } from "../types";
+import { Pollutant, MapDataType } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
 
 const attribution = new Attribution({
@@ -32,7 +32,8 @@ export default Vue.extend({
   props: {
     year: Number,
     pollutant: { type: Object as PropType<Pollutant> },
-    gnfr: { type: String as PropType<Gnfr> }
+    gnfr: { type: String as PropType<Gnfr> },
+    mapDataType: { type: String as PropType<MapDataType> }
   },
   components: {
     OlGridDataLayer
@@ -45,7 +46,8 @@ export default Vue.extend({
   data() {
     return {
       map: undefined as Map | undefined,
-      isReady: false as boolean
+      isReady: false as boolean,
+      mapDataTypes: Object(MapDataType)
     };
   },
   mounted() {

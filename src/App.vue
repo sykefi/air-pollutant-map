@@ -11,6 +11,7 @@
           :gnfr="gnfr"
           :year="year"
           :pollutant="pollutant"
+          :mapDataType="mapDataType"
           @update-legend="updateLegend"
         />
         <SelectorDataType
