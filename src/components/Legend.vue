@@ -1,12 +1,14 @@
 <template>
-  <div id="legend-box">
-    <div id="legend-title">Päästömäärä ({{ legend.unit }})</div>
-    <div class="legend-class-row" v-for="className in legend.classNames" :key="className">
-      <div
-        class="legend-color-box"
-        v-bind:style="{ backgroundColor: legend[className].color }"
-      />
-      <div>{{ legend[className].min }} - {{ legend[className].max }}</div>
+  <div>
+    <div id="legend-box">
+      <div id="legend-title">Päästömäärä ({{ legend.unit }})</div>
+      <div class="legend-class-row" v-for="className in legend.classNames" :key="className">
+        <div
+          class="legend-color-box"
+          v-bind:style="{ backgroundColor: legend[className].color }"
+        />
+        <div>{{ legend[className].min }} - {{ legend[className].max }}</div>
+      </div>
     </div>
   </div>
 </template>
