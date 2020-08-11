@@ -12,21 +12,20 @@
       </div>
     </div>
     <div class="olpopup" ref="olpopup" v-show="popupContent">
-      <span class="olpopup-closer" @click="closePopup">✖</span>
-      <div class="olpopup-content">{{ popupContent }}</div>
+      <OlMapPopup @close-popup="closePopup" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
-import { PropType } from "vue";
+import Vue, { PropType } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import OSM from "ol/source/OSM";
 import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
+import OlMapPopup from "./OlMapPopup.vue";
 import { Pollutant, MapDataType } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
 import Overlay from "ol/Overlay";
@@ -38,26 +37,15 @@ const attribution = new Attribution({
 });
 
 export default Vue.extend({
+  components: {
+    OlGridDataLayer,
+    OlMapPopup
+  },
   props: {
     year: Number,
     pollutant: { type: Object as PropType<Pollutant> },
     gnfr: { type: String as PropType<Gnfr> },
     mapDataType: { type: String as PropType<MapDataType> }
-  },
-  components: {
-    OlGridDataLayer
-  },
-  methods: {
-    updateLegend(legend: PollutantLegend) {
-      this.$emit("update-legend", legend);
-    },
-    closePopup() {
-      // Set the position of the pop-up window to undefined, and clear the coordinate data
-      if (this.overlay) {
-        this.overlay.setPosition(undefined);
-      }
-      this.popupContent = null;
-    }
   },
   data() {
     return {
@@ -67,6 +55,32 @@ export default Vue.extend({
       overlay: null as Overlay | null,
       popupContent: null as string | null
     };
+  },
+  methods: {
+    updateLegend(legend: PollutantLegend) {
+      this.$emit("update-legend", legend);
+    },
+    initializePopup() {
+      this.overlay = new Overlay({
+        // @ts-ignore
+        element: this.$refs.olpopup, // popup tag, in html
+        autoPan: true, // If the pop-up window is at the edge of the base image, the base image will move
+        autoPanAnimation: {
+          // Basemap moving animation
+          duration: 250
+        }
+      });
+      if (this.map) {
+        this.map.addOverlay(this.overlay);
+      }
+    },
+    closePopup() {
+      // Set the position of the pop-up window to undefined, and clear the coordinate data
+      if (this.overlay) {
+        this.overlay.setPosition(undefined);
+      }
+      this.popupContent = null;
+    }
   },
   mounted() {
     this.map = new Map({
@@ -83,16 +97,8 @@ export default Vue.extend({
       console.log("map is ready");
       this.isReady = true;
     });
-    this.overlay = new Overlay({
-      // @ts-ignore
-      element: this.$refs.olpopup, // popup tag, in html
-      autoPan: true, // If the pop-up window is at the edge of the base image, the base image will move
-      autoPanAnimation: {
-        // Basemap moving animation
-        duration: 250
-      }
-    });
-    this.map.addOverlay(this.overlay);
+    this.initializePopup();
+
     this.map.on("singleclick", (evt) => {
       const coordinate = evt.coordinate; // get coordinates
       const hdms = toStringHDMS(toLonLat(coordinate)); // Convert coordinate format
@@ -142,14 +148,5 @@ export default Vue.extend({
   bottom: -23px;
   left: 50%;
   transform: translateX(-50%);
-}
-/* Close popup button */
-.olpopup-closer {
-  cursor: pointer;
-  align-self: flex-end;
-  margin-bottom: 10px;
-}
-.olpopup-content {
-  color: blue;
 }
 </style>
