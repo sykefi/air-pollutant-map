@@ -8,11 +8,12 @@
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
+          @set-feature-popup="setFeaturePopup"
         />
       </div>
     </div>
-    <div class="olpopup" ref="olpopup" v-show="popupContent">
-      <OlMapPopup @close-popup="closePopup" />
+    <div class="olpopup" ref="olpopup" v-show="popupValue">
+      <OlMapPopup :popupValue="popupValue" :pollutant="pollutant" @close-popup="closePopup" />
     </div>
   </div>
 </template>
@@ -22,15 +23,14 @@ import Vue, { PropType } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import OSM from "ol/source/OSM";
+import Overlay from "ol/Overlay";
 import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
+import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import OlMapPopup from "./OlMapPopup.vue";
 import { Pollutant, MapDataType } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
-import Overlay from "ol/Overlay";
-import { toStringHDMS } from "ol/coordinate";
-import { toLonLat } from "ol/proj";
 
 const attribution = new Attribution({
   collapsible: true
@@ -53,11 +53,13 @@ export default Vue.extend({
       isReady: false as boolean,
       mapDataTypes: Object(MapDataType),
       overlay: null as Overlay | null,
-      popupContent: null as string | null
+      popupValue: null as number | null,
+      legend: undefined as PollutantLegend | undefined
     };
   },
   methods: {
     updateLegend(legend: PollutantLegend) {
+      this.legend = legend;
       this.$emit("update-legend", legend);
     },
     initializePopup() {
@@ -74,12 +76,21 @@ export default Vue.extend({
         this.map.addOverlay(this.overlay);
       }
     },
+    setFeaturePopup(coordinate: Coordinate, value: number) {
+      this.popupValue = value;
+      setTimeout(() => {
+        // Set the timer here, otherwise the pop-up window will appear for the first time, and the base map will be off-track
+        if (this.overlay) {
+          this.overlay.setPosition(coordinate);
+        }
+      }, 0);
+    },
     closePopup() {
       // Set the position of the pop-up window to undefined, and clear the coordinate data
       if (this.overlay) {
         this.overlay.setPosition(undefined);
       }
-      this.popupContent = null;
+      this.popupValue = null;
     }
   },
   mounted() {
@@ -98,19 +109,6 @@ export default Vue.extend({
       this.isReady = true;
     });
     this.initializePopup();
-
-    this.map.on("singleclick", (evt) => {
-      const coordinate = evt.coordinate; // get coordinates
-      const hdms = toStringHDMS(toLonLat(coordinate)); // Convert coordinate format
-      this.popupContent = hdms;
-      setTimeout(() => {
-        // Set the position of the pop-up window
-        // Set the timer here, otherwise the pop-up window will appear for the first time, and the base map will be off-track
-        if (this.overlay) {
-          this.overlay.setPosition(coordinate);
-        }
-      }, 0);
-    });
   }
 });
 </script>
@@ -124,7 +122,7 @@ export default Vue.extend({
 }
 /* Pop-up window style */
 .olpopup {
-  min-width: 280px;
+  min-width: max-content;
   position: absolute;
   background: #fff;
   padding: 8px 16px;

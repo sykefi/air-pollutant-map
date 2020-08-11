@@ -109,6 +109,25 @@ export default Vue.extend({
       // finally update legend to match the new style
       this.legend = styleUtils.getPollutantLegendObject(this.pollutant, maxValue);
       this.$emit("update-legend", this.legend);
+    },
+    async setFeaturePopup(event) {
+      const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
+      if (feats.length > 0) {
+        this.$emit(
+          "set-feature-popup",
+          event.coordinate,
+          feats[0].getProperties()[this.pollutant.dbCol]
+        );
+      } else {
+        console.log("nod features found on click -> cannot set popup");
+      }
+    },
+    enableShowFeaturePopupOnClick() {
+      this.map.on("singleclick", this.setFeaturePopup);
+    },
+    disableShowFeaturePopupOnClick() {
+      this.map.un("singleclick", this.setFeaturePopup);
+      this.$emit("set-feature-popup", undefined, null);
     }
   },
   mounted() {
@@ -132,10 +151,12 @@ export default Vue.extend({
       style: this.getOlStyle("initial")
     });
     this.map.addLayer(this.vectorLayer);
+    this.enableShowFeaturePopupOnClick();
   },
   destroyed() {
     console.log("Removing grid data layer from the map");
     this.$emit("update-legend", undefined);
+    this.disableShowFeaturePopupOnClick();
     this.map.removeLayer(this.vectorLayer);
   }
 });
