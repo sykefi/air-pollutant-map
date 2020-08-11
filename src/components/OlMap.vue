@@ -12,6 +12,7 @@
         />
       </div>
     </div>
+    <Legend v-if="legend" id="map-legend-container" :legend="legend" />
     <div class="olpopup" ref="olpopup" v-show="popupValue">
       <OlMapPopup :popupValue="popupValue" :pollutant="pollutant" @close-popup="closePopup" />
     </div>
@@ -29,6 +30,7 @@ import { Attribution, defaults as defaultControls } from "ol/control";
 import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import OlMapPopup from "./OlMapPopup.vue";
+import Legend from "./Legend.vue";
 import { Pollutant, MapDataType } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
 
@@ -39,7 +41,8 @@ const attribution = new Attribution({
 export default Vue.extend({
   components: {
     OlGridDataLayer,
-    OlMapPopup
+    OlMapPopup,
+    Legend
   },
   props: {
     year: Number,
@@ -60,7 +63,6 @@ export default Vue.extend({
   methods: {
     updateLegend(legend: PollutantLegend) {
       this.legend = legend;
-      this.$emit("update-legend", legend);
     },
     initializePopup() {
       this.overlay = new Overlay({
@@ -119,6 +121,12 @@ export default Vue.extend({
   height: 900px;
   width: 100%;
   z-index: 0;
+}
+#map-legend-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
 }
 /* Pop-up window style */
 .olpopup {

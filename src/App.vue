@@ -7,43 +7,41 @@
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="map-container">
-        <OlMap
-          :gnfr="gnfr"
-          :year="year"
-          :pollutant="pollutant"
-          :mapDataType="mapDataType"
-          @update-legend="updateLegend"
-        />
+        <OlMap :gnfr="gnfr" :year="year" :pollutant="pollutant" :mapDataType="mapDataType" />
         <SelectorDataType
           id="map-data-type-selector-container"
           :mapDataType="mapDataType"
           @select-map-data-type="selectMapDataType"
         />
-        <Legend v-if="legend" id="map-legend-container" :legend="legend" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
+import Vue from "vue";
 import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
 import SelectorDataType from "./components/SelectorDataType.vue";
-import Legend from "./components/Legend.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
-import { Pollutant, PollutantLegend, Gnfr, MapDataType } from "./types";
+import { Pollutant, Gnfr, MapDataType } from "./types";
 import * as constants from "./constants";
 
 export default Vue.extend({
+  components: {
+    OlMap,
+    SelectorYear,
+    SelectorGnfr,
+    SelectorPollutant,
+    SelectorDataType
+  },
   data() {
     return {
       year: constants.initialYear as number,
       gnfr: constants.initialGnfr as Gnfr,
       pollutant: getDefaultPollutant() as Pollutant,
-      mapDataType: MapDataType.GRID as MapDataType,
-      legend: undefined as PollutantLegend | undefined
+      mapDataType: MapDataType.GRID as MapDataType
     };
   },
   methods: {
@@ -58,18 +56,7 @@ export default Vue.extend({
     },
     selectMapDataType(mapDataType: MapDataType) {
       this.mapDataType = mapDataType;
-    },
-    updateLegend(legend: PollutantLegend) {
-      this.legend = legend;
     }
-  },
-  components: {
-    OlMap,
-    SelectorYear,
-    SelectorGnfr,
-    SelectorPollutant,
-    SelectorDataType,
-    Legend
   }
 });
 </script>
@@ -106,11 +93,5 @@ export default Vue.extend({
   position: absolute;
   top: 9px;
   left: 50px;
-}
-#map-legend-container {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
 }
 </style>
