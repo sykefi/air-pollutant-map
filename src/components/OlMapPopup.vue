@@ -2,7 +2,12 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      {{ roundPollutantValue(popupValue) }} {{ pollutant.yksikko }}
+      <div class="olpopup-title">
+        {{ pollutant.parlocRyhmaSelite }} ({{ pollutant.yksikko }}):
+      </div>
+      <div class="olpopup-value">
+        <span class="olpopup-value">{{ roundPollutantValue(popupValue) }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -21,7 +26,7 @@ export default Vue.extend({
       this.$emit("close-popup");
     },
     roundPollutantValue(n: number) {
-      // round breakpoint values to at least two significant figures
+      // rounds value to at least two significant figures
       for (let i = 10; i < Math.pow(10, 10); i = i * 10) {
         const divider = 10 / i;
         if (n > divider) {
@@ -44,8 +49,14 @@ export default Vue.extend({
   margin-bottom: 10px;
 }
 .olpopup-content {
-  padding: 3px 22px 3px 3px;
+  padding: 3px 22px 2px 3px;
   color: black;
   font-weight: 550;
+}
+.olpopup-title {
+  margin-bottom: 4px;
+}
+.olpopup-value {
+  color: #007ac9;
 }
 </style>
