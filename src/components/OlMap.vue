@@ -1,26 +1,36 @@
 <template>
-  <div id="ol-map">
-    <div v-if="isReady && mapDataType === mapDataTypes.GRID">
-      <OlGridDataLayer
-        :gnfr="gnfr"
-        :year="year"
-        :pollutant="pollutant"
-        :map="map"
-        @update-legend="updateLegend"
-      />
+  <div>
+    <div id="ol-map">
+      <div v-if="isReady && mapDataType === mapDataTypes.GRID">
+        <OlGridDataLayer
+          :gnfr="gnfr"
+          :year="year"
+          :pollutant="pollutant"
+          :map="map"
+          @update-legend="updateLegend"
+          @set-feature-popup="setFeaturePopup"
+        />
+      </div>
+    </div>
+    <Legend v-if="legend" id="map-legend-container" :legend="legend" />
+    <div class="olpopup" ref="olpopup" v-show="popupValue">
+      <OlMapPopup :popupValue="popupValue" :pollutant="pollutant" @close-popup="closePopup" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
-import { PropType } from "vue";
+import Vue, { PropType } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import OSM from "ol/source/OSM";
+import Overlay from "ol/Overlay";
 import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
+import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
+import OlMapPopup from "./OlMapPopup.vue";
+import Legend from "./Legend.vue";
 import { Pollutant, MapDataType } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
 
@@ -29,26 +39,61 @@ const attribution = new Attribution({
 });
 
 export default Vue.extend({
+  components: {
+    OlGridDataLayer,
+    OlMapPopup,
+    Legend
+  },
   props: {
     year: Number,
     pollutant: { type: Object as PropType<Pollutant> },
     gnfr: { type: String as PropType<Gnfr> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
-  components: {
-    OlGridDataLayer
-  },
-  methods: {
-    updateLegend(legend: PollutantLegend) {
-      this.$emit("update-legend", legend);
-    }
-  },
   data() {
     return {
       map: undefined as Map | undefined,
       isReady: false as boolean,
-      mapDataTypes: Object(MapDataType)
+      mapDataTypes: Object(MapDataType),
+      overlay: null as Overlay | null,
+      popupValue: null as number | null,
+      legend: undefined as PollutantLegend | undefined
     };
+  },
+  methods: {
+    updateLegend(legend: PollutantLegend) {
+      this.legend = legend;
+    },
+    initializePopup() {
+      this.overlay = new Overlay({
+        // @ts-ignore
+        element: this.$refs.olpopup, // popup tag, in html
+        autoPan: true, // If the pop-up window is at the edge of the base image, the base image will move
+        autoPanAnimation: {
+          // Basemap moving animation
+          duration: 250
+        }
+      });
+      if (this.map) {
+        this.map.addOverlay(this.overlay);
+      }
+    },
+    setFeaturePopup(coordinate: Coordinate, value: number) {
+      this.popupValue = value;
+      setTimeout(() => {
+        // Set the timer here, otherwise the pop-up window will appear for the first time, and the base map will be off-track
+        if (this.overlay) {
+          this.overlay.setPosition(coordinate);
+        }
+      }, 0);
+    },
+    closePopup() {
+      // Set the position of the pop-up window to undefined, and clear the coordinate data
+      if (this.overlay) {
+        this.overlay.setPosition(undefined);
+      }
+      this.popupValue = null;
+    }
   },
   mounted() {
     this.map = new Map({
@@ -65,6 +110,7 @@ export default Vue.extend({
       console.log("map is ready");
       this.isReady = true;
     });
+    this.initializePopup();
   }
 });
 </script>
@@ -75,5 +121,38 @@ export default Vue.extend({
   height: 900px;
   width: 100%;
   z-index: 0;
+}
+#map-legend-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+/* Pop-up window style */
+.olpopup {
+  min-width: max-content;
+  position: absolute;
+  background: #fff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  transform: translate(-50%, calc(-100% - 12px));
+}
+/* The small triangle below the pop-up window */
+.olpopup:after,
+.olpopup:before {
+  display: block;
+  content: "";
+  width: 0;
+  height: 0;
+  position: absolute;
+  border: 12px solid transparent;
+  border-top-color: #fff;
+  bottom: -23px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>
