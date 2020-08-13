@@ -11,6 +11,15 @@
           @set-feature-popup="setFeaturePopup"
         />
       </div>
+      <div v-if="isReady && mapDataType === mapDataTypes.MUNICIPALITY">
+        <OlMuniDataLayer
+          :year="year"
+          :pollutant="pollutant"
+          :map="map"
+          @update-legend="updateLegend"
+          @set-feature-popup="setFeaturePopup"
+        />
+      </div>
     </div>
     <Legend v-if="legend" id="map-legend-container" :legend="legend" />
     <div class="olpopup" ref="olpopup" v-show="popupValue">
@@ -29,6 +38,7 @@ import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
+import OlMuniDataLayer from "./OlMuniDataLayer.vue";
 import OlMapPopup from "./OlMapPopup.vue";
 import Legend from "./Legend.vue";
 import { Pollutant, MapDataType } from "../types";
@@ -41,6 +51,7 @@ const attribution = new Attribution({
 export default Vue.extend({
   components: {
     OlGridDataLayer,
+    OlMuniDataLayer,
     OlMapPopup,
     Legend
   },

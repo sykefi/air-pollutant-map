@@ -3,8 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
-import { PropType } from "vue";
+import Vue, { PropType } from "vue";
 import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";
@@ -13,7 +12,7 @@ import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
-import { Pollutant, PollutantLegend, Gnfr, MapDataType } from "../types";
+import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import * as constants from "./../constants";
 
@@ -23,8 +22,7 @@ export default Vue.extend({
   props: {
     map: { type: Object as PropType<Map> },
     year: Number,
-    pollutant: { type: Object as PropType<Pollutant> },
-    gnfr: { type: String as PropType<Gnfr> }
+    pollutant: { type: Object as PropType<Pollutant> }
   },
   data() {
     return {
@@ -37,15 +35,11 @@ export default Vue.extend({
   },
   watch: {
     year: function (newVal) {
-      console.log(`Year changed to ${newVal}, refreshing grid data...`);
-      this.layerSource.refresh();
-    },
-    gnfr: function (newVal: Gnfr) {
-      console.log(`Gnfr changed to ${newVal}, refreshing grid data...`);
+      console.log(`Year changed to ${newVal}, refreshing muni data...`);
       this.layerSource.refresh();
     },
     pollutant: function (newVal: Pollutant) {
-      console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing grid data...`);
+      console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing muni data...`);
       this.colorFunction = undefined;
       this.layerSource.refresh();
     }
@@ -63,7 +57,7 @@ export default Vue.extend({
     async updateStyle() {
       console.log(
         `Has breakpoints (${this.pollutant.dbCol})? ${styleUtils.hasBreakPoints(
-          MapDataType.GRID,
+          MapDataType.MUNICIPALITY,
           this.pollutant
         )}`
       );
@@ -74,8 +68,8 @@ export default Vue.extend({
       );
       console.log("Found max value for the layer", maxValue);
 
-      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant)) {
-        if (this.gnfr === Gnfr.COMBINED && this.year === constants.latestYear) {
+      if (!styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.pollutant)) {
+        if (this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
             `Calculating breakpoints from visible features (${constants.latestYear})`
@@ -84,13 +78,13 @@ export default Vue.extend({
             .getFeatures()
             .map((feat) => feat.get(this.pollutant.dbCol));
           styleUtils.setPollutantBreakPoints(
-            MapDataType.GRID,
+            MapDataType.MUNICIPALITY,
             this.pollutant,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
-            MapDataType.GRID,
+            MapDataType.MUNICIPALITY,
             this.pollutant,
             maxValue
           );
@@ -99,22 +93,21 @@ export default Vue.extend({
           console.log(
             `Fetching features of ${constants.latestYear} and calculating breakpoints`
           );
-          const fc = await pollutantService.fetchFeatures(
+          const fc = await pollutantService.fetchMuniFeatures(
             constants.latestYear,
-            Gnfr.COMBINED,
             this.pollutant
           );
           const latestValues = fc.features.map(
             (feat) => feat.properties[this.pollutant.dbCol]
           );
           styleUtils.setPollutantBreakPoints(
-            MapDataType.GRID,
+            MapDataType.MUNICIPALITY,
             this.pollutant,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
-            MapDataType.GRID,
+            MapDataType.MUNICIPALITY,
             this.pollutant,
             maxValue
           );
@@ -123,7 +116,7 @@ export default Vue.extend({
         }
       } else {
         this.colorFunction = styleUtils.getColorFunction(
-          MapDataType.GRID,
+          MapDataType.MUNICIPALITY,
           this.pollutant,
           maxValue
         );
@@ -131,7 +124,7 @@ export default Vue.extend({
       }
       // finally update legend to match the new style
       this.legend = styleUtils.getPollutantLegendObject(
-        MapDataType.GRID,
+        MapDataType.MUNICIPALITY,
         this.pollutant,
         maxValue
       );
@@ -158,11 +151,11 @@ export default Vue.extend({
     }
   },
   mounted() {
-    console.log("mounting grid data:", this.pollutant.dbCol, "of year", this.year);
+    console.log("mounting muni data:", this.pollutant.dbCol, "of year", this.year);
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {
-        const fc = await pollutantService.fetchFeatures(this.year, this.gnfr, this.pollutant);
+        const fc = await pollutantService.fetchMuniFeatures(this.year, this.pollutant);
         this.layerSource.clear();
         this.layerSource.addFeatures(
           // @ts-ignore
@@ -181,7 +174,7 @@ export default Vue.extend({
     this.enableShowFeaturePopupOnClick();
   },
   destroyed() {
-    console.log("Removing grid data layer from the map");
+    console.log("Removing muni data layer from the map");
     this.$emit("update-legend", undefined);
     this.disableShowFeaturePopupOnClick();
     this.map.removeLayer(this.vectorLayer);
