@@ -57,8 +57,8 @@ export default Vue.extend({
   },
   props: {
     year: Number,
-    pollutant: { type: Object as PropType<Pollutant> },
     gnfr: { type: String as PropType<Gnfr> },
+    pollutant: { type: Object as PropType<Pollutant> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
   data() {
@@ -70,6 +70,17 @@ export default Vue.extend({
       popupValue: null as number | null,
       legend: undefined as PollutantLegend | undefined
     };
+  },
+  watch: {
+    year: function () {
+      this.closePopup();
+    },
+    gnfr: function () {
+      this.closePopup();
+    },
+    pollutant: function () {
+      this.closePopup();
+    }
   },
   methods: {
     updateLegend(legend: PollutantLegend) {
