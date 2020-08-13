@@ -13,7 +13,7 @@ import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
-import { Pollutant, PollutantLegend, Gnfr } from "../types";
+import { Pollutant, PollutantLegend, Gnfr, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import * as constants from "./../constants";
 
@@ -63,6 +63,7 @@ export default Vue.extend({
     async updateStyle() {
       console.log(
         `Has breakpoints (${this.pollutant.dbCol})? ${styleUtils.hasBreakPoints(
+          MapDataType.GRID,
           this.pollutant
         )}`
       );
@@ -73,7 +74,7 @@ export default Vue.extend({
       );
       console.log("Found max value for the layer", maxValue);
 
-      if (!styleUtils.hasBreakPoints(this.pollutant)) {
+      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant)) {
         if (this.gnfr === Gnfr.COMBINED && this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
@@ -82,8 +83,17 @@ export default Vue.extend({
           const latestValues = this.layerSource
             .getFeatures()
             .map((feat) => feat.get(this.pollutant.dbCol));
-          styleUtils.setPollutantBreakPoints(this.pollutant, latestValues, classCount);
-          this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
+          styleUtils.setPollutantBreakPoints(
+            MapDataType.GRID,
+            this.pollutant,
+            latestValues,
+            classCount
+          );
+          this.colorFunction = styleUtils.getColorFunction(
+            MapDataType.GRID,
+            this.pollutant,
+            maxValue
+          );
         } else {
           // combined pollutants from latest year need to be fetched for calculating breakpoints
           console.log(
@@ -97,17 +107,34 @@ export default Vue.extend({
           const latestValues = fc.features.map(
             (feat) => feat.properties[this.pollutant.dbCol]
           );
-          styleUtils.setPollutantBreakPoints(this.pollutant, latestValues, classCount);
-          this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
+          styleUtils.setPollutantBreakPoints(
+            MapDataType.GRID,
+            this.pollutant,
+            latestValues,
+            classCount
+          );
+          this.colorFunction = styleUtils.getColorFunction(
+            MapDataType.GRID,
+            this.pollutant,
+            maxValue
+          );
           // for some reason this async style update needs to be triggered manually
           this.vectorLayer.setStyle(this.getOlStyle("update"));
         }
       } else {
-        this.colorFunction = styleUtils.getColorFunction(this.pollutant, maxValue);
+        this.colorFunction = styleUtils.getColorFunction(
+          MapDataType.GRID,
+          this.pollutant,
+          maxValue
+        );
         console.log(`Updated to use previously created style function`);
       }
       // finally update legend to match the new style
-      this.legend = styleUtils.getPollutantLegendObject(this.pollutant, maxValue);
+      this.legend = styleUtils.getPollutantLegendObject(
+        MapDataType.GRID,
+        this.pollutant,
+        maxValue
+      );
       this.$emit("update-legend", this.legend);
     },
     async setFeaturePopup(event) {
