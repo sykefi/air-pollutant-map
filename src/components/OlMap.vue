@@ -17,15 +17,21 @@
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
-          @set-muni-feature-popup="setGridFeaturePopup"
+          @set-muni-feature-popup="setMuniFeaturePopup"
         />
       </div>
     </div>
     <Legend v-if="legend" id="map-legend-container" :legend="legend" />
-    <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupValue">
+    <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupFeat">
       <GridFeaturePopup
         v-if="gridPopupValue"
         :popupValue="gridPopupValue"
+        :pollutant="pollutant"
+        @close-popup="closePopup"
+      />
+      <MuniFeaturePopup
+        v-if="muniPopupFeat"
+        :featProps="muniPopupFeat"
         :pollutant="pollutant"
         @close-popup="closePopup"
       />
@@ -45,6 +51,7 @@ import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import OlMuniDataLayer from "./OlMuniDataLayer.vue";
 import GridFeaturePopup from "./GridFeaturePopup.vue";
+import MuniFeaturePopup from "./MuniFeaturePopup.vue";
 import Legend from "./Legend.vue";
 import { Pollutant, MapDataType, MuniFeatureProperties } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
@@ -58,6 +65,7 @@ export default Vue.extend({
     OlGridDataLayer,
     OlMuniDataLayer,
     GridFeaturePopup,
+    MuniFeaturePopup,
     Legend
   },
   props: {
@@ -73,7 +81,7 @@ export default Vue.extend({
       mapDataTypes: Object(MapDataType),
       overlay: null as Overlay | null,
       gridPopupValue: null as number | null,
-      muniPopupValue: null as MuniFeatureProperties | null,
+      muniPopupFeat: null as MuniFeatureProperties | null,
       legend: undefined as PollutantLegend | undefined
     };
   },
@@ -115,13 +123,21 @@ export default Vue.extend({
         }
       }, 0);
     },
+    setMuniFeaturePopup(coordinate: Coordinate, value: MuniFeatureProperties) {
+      this.muniPopupFeat = value;
+      setTimeout(() => {
+        if (this.overlay) {
+          this.overlay.setPosition(coordinate);
+        }
+      }, 0);
+    },
     closePopup() {
       // Set the position of the pop-up window to undefined, and clear the coordinate data
       if (this.overlay) {
         this.overlay.setPosition(undefined);
       }
       this.gridPopupValue = null;
-      this.muniPopupValue = null;
+      this.muniPopupFeat = null;
     }
   },
   mounted() {

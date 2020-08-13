@@ -136,11 +136,7 @@ export default Vue.extend({
     async setFeaturePopup(event) {
       const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
       if (feats.length > 0) {
-        this.$emit(
-          "set-muni-feature-popup",
-          event.coordinate,
-          feats[0].getProperties()[this.pollutant.dbCol]
-        );
+        this.$emit("set-muni-feature-popup", event.coordinate, feats[0].getProperties());
       } else {
         console.log("no features found on click -> cannot set popup");
       }
