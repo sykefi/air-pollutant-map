@@ -137,7 +137,7 @@ export default Vue.extend({
       const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
       if (feats.length > 0) {
         this.$emit(
-          "set-feature-popup",
+          "set-muni-feature-popup",
           event.coordinate,
           feats[0].getProperties()[this.pollutant.dbCol]
         );
@@ -150,7 +150,7 @@ export default Vue.extend({
     },
     disableShowFeaturePopupOnClick() {
       this.map.un("singleclick", this.setFeaturePopup);
-      this.$emit("set-feature-popup", undefined, null);
+      this.$emit("set-muni-feature-popup", undefined, null);
     }
   },
   mounted() {

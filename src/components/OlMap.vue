@@ -8,7 +8,7 @@
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
-          @set-feature-popup="setFeaturePopup"
+          @set-grid-feature-popup="setGridFeaturePopup"
         />
       </div>
       <div v-if="isReady && mapDataType === mapDataTypes.MUNICIPALITY">
@@ -17,13 +17,18 @@
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
-          @set-feature-popup="setFeaturePopup"
+          @set-muni-feature-popup="setGridFeaturePopup"
         />
       </div>
     </div>
     <Legend v-if="legend" id="map-legend-container" :legend="legend" />
-    <div class="olpopup" ref="olpopup" v-show="popupValue">
-      <OlMapPopup :popupValue="popupValue" :pollutant="pollutant" @close-popup="closePopup" />
+    <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupValue">
+      <GridFeaturePopup
+        v-if="gridPopupValue"
+        :popupValue="gridPopupValue"
+        :pollutant="pollutant"
+        @close-popup="closePopup"
+      />
     </div>
   </div>
 </template>
@@ -39,9 +44,9 @@ import { Attribution, defaults as defaultControls } from "ol/control";
 import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import OlMuniDataLayer from "./OlMuniDataLayer.vue";
-import OlMapPopup from "./OlMapPopup.vue";
+import GridFeaturePopup from "./GridFeaturePopup.vue";
 import Legend from "./Legend.vue";
-import { Pollutant, MapDataType } from "../types";
+import { Pollutant, MapDataType, MuniFeatureProperties } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
 
 const attribution = new Attribution({
@@ -52,7 +57,7 @@ export default Vue.extend({
   components: {
     OlGridDataLayer,
     OlMuniDataLayer,
-    OlMapPopup,
+    GridFeaturePopup,
     Legend
   },
   props: {
@@ -67,7 +72,8 @@ export default Vue.extend({
       isReady: false as boolean,
       mapDataTypes: Object(MapDataType),
       overlay: null as Overlay | null,
-      popupValue: null as number | null,
+      gridPopupValue: null as number | null,
+      muniPopupValue: null as MuniFeatureProperties | null,
       legend: undefined as PollutantLegend | undefined
     };
   },
@@ -100,8 +106,8 @@ export default Vue.extend({
         this.map.addOverlay(this.overlay);
       }
     },
-    setFeaturePopup(coordinate: Coordinate, value: number) {
-      this.popupValue = value;
+    setGridFeaturePopup(coordinate: Coordinate, value: number) {
+      this.gridPopupValue = value;
       setTimeout(() => {
         // Set the timer here, otherwise the pop-up window will appear for the first time, and the base map will be off-track
         if (this.overlay) {
@@ -114,7 +120,8 @@ export default Vue.extend({
       if (this.overlay) {
         this.overlay.setPosition(undefined);
       }
-      this.popupValue = null;
+      this.gridPopupValue = null;
+      this.muniPopupValue = null;
     }
   },
   mounted() {
