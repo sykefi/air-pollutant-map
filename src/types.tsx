@@ -44,3 +44,10 @@ export enum MapDataType {
   MUNICIPALITY = "Municipality",
   GRID = "Grid"
 }
+
+export interface MuniFeatureProperties {
+  id: number;
+  nimi: string;
+  area: number;
+  [key: string]: number | string;
+}
