@@ -64,7 +64,7 @@ export default Vue.extend({
       console.log(
         `Has breakpoints (${this.pollutant.dbCol})? ${styleUtils.hasBreakPoints(
           MapDataType.GRID,
-          this.pollutant
+          this.pollutant.dbCol
         )}`
       );
       const maxValue = Math.ceil(
@@ -74,7 +74,7 @@ export default Vue.extend({
       );
       console.log("Found max value for the layer", maxValue);
 
-      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant)) {
+      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.dbCol)) {
         if (this.gnfr === Gnfr.COMBINED && this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
@@ -85,13 +85,13 @@ export default Vue.extend({
             .map((feat) => feat.get(this.pollutant.dbCol));
           styleUtils.setPollutantBreakPoints(
             MapDataType.GRID,
-            this.pollutant,
+            this.pollutant.dbCol,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
             MapDataType.GRID,
-            this.pollutant,
+            this.pollutant.dbCol,
             maxValue
           );
         } else {
@@ -109,13 +109,13 @@ export default Vue.extend({
           );
           styleUtils.setPollutantBreakPoints(
             MapDataType.GRID,
-            this.pollutant,
+            this.pollutant.dbCol,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
             MapDataType.GRID,
-            this.pollutant,
+            this.pollutant.dbCol,
             maxValue
           );
           // for some reason this async style update needs to be triggered manually
@@ -124,7 +124,7 @@ export default Vue.extend({
       } else {
         this.colorFunction = styleUtils.getColorFunction(
           MapDataType.GRID,
-          this.pollutant,
+          this.pollutant.dbCol,
           maxValue
         );
         console.log(`Updated to use previously created style function`);
@@ -133,6 +133,7 @@ export default Vue.extend({
       this.legend = styleUtils.getPollutantLegendObject(
         MapDataType.GRID,
         this.pollutant,
+        this.pollutant.dbCol,
         maxValue
       );
       this.$emit("update-legend", this.legend);

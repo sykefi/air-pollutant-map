@@ -6,6 +6,7 @@ const gridDataTable = "p_gd_test";
 const gridDataTotalsTable = "p_gd_totals";
 const muniDataTable = "p_muni_data";
 const outputFormat = "&outputFormat=application/json";
+const m2tokm2 = 1e-6;
 
 const getWfsGridDataUri = (year: number, gnfr: Gnfr, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
@@ -61,6 +62,11 @@ export const fetchMuniFeatures = async (year: number, pollutant: Pollutant) => {
   }
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
+  // calculate pollutant densities to feature properties
+  fc.features.forEach((feat) => {
+    feat.properties[pollutant.dbCol + "-density"] =
+      feat.properties[pollutant.dbCol] / (feat.properties.area * m2tokm2);
+  });
   cache.setToCache(cacheKey, fc);
   console.log("Fetched muni data from WFS");
   return fc;

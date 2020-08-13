@@ -8,7 +8,7 @@ import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
-import { Fill, Style } from "ol/style";
+import { Fill, Style, Stroke } from "ol/style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
@@ -30,7 +30,7 @@ export default Vue.extend({
       vectorLayer: new VectorLayer() as VectorLayer,
       colorFunction: undefined as Function | undefined,
       legend: undefined as PollutantLegend | undefined,
-      cache: {} as { [key: string]: string }
+      densityProp: (this.pollutant.dbCol + "-density") as string
     };
   },
   watch: {
@@ -40,6 +40,7 @@ export default Vue.extend({
     },
     pollutant: function (newVal: Pollutant) {
       console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing muni data...`);
+      this.densityProp = newVal.dbCol + "-density";
       this.colorFunction = undefined;
       this.layerSource.refresh();
     }
@@ -51,24 +52,27 @@ export default Vue.extend({
         new Style({
           fill: new Fill({
             color: this.colorFunction ? this.colorFunction(feature) : "rgba(255,255,255,0)"
+          }),
+          stroke: new Stroke({
+            color: "black",
+            width: 1
           })
         });
     },
     async updateStyle() {
+      console.log("Updating style with density prop:", this.densityProp);
       console.log(
-        `Has breakpoints (${this.pollutant.dbCol})? ${styleUtils.hasBreakPoints(
+        `Has breakpoints (${this.densityProp})? ${styleUtils.hasBreakPoints(
           MapDataType.MUNICIPALITY,
-          this.pollutant
+          this.densityProp
         )}`
       );
       const maxValue = Math.ceil(
-        Math.max(
-          ...this.layerSource.getFeatures().map((feat) => feat.get(this.pollutant.dbCol))
-        )
+        Math.max(...this.layerSource.getFeatures().map((feat) => feat.get(this.densityProp)))
       );
       console.log("Found max value for the layer", maxValue);
 
-      if (!styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.pollutant)) {
+      if (!styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.densityProp)) {
         if (this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
@@ -76,16 +80,16 @@ export default Vue.extend({
           );
           const latestValues = this.layerSource
             .getFeatures()
-            .map((feat) => feat.get(this.pollutant.dbCol));
+            .map((feat) => feat.get(this.densityProp));
           styleUtils.setPollutantBreakPoints(
             MapDataType.MUNICIPALITY,
-            this.pollutant,
+            this.densityProp,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
             MapDataType.MUNICIPALITY,
-            this.pollutant,
+            this.densityProp,
             maxValue
           );
         } else {
@@ -97,18 +101,16 @@ export default Vue.extend({
             constants.latestYear,
             this.pollutant
           );
-          const latestValues = fc.features.map(
-            (feat) => feat.properties[this.pollutant.dbCol]
-          );
+          const latestValues = fc.features.map((feat) => feat.properties[this.densityProp]);
           styleUtils.setPollutantBreakPoints(
             MapDataType.MUNICIPALITY,
-            this.pollutant,
+            this.densityProp,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
             MapDataType.MUNICIPALITY,
-            this.pollutant,
+            this.densityProp,
             maxValue
           );
           // for some reason this async style update needs to be triggered manually
@@ -117,7 +119,7 @@ export default Vue.extend({
       } else {
         this.colorFunction = styleUtils.getColorFunction(
           MapDataType.MUNICIPALITY,
-          this.pollutant,
+          this.densityProp,
           maxValue
         );
         console.log(`Updated to use previously created style function`);
@@ -126,6 +128,7 @@ export default Vue.extend({
       this.legend = styleUtils.getPollutantLegendObject(
         MapDataType.MUNICIPALITY,
         this.pollutant,
+        this.densityProp,
         maxValue
       );
       this.$emit("update-legend", this.legend);

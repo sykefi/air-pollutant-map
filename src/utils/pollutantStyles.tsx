@@ -13,7 +13,7 @@ const colorScale: string[] = [
   "#d73027"
 ];
 
-const getStyleId = (dataType: MapDataType, pollutant: Pollutant) => dataType + pollutant.dbCol;
+const getStyleId = (dataType: MapDataType, valuePropName: string) => dataType + valuePropName;
 
 const getStandardDeviation = (array: number[], mean: number, n: number): number => {
   return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
@@ -69,22 +69,25 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
   return combinedBreakPoints.filter((value, index, self) => self.indexOf(value) === index);
 };
 
-const getBreakPoints = (dataType: MapDataType, pollutant: Pollutant): number[] | undefined => {
+const getBreakPoints = (
+  dataType: MapDataType,
+  valuePropName: string
+): number[] | undefined => {
   let breakPoints: number[] | undefined = undefined;
-  const styleId = getStyleId(dataType, pollutant);
+  const styleId = getStyleId(dataType, valuePropName);
   if (styleId in breakPointDictionary) {
     breakPoints = breakPointDictionary[styleId];
   }
   return breakPoints ? [...breakPoints] : breakPoints;
 };
 
-export const hasBreakPoints = (dataType: MapDataType, pollutant: Pollutant): boolean => {
-  return getStyleId(dataType, pollutant) in breakPointDictionary;
+export const hasBreakPoints = (dataType: MapDataType, valuePropName: string): boolean => {
+  return getStyleId(dataType, valuePropName) in breakPointDictionary;
 };
 
 export const setPollutantBreakPoints = (
   dataType: MapDataType,
-  pollutant: Pollutant,
+  valuePropName: string,
   valueList: number[],
   classCount: number
 ): void => {
@@ -96,7 +99,7 @@ export const setPollutantBreakPoints = (
     console.log(validSortedValues);
   }
 
-  breakPointDictionary[getStyleId(dataType, pollutant)] = calculateAdjustedBreakPoints(
+  breakPointDictionary[getStyleId(dataType, valuePropName)] = calculateAdjustedBreakPoints(
     validSortedValues,
     classCount
   );
@@ -146,15 +149,14 @@ const getFeatureColor = (
 
 export const getColorFunction = (
   dataType: MapDataType,
-  pollutant: Pollutant,
+  valuePropName: string,
   maxValue: number
 ): Function | undefined => {
-  const breakPoints = getBreakPoints(dataType, pollutant);
+  const breakPoints = getBreakPoints(dataType, valuePropName);
   if (!breakPoints) {
     console.log(
       "Failed to load style function for pollutant (no breakpoints found)",
-      pollutant.dbCol,
-      pollutant.parlocRyhmaSelite
+      valuePropName
     );
     return undefined;
   }
@@ -166,15 +168,16 @@ export const getColorFunction = (
   // get color scale by number of breakpoints
   const colors = getColorArray(colorScale, breakPoints);
   return (feature: FeatureLike) =>
-    getFeatureColor(breakPoints, colors, pollutant.dbCol, feature);
+    getFeatureColor(breakPoints, colors, valuePropName, feature);
 };
 
 export const getPollutantLegendObject = (
   dataType: MapDataType,
   pollutant: Pollutant,
+  valuePropName: string,
   maxValue: number
 ): PollutantLegend | undefined => {
-  const breakPoints = getBreakPoints(dataType, pollutant);
+  const breakPoints = getBreakPoints(dataType, valuePropName);
   if (!breakPoints) {
     console.log(
       "Failed to load legend for pollutant (no breakpoints found)",
