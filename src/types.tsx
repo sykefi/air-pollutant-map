@@ -24,11 +24,23 @@ export interface PollutantLegend {
   unit: string;
 }
 
-export interface Gnfr {
+interface LangStringMap {
+  fi: string;
+  sv: string;
+  en: string;
+}
+
+export interface DbGnfr {
   db_key: string;
   nimi: string;
   namn: string;
   name: string;
+  use_dev: boolean;
+  use_prod: boolean;
+}
+export interface Gnfr {
+  db_key: string;
+  name: LangStringMap;
   use_dev: boolean;
   use_prod: boolean;
 }
