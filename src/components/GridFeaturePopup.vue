@@ -57,6 +57,7 @@ export default Vue.extend({
   margin-bottom: 4px;
 }
 .olpopup-value {
+  font-weight: 500;
   color: #007ac9;
 }
 </style>

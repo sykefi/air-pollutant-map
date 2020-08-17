@@ -3,7 +3,7 @@
     <div id="app-container">
       <div id="settings-panel">
         <SelectorYear @set-selected-year="setSelectedYear" />
-        <SelectorGnfr @set-selected-gnfr="setSelectedGnfr" />
+        <SelectorGnfr :mapDataType="mapDataType" @set-selected-gnfr="setSelectedGnfr" />
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="map-container">

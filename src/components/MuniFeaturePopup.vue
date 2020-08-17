@@ -1,0 +1,82 @@
+<template>
+  <div class="olpopup-container">
+    <div class="olpopup-closer" @click="closePopup">✖</div>
+    <div class="olpopup-content">
+      <div class="olpopup-title">
+        {{ pollutant.parlocRyhmaSelite }} ({{ featProps.nimi }}):
+      </div>
+      <div class="olpopup-values">
+        <div class="olpopup-value-row">
+          <span class="olpopup-value">
+            {{ roundPollutantValue(featProps[pollutant.dbCol]) }}
+          </span>
+          <span>{{ pollutant.yksikko }} </span>
+        </div>
+        <div class="olpopup-value-row">
+          <span class="olpopup-value"
+            >{{ roundPollutantValue(featProps[pollutant.dbCol + "-density"]) }}
+          </span>
+          <span>{{ pollutant.yksikko }} / km<sup>2</sup> </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from "vue";
+import { Pollutant, MuniFeatureProperties } from "@/types";
+
+export default Vue.extend({
+  props: {
+    pollutant: { type: Object as PropType<Pollutant> },
+    featProps: { type: Object as PropType<MuniFeatureProperties> }
+  },
+  methods: {
+    closePopup() {
+      this.$emit("close-popup");
+    },
+    roundPollutantValue(n: number) {
+      // rounds value to at least two significant figures
+      for (let i = 10; i < Math.pow(10, 10); i = i * 10) {
+        const divider = 10 / i;
+        if (n > divider) {
+          return Math.round(n * i) / i;
+        }
+      }
+      return n;
+    }
+  }
+});
+</script>
+
+<style scoped>
+/* Close popup button */
+.olpopup-closer {
+  position: absolute;
+  right: 11px;
+  top: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.olpopup-content {
+  padding: 3px 22px 2px 3px;
+  color: black;
+  font-weight: 500;
+}
+.olpopup-title {
+  font-weight: 550;
+  margin-bottom: 6px;
+}
+.olpopup-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.olpopup-value-row {
+  margin: 1px 0 1px 0;
+}
+.olpopup-value {
+  color: #007ac9;
+}
+</style>
