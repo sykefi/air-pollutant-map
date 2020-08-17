@@ -183,7 +183,7 @@ export default Vue.extend({
   max-width: 100%;
   box-sizing: border-box;
   margin: 0;
-  border: 1px solid #aaa;
+  border: 1px solid black;
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
   border-radius: 0.25em;
   -moz-appearance: none;
@@ -195,9 +195,6 @@ export default Vue.extend({
 }
 .select-css::-ms-expand {
   display: none;
-}
-.select-css:hover {
-  border-color: #888;
 }
 .select-css:focus {
   border: 1px solid blue;
