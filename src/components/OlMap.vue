@@ -8,13 +8,38 @@
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
-          @set-feature-popup="setFeaturePopup"
+          @set-grid-feature-popup="setGridFeaturePopup"
+        />
+      </div>
+      <div v-if="isReady && mapDataType === mapDataTypes.MUNICIPALITY">
+        <OlMuniDataLayer
+          :year="year"
+          :pollutant="pollutant"
+          :map="map"
+          @update-legend="updateLegend"
+          @set-muni-feature-popup="setMuniFeaturePopup"
         />
       </div>
     </div>
-    <Legend v-if="legend" id="map-legend-container" :legend="legend" />
-    <div class="olpopup" ref="olpopup" v-show="popupValue">
-      <OlMapPopup :popupValue="popupValue" :pollutant="pollutant" @close-popup="closePopup" />
+    <Legend
+      v-if="legend"
+      id="map-legend-container"
+      :legend="legend"
+      :mapDataType="mapDataType"
+    />
+    <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupFeat">
+      <GridFeaturePopup
+        v-if="gridPopupValue"
+        :popupValue="gridPopupValue"
+        :pollutant="pollutant"
+        @close-popup="closePopup"
+      />
+      <MuniFeaturePopup
+        v-if="muniPopupFeat"
+        :featProps="muniPopupFeat"
+        :pollutant="pollutant"
+        @close-popup="closePopup"
+      />
     </div>
   </div>
 </template>
@@ -29,9 +54,11 @@ import { Tile as TileLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
-import OlMapPopup from "./OlMapPopup.vue";
+import OlMuniDataLayer from "./OlMuniDataLayer.vue";
+import GridFeaturePopup from "./GridFeaturePopup.vue";
+import MuniFeaturePopup from "./MuniFeaturePopup.vue";
 import Legend from "./Legend.vue";
-import { Pollutant, MapDataType } from "../types";
+import { Pollutant, MapDataType, MuniFeatureProperties } from "../types";
 import { PollutantLegend, Gnfr } from "../types";
 
 const attribution = new Attribution({
@@ -41,13 +68,15 @@ const attribution = new Attribution({
 export default Vue.extend({
   components: {
     OlGridDataLayer,
-    OlMapPopup,
+    OlMuniDataLayer,
+    GridFeaturePopup,
+    MuniFeaturePopup,
     Legend
   },
   props: {
     year: Number,
-    pollutant: { type: Object as PropType<Pollutant> },
     gnfr: { type: String as PropType<Gnfr> },
+    pollutant: { type: Object as PropType<Pollutant> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
   data() {
@@ -56,9 +85,21 @@ export default Vue.extend({
       isReady: false as boolean,
       mapDataTypes: Object(MapDataType),
       overlay: null as Overlay | null,
-      popupValue: null as number | null,
+      gridPopupValue: null as number | null,
+      muniPopupFeat: null as MuniFeatureProperties | null,
       legend: undefined as PollutantLegend | undefined
     };
+  },
+  watch: {
+    year: function () {
+      this.closePopup();
+    },
+    gnfr: function () {
+      this.closePopup();
+    },
+    pollutant: function () {
+      this.closePopup();
+    }
   },
   methods: {
     updateLegend(legend: PollutantLegend) {
@@ -78,10 +119,18 @@ export default Vue.extend({
         this.map.addOverlay(this.overlay);
       }
     },
-    setFeaturePopup(coordinate: Coordinate, value: number) {
-      this.popupValue = value;
+    setGridFeaturePopup(coordinate: Coordinate, value: number) {
+      this.gridPopupValue = value;
       setTimeout(() => {
         // Set the timer here, otherwise the pop-up window will appear for the first time, and the base map will be off-track
+        if (this.overlay) {
+          this.overlay.setPosition(coordinate);
+        }
+      }, 0);
+    },
+    setMuniFeaturePopup(coordinate: Coordinate, value: MuniFeatureProperties) {
+      this.muniPopupFeat = value;
+      setTimeout(() => {
         if (this.overlay) {
           this.overlay.setPosition(coordinate);
         }
@@ -92,7 +141,8 @@ export default Vue.extend({
       if (this.overlay) {
         this.overlay.setPosition(undefined);
       }
-      this.popupValue = null;
+      this.gridPopupValue = null;
+      this.muniPopupFeat = null;
     }
   },
   mounted() {

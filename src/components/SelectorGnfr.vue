@@ -1,12 +1,17 @@
 <template>
   <div class="gnfr-selector-div">
     <label class="hidden-visually" for="gnfr-select-input">Luokka</label>
-    <div class="selector-label" for="gnfr-select-input">Luokka</div>
+    <div
+      :class="[disabled ? 'gnfr-selector-disabled' : '', 'selector-label']"
+      for="gnfr-select-input"
+    >
+      Luokka
+    </div>
     <div id="gnfr-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
       class="gnfr-select"
       id="gnfrSelector"
-      v-on:click="handleSelectorClick"
+      @click="handleSelectorClick"
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="gnfr-select-list"
@@ -15,6 +20,7 @@
         type="text"
         id="gnfr-select-input"
         v-model="gnfrInputValue"
+        :disabled="disabled"
         class="select-css"
         aria-describedby="gnfr-select-info"
         aria-autocomplete="both"
@@ -35,7 +41,7 @@
           focusable="false"
           aria-hidden="true"
           id="icon-circle-down"
-          v-bind:class="[!showOptions ? '' : 'hidden-all', 'icon']"
+          :class="[!showOptions ? '' : 'hidden-all', 'icon']"
           role="img"
         >
           <path
@@ -80,8 +86,8 @@
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
-import { Gnfr } from "./../types";
+import Vue, { PropType } from "vue";
+import { Gnfr, MapDataType } from "./../types";
 import * as constants from "./../constants";
 
 const findFocus = () => {
@@ -107,12 +113,27 @@ let selectorElement: Element | null = null;
 let gnfrInputElement: Element | null = null;
 
 export default Vue.extend({
+  props: {
+    mapDataType: { type: String as PropType<MapDataType> }
+  },
+  watch: {
+    mapDataType: function () {
+      if (this.mapDataType === MapDataType.MUNICIPALITY) {
+        // Disable GNFR selector for municipality data
+        this.setSelectedGnfr(Gnfr.COMBINED);
+        this.disabled = true;
+      } else {
+        this.disabled = false;
+      }
+    }
+  },
   data() {
     return {
       gnfrOptions: Object.values(Gnfr).sort(sortGnfrOptions) as Gnfr[],
       gnfrInputValue: constants.initialGnfr as Gnfr,
       showOptions: false as boolean,
-      selectorState: "initial" as string
+      selectorState: "initial" as string,
+      disabled: false as boolean
     };
   },
   methods: {
@@ -127,6 +148,9 @@ export default Vue.extend({
       this.selectorState = state;
     },
     handleSelectorClick: function () {
+      if (this.disabled) {
+        return;
+      }
       const currentFocus = findFocus();
       switch (this.selectorState) {
         case "initial":
@@ -167,11 +191,14 @@ export default Vue.extend({
         .trim();
 
       if (selectedGnfr) {
-        this.$emit("set-selected-gnfr", selectedGnfr);
-        this.gnfrInputValue = selectedGnfr;
+        this.setSelectedGnfr(selectedGnfr);
       } else {
         console.log("Could not select gnfr by id", selectedGnfr);
       }
+    },
+    setSelectedGnfr: function (selectedGnfr: Gnfr) {
+      this.$emit("set-selected-gnfr", selectedGnfr);
+      this.gnfrInputValue = selectedGnfr;
     }
   },
   mounted() {
@@ -213,7 +240,7 @@ export default Vue.extend({
   max-width: 100%;
   box-sizing: border-box;
   margin: 0;
-  border: 1px solid #aaa;
+  border: 1px solid black;
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
   border-radius: 0.25em;
   -moz-appearance: none;
@@ -226,13 +253,21 @@ export default Vue.extend({
 .select-css::-ms-expand {
   display: none;
 }
-.select-css:hover {
-  border-color: #888;
-}
 .select-css:focus {
   border: 1px solid blue;
   color: #222;
   outline: none;
+}
+.select-css:disabled {
+  border-color: grey;
+  color: grey;
+}
+.gnfr-selector-disabled {
+  color: grey;
+}
+.gnfr-selector-disabled:hover {
+  color: grey;
+  cursor: initial;
 }
 .gnfr-select-icons {
   pointer-events: none;
