@@ -78,7 +78,7 @@
           tabindex="-1"
           role="option"
         >
-          {{ gnfr.nimi }}
+          {{ gnfr.name["fi"] }}
           <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.db_key }}</span>
         </li>
       </ul>
@@ -102,9 +102,9 @@ const sortGnfrOptions = (a: Gnfr, b: Gnfr): number => {
   } else if (b.db_key === "COMBINED") {
     return 1;
   }
-  if (a.nimi < b.nimi) {
+  if (a.name["fi"] < b.name["fi"]) {
     return -1;
-  } else if (a.nimi > b.nimi) {
+  } else if (a.name["fi"] > b.name["fi"]) {
     return 1;
   }
   return 0;
@@ -145,7 +145,7 @@ export default Vue.extend({
       const combinedGnfr = this.gnfrOptions.find((gnfr) => gnfr.db_key === "COMBINED");
       if (combinedGnfr) {
         this.combinedGnfr = combinedGnfr;
-        this.gnfrInputValue = combinedGnfr.nimi;
+        this.gnfrInputValue = combinedGnfr.name["fi"];
         this.setSelectedGnfr(this.combinedGnfr);
       } else {
         console.error("Could not find initial (combined) gnfr");
@@ -216,7 +216,7 @@ export default Vue.extend({
     },
     setSelectedGnfr: function (selectedGnfr: Gnfr) {
       this.$emit("set-selected-gnfr", selectedGnfr.db_key);
-      this.gnfrInputValue = selectedGnfr.nimi;
+      this.gnfrInputValue = selectedGnfr.name["fi"];
     }
   },
   mounted() {

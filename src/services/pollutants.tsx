@@ -1,4 +1,4 @@
-import { Gnfr, Pollutant } from "@/types";
+import { Gnfr, Pollutant, DbGnfr } from "@/types";
 import * as cache from "./cache";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
@@ -73,12 +73,15 @@ export const fetchMuniFeatures = async (year: number, pollutant: Pollutant) => {
   return fc;
 };
 
+const getGnfrObject = (props: DbGnfr): Gnfr => {
+  const name = { fi: props.nimi, sv: props.namn, en: props.name };
+  return { db_key: props.db_key, name, use_dev: props.use_dev, use_prod: props.use_prod };
+};
+
 export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
   const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${gnfrMetaTable}&outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
-  console.log("Gnfr meta", fc);
-  console.log(JSON.stringify(fc.features[3]));
-  return fc.features.map((feat) => feat.properties);
+  return fc.features.map((feat) => getGnfrObject(feat.properties));
 };
