@@ -2,21 +2,22 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      <div class="olpopup-title">{{ pollutant.parlocRyhmaSelite }}:</div>
+      <div class="olpopup-title">
+        {{ pollutant.parlocRyhmaSelite }} ({{ featProps.nimi }}):
+      </div>
       <div class="olpopup-values">
-        <div class="olpopup-value-row">
-          <span class="olpopup-value"
-            >{{ roundPollutantValue(featProps[pollutant.dbCol + "-density"]) }}
-          </span>
-          <span>{{ pollutant.yksikko }} / km<sup>2</sup> </span>
-        </div>
         <div class="olpopup-value-row">
           <span class="olpopup-value">
             {{ roundPollutantValue(featProps[pollutant.dbCol]) }}
           </span>
           <span>{{ pollutant.yksikko }} </span>
         </div>
-        <div class="olpopup-value-row" style="margin-top: 4px;">({{ featProps.nimi }})</div>
+        <div class="olpopup-value-row">
+          <span class="olpopup-value"
+            >{{ roundPollutantValue(featProps[pollutant.dbCol + "-density"]) }}
+          </span>
+          <span>{{ pollutant.yksikko }} / km<sup>2</sup> </span>
+        </div>
       </div>
     </div>
   </div>
@@ -65,7 +66,7 @@ export default Vue.extend({
 }
 .olpopup-title {
   font-weight: 550;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .olpopup-values {
   display: flex;
@@ -73,7 +74,7 @@ export default Vue.extend({
   align-items: flex-start;
 }
 .olpopup-value-row {
-  margin: 2px 0 1px 0;
+  margin: 1px 0 1px 0;
 }
 .olpopup-value {
   color: #007ac9;
