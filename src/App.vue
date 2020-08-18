@@ -23,7 +23,7 @@ import Vue from "vue";
 import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
 import SelectorDataType from "./components/SelectorDataType.vue";
-import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
+import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import { Pollutant, MapDataType } from "./types";
 import * as constants from "./constants";
@@ -40,7 +40,7 @@ export default Vue.extend({
     return {
       year: constants.initialYear as number,
       gnfr: undefined as string | undefined,
-      pollutant: getDefaultPollutant() as Pollutant,
+      pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType
     };
   },

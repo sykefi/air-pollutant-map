@@ -72,7 +72,7 @@
           tabindex="-1"
           role="option"
         >
-          {{ pollutant.parlocRyhmaSelite }}
+          {{ pollutant.name["fi"] }}
           <span> ({{ pollutant.dbCol }})</span>
         </li>
       </ul>
@@ -83,9 +83,7 @@
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
 import { Pollutant } from "./../types";
-import pollutantList from "./../pollutants.json";
-
-console.log("Read", pollutantList.length, "pollutants from JSON");
+import { fetchPollutantMeta } from "./../services/pollutants";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -95,24 +93,27 @@ const findFocus = () => {
 let selectorElement: Element | null = null;
 let pollutantInputElement: Element | null = null;
 
-export const getDefaultPollutant = (): Pollutant => {
-  const defaultPollutants = pollutantList.filter((po) => po.dbCol === "s16");
-  console.log("Getting default pollutant", defaultPollutants[0]);
-  // @ts-ignore
-  return defaultPollutants[0];
-};
-
 export default Vue.extend({
   data() {
     return {
-      pollutantOptions: pollutantList as Pollutant[],
-      selectedPollutant: getDefaultPollutant() as Pollutant | null, // TODO: this is not used?
+      pollutantOptions: [] as Pollutant[],
       pollutantInputValue: "" as string,
       showOptions: false as boolean,
       selectorState: "initial" as string
     };
   },
   methods: {
+    async initializePollutantOptions() {
+      const pollutantOptions = await fetchPollutantMeta();
+      this.pollutantOptions = pollutantOptions
+        .filter((feat) => feat.useDev)
+        .sort((a, b) => a.name["fi"].localeCompare(b.name["fi"]));
+
+      const initialPollutant = this.pollutantOptions.find((feat) => feat.dbCol === "s16");
+      if (initialPollutant) {
+        this.setSelectedPollutant(initialPollutant);
+      }
+    },
     togglePollutantSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
@@ -175,7 +176,7 @@ export default Vue.extend({
     },
     setSelectedPollutant: function (po: Pollutant) {
       this.$emit("set-selected-pollutant", po);
-      this.pollutantInputValue = po.parlocRyhmaSelite;
+      this.pollutantInputValue = po.name["fi"];
     }
   },
   mounted() {
@@ -188,19 +189,7 @@ export default Vue.extend({
     });
     selectorElement = document.querySelector("#pollutantSelector");
     pollutantInputElement = selectorElement ? selectorElement.querySelector("input") : null;
-
-    // filter pollutants to only the ones for which we have data
-    const dbCols = ["s16", "s15", "s22", "s13", "s28", "s29", "s27", "s43", "s5", "s18", "s3", "s12", "s1", "s7", "s8", "s14", "s19", "s17", "s38", "s40"] // prettier-ignore
-    this.pollutantOptions = this.pollutantOptions.filter((po) => dbCols.includes(po.dbCol));
-    this.pollutantOptions.sort((a, b) =>
-      a.parlocRyhmaSelite.localeCompare(b.parlocRyhmaSelite)
-    );
-    // set default pollutant
-    this.pollutantOptions.forEach((po) => {
-      if (po.dbCol === "s16") {
-        this.setSelectedPollutant(po);
-      }
-    });
+    this.initializePollutantOptions();
   }
 });
 </script>
