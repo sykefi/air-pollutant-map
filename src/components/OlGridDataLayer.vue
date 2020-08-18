@@ -24,7 +24,7 @@ export default Vue.extend({
     map: { type: Object as PropType<Map> },
     year: Number,
     pollutant: { type: Object as PropType<Pollutant> },
-    gnfr: { type: String as PropType<Gnfr> }
+    gnfr: String
   },
   data() {
     return {
@@ -75,7 +75,7 @@ export default Vue.extend({
       console.log("Found max value for the layer", maxValue);
 
       if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.dbCol)) {
-        if (this.gnfr === Gnfr.COMBINED && this.year === constants.latestYear) {
+        if (this.gnfr === "COMBINED" && this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
             `Calculating breakpoints from visible features (${constants.latestYear})`
@@ -101,7 +101,7 @@ export default Vue.extend({
           );
           const fc = await pollutantService.fetchFeatures(
             constants.latestYear,
-            Gnfr.COMBINED,
+            "COMBINED",
             this.pollutant
           );
           const latestValues = fc.features.map(

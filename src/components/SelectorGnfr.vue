@@ -78,7 +78,8 @@
           tabindex="-1"
           role="option"
         >
-          <span> {{ gnfr }}</span>
+          {{ gnfr.name["fi"] }}
+          <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.dbKey }}</span>
         </li>
       </ul>
     </div>
@@ -88,7 +89,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Gnfr, MapDataType } from "./../types";
-import * as constants from "./../constants";
+import { fetchGnfrMeta } from "@/services/pollutants";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -96,14 +97,14 @@ const findFocus = () => {
 };
 
 const sortGnfrOptions = (a: Gnfr, b: Gnfr): number => {
-  if (a === Gnfr.COMBINED) {
+  if (a.dbKey === "COMBINED") {
     return -1;
-  } else if (b === Gnfr.COMBINED) {
+  } else if (b.dbKey === "COMBINED") {
     return 1;
   }
-  if (a < b) {
+  if (a.name["fi"] < b.name["fi"]) {
     return -1;
-  } else if (a > b) {
+  } else if (a.name["fi"] > b.name["fi"]) {
     return 1;
   }
   return 0;
@@ -120,7 +121,7 @@ export default Vue.extend({
     mapDataType: function () {
       if (this.mapDataType === MapDataType.MUNICIPALITY) {
         // Disable GNFR selector for municipality data
-        this.setSelectedGnfr(Gnfr.COMBINED);
+        this.setSelectedGnfr(this.combinedGnfr!);
         this.disabled = true;
       } else {
         this.disabled = false;
@@ -129,14 +130,30 @@ export default Vue.extend({
   },
   data() {
     return {
-      gnfrOptions: Object.values(Gnfr).sort(sortGnfrOptions) as Gnfr[],
-      gnfrInputValue: constants.initialGnfr as Gnfr,
+      gnfrOptions: [] as Gnfr[],
+      gnfrInputValue: "" as string,
+      combinedGnfr: undefined as Gnfr | undefined,
       showOptions: false as boolean,
       selectorState: "initial" as string,
       disabled: false as boolean
     };
   },
   methods: {
+    async initializeGnfrOptions() {
+      const gnfrOptions = await fetchGnfrMeta();
+      this.gnfrOptions = gnfrOptions.sort(sortGnfrOptions);
+      const combinedGnfr = this.gnfrOptions.find((gnfr) => gnfr.dbKey === "COMBINED");
+      if (combinedGnfr) {
+        this.combinedGnfr = combinedGnfr;
+        this.gnfrInputValue = combinedGnfr.name["fi"];
+        this.setSelectedGnfr(this.combinedGnfr);
+      } else {
+        console.error("Could not find initial (combined) gnfr");
+      }
+    },
+    getGnfrByKey(gnfrKey: string): Gnfr | undefined {
+      return this.gnfrOptions.find((gnfr) => gnfr.dbKey === gnfrKey);
+    },
     toggleGnfrSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
@@ -185,23 +202,26 @@ export default Vue.extend({
     },
     makeChoice: function (whichOption) {
       // read gnfr identifier from span element
-      const selectedGnfr = whichOption
+      const selectedGnfrKey = whichOption
         .querySelector("span")
         .textContent.replace(/[{()}]/g, "")
         .trim();
 
-      if (selectedGnfr) {
+      const selectedGnfr = this.getGnfrByKey(selectedGnfrKey);
+      if (selectedGnfrKey && selectedGnfr) {
         this.setSelectedGnfr(selectedGnfr);
       } else {
         console.log("Could not select gnfr by id", selectedGnfr);
       }
     },
     setSelectedGnfr: function (selectedGnfr: Gnfr) {
-      this.$emit("set-selected-gnfr", selectedGnfr);
-      this.gnfrInputValue = selectedGnfr;
+      this.$emit("set-selected-gnfr", selectedGnfr.dbKey);
+      this.gnfrInputValue = selectedGnfr.name["fi"];
     }
   },
   mounted() {
+    this.initializeGnfrOptions();
+
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       if (target && !target.closest("#gnfrSelector")) {

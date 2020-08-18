@@ -25,7 +25,7 @@ import SelectorYear from "./components/SelectorYear.vue";
 import SelectorDataType from "./components/SelectorDataType.vue";
 import SelectorPollutant, { getDefaultPollutant } from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
-import { Pollutant, Gnfr, MapDataType } from "./types";
+import { Pollutant, MapDataType } from "./types";
 import * as constants from "./constants";
 
 export default Vue.extend({
@@ -39,7 +39,7 @@ export default Vue.extend({
   data() {
     return {
       year: constants.initialYear as number,
-      gnfr: constants.initialGnfr as Gnfr,
+      gnfr: undefined as string | undefined,
       pollutant: getDefaultPollutant() as Pollutant,
       mapDataType: MapDataType.GRID as MapDataType
     };
@@ -48,8 +48,8 @@ export default Vue.extend({
     setSelectedYear(year: number) {
       this.year = year;
     },
-    setSelectedGnfr(gnfr: Gnfr) {
-      this.gnfr = gnfr;
+    setSelectedGnfr(gnfrKey: string) {
+      this.gnfr = gnfrKey;
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
