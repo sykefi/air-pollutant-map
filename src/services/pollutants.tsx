@@ -75,7 +75,7 @@ export const fetchMuniFeatures = async (year: number, pollutant: Pollutant) => {
 
 const getGnfrObject = (props: DbGnfr): Gnfr => {
   const name = { fi: props.nimi, sv: props.namn, en: props.name };
-  return { db_key: props.db_key, name, use_dev: props.use_dev, use_prod: props.use_prod };
+  return { dbKey: props.db_key, name, useDev: props.use_dev, useProd: props.use_prod };
 };
 
 export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {

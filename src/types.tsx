@@ -39,10 +39,10 @@ export interface DbGnfr {
   use_prod: boolean;
 }
 export interface Gnfr {
-  db_key: string;
+  dbKey: string;
   name: LangStringMap;
-  use_dev: boolean;
-  use_prod: boolean;
+  useDev: boolean;
+  useProd: boolean;
 }
 
 export enum MapDataType {
