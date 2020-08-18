@@ -45,7 +45,7 @@ export default Vue.extend({
       this.layerSource.refresh();
     },
     pollutant: function (newVal: Pollutant) {
-      console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing grid data...`);
+      console.log(`Pollutant changed to ${newVal.name["fi"]}, refreshing grid data...`);
       this.colorFunction = undefined;
       this.layerSource.refresh();
     }

@@ -1,4 +1,4 @@
-import { Gnfr, Pollutant, DbGnfr } from "@/types";
+import { Gnfr, Pollutant, DbGnfr, DbPollutant } from "@/types";
 import * as cache from "./cache";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
@@ -6,6 +6,7 @@ const gridDataTable = "p_gd_test";
 const gridDataTotalsTable = "p_gd_totals";
 const muniDataTable = "p_muni_data";
 const gnfrMetaTable = "p_gnfr_meta";
+const pollutantMetaTable = "p_pollutant_meta";
 const outputFormat = "&outputFormat=application/json";
 const m2tokm2 = 1e-6;
 
@@ -84,4 +85,28 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   return fc.features.map((feat) => getGnfrObject(feat.properties));
+};
+
+const getPollutantObject = (props: DbPollutant): Pollutant => {
+  return {
+    parlocGroupId: props.parloc_ryhma_tunnus,
+    parlocGroupName: props.parloc_ryhma_nimi,
+    dbCol: props.db_col,
+    name: { fi: props.nimi, sv: props.namn, en: props.name },
+    threshold: props.raja_arvo,
+    unit: props.yksikko,
+    repUnit: props.rap_yksikko,
+    group: props.ryhma,
+    useDev: props.use_dev,
+    useProd: props.use_prod
+  };
+};
+
+export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
+  const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
+  &typeName=paastotkartalla:${pollutantMetaTable}
+  &outputFormat=application/json`.replace(/ /g, "");
+  const response = await fetch(encodeURI(uri));
+  const fc = await response.json();
+  return fc.features.map((feat) => getPollutantObject(feat.properties));
 };

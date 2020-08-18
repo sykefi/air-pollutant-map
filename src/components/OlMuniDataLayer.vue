@@ -39,7 +39,7 @@ export default Vue.extend({
       this.layerSource.refresh();
     },
     pollutant: function (newVal: Pollutant) {
-      console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing muni data...`);
+      console.log(`Pollutant changed to ${newVal.name["fi"]}, refreshing muni data...`);
       this.densityProp = newVal.dbCol + "-density";
       this.colorFunction = undefined;
       this.layerSource.refresh();
