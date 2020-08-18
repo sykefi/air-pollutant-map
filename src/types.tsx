@@ -24,20 +24,25 @@ export interface PollutantLegend {
   unit: string;
 }
 
-export enum Gnfr {
-  COMBINED = "Combined",
-  I_OFFROAD = "I_Offroad",
-  A_PUBLICPOWER = "A_PublicPower",
-  K_AGRILIVESTOCK = "K_AgriLivestock",
-  G_SHIPPING = "G_Shipping",
-  H_AVIATION = "H_Aviation",
-  F_ROADTRANSPORT = "F_RoadTransport",
-  B_INDUSTRY = "B_Industry",
-  C_OTHERSTATIONARYCOMB = "C_OtherStationaryComb",
-  L_AGRIOTHER = "L_AgriOther",
-  E_SOLVENTS = "E_Solvents",
-  J_WASTE = "J_Waste",
-  D_FUGITIVE = "D_Fugitive"
+interface LangStringMap {
+  fi: string;
+  sv: string;
+  en: string;
+}
+
+export interface DbGnfr {
+  db_key: string;
+  nimi: string;
+  namn: string;
+  name: string;
+  use_dev: boolean;
+  use_prod: boolean;
+}
+export interface Gnfr {
+  dbKey: string;
+  name: LangStringMap;
+  useDev: boolean;
+  useProd: boolean;
 }
 
 export enum MapDataType {

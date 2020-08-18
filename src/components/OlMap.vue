@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="ol-map">
-      <div v-if="isReady && mapDataType === mapDataTypes.GRID">
+      <div v-if="gnfr && isReady && mapDataType === mapDataTypes.GRID">
         <OlGridDataLayer
           :gnfr="gnfr"
           :year="year"
@@ -11,7 +11,7 @@
           @set-grid-feature-popup="setGridFeaturePopup"
         />
       </div>
-      <div v-if="isReady && mapDataType === mapDataTypes.MUNICIPALITY">
+      <div v-if="gnfr && isReady && mapDataType === mapDataTypes.MUNICIPALITY">
         <OlMuniDataLayer
           :year="year"
           :pollutant="pollutant"
@@ -59,7 +59,7 @@ import GridFeaturePopup from "./GridFeaturePopup.vue";
 import MuniFeaturePopup from "./MuniFeaturePopup.vue";
 import Legend from "./Legend.vue";
 import { Pollutant, MapDataType, MuniFeatureProperties } from "../types";
-import { PollutantLegend, Gnfr } from "../types";
+import { PollutantLegend } from "../types";
 
 const attribution = new Attribution({
   collapsible: true
@@ -75,7 +75,7 @@ export default Vue.extend({
   },
   props: {
     year: Number,
-    gnfr: { type: String as PropType<Gnfr> },
+    gnfr: String,
     pollutant: { type: Object as PropType<Pollutant> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
