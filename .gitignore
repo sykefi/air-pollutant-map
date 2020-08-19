@@ -116,3 +116,4 @@ dist
 /dist
 .DS_Store
 db/temp
+cypress/integration/examples

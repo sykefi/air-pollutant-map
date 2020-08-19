@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "cypress": "npx cypress open"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -25,7 +26,9 @@
     "@vue/cli-plugin-typescript": "~4.4.0",
     "@vue/cli-service": "~4.4.0",
     "@vue/eslint-config-typescript": "^5.0.2",
+    "cypress": "^4.12.1",
     "eslint": "^6.7.2",
+    "eslint-plugin-cypress": "^2.11.1",
     "eslint-plugin-vue": "^6.2.2",
     "prettier": "^2.0.5",
     "typescript": "~3.9.3",
