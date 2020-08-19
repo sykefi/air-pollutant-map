@@ -1,19 +1,19 @@
 import { Gnfr, Pollutant, DbGnfr, DbPollutant } from "@/types";
 import * as cache from "./cache";
+import { m2tokm2 } from "./../constants";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
-const gridDataTable = "p_gd_test";
-const gridDataTotalsTable = "p_gd_totals";
+const gridDataTable = "p_grid_data_gnfr";
+const gridDataTotalsTable = "p_grid_data_totals";
 const muniDataTable = "p_muni_data";
 const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";
 const outputFormat = "&outputFormat=application/json";
-const m2tokm2 = 1e-6;
 
-const getWfsGridDataUri = (year: number, gnfrKey: string, pollutant: Pollutant): string => {
+const getWfsGridDataUri = (year: number, gnfrId: string, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${pollutant.id}
-    ${outputFormat}&viewparams=year:${year};class:${gnfrKey}`.replace(/ /g, "");
+    ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
 const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant) => {
@@ -22,16 +22,16 @@ const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant) => {
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
-const getGridDataCacheKey = (year: number, gnfrKey: string, pollutant: Pollutant) => {
-  return `pollutant_map_grid_data_${year}_${gnfrKey}_${pollutant.id}`;
+const getGridDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant) => {
+  return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutant.id}`;
 };
 
-export const fetchFeatures = async (year: number, gnfrKey: string, pollutant: Pollutant) => {
+export const fetchFeatures = async (year: number, gnfrId: string, pollutant: Pollutant) => {
   const uri =
-    gnfrKey === "COMBINED"
+    gnfrId === "COMBINED"
       ? getWfsTotalGridDataUri(year, pollutant)
-      : getWfsGridDataUri(year, gnfrKey, pollutant);
-  const cacheKey = getGridDataCacheKey(year, gnfrKey, pollutant);
+      : getWfsGridDataUri(year, gnfrId, pollutant);
+  const cacheKey = getGridDataCacheKey(year, gnfrId, pollutant);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
     console.log("Fetched grid data from cache");
