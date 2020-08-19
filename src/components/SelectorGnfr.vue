@@ -151,8 +151,8 @@ export default Vue.extend({
         console.error("Could not find initial (combined) gnfr");
       }
     },
-    getGnfrByKey(gnfrKey: string): Gnfr | undefined {
-      return this.gnfrOptions.find((gnfr) => gnfr.id === gnfrKey);
+    getGnfrByKey(gnfrId: string): Gnfr | undefined {
+      return this.gnfrOptions.find((gnfr) => gnfr.id === gnfrId);
     },
     toggleGnfrSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
@@ -202,13 +202,13 @@ export default Vue.extend({
     },
     makeChoice: function (whichOption) {
       // read gnfr identifier from span element
-      const selectedGnfrKey = whichOption
+      const selectedGnfrId = whichOption
         .querySelector("span")
         .textContent.replace(/[{()}]/g, "")
         .trim();
 
-      const selectedGnfr = this.getGnfrByKey(selectedGnfrKey);
-      if (selectedGnfrKey && selectedGnfr) {
+      const selectedGnfr = this.getGnfrByKey(selectedGnfrId);
+      if (selectedGnfrId && selectedGnfr) {
         this.setSelectedGnfr(selectedGnfr);
       } else {
         console.log("Could not select gnfr by id", selectedGnfr);

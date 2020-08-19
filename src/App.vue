@@ -48,8 +48,8 @@ export default Vue.extend({
     setSelectedYear(year: number) {
       this.year = year;
     },
-    setSelectedGnfr(gnfrKey: string) {
-      this.gnfr = gnfrKey;
+    setSelectedGnfr(gnfrId: string) {
+      this.gnfr = gnfrId;
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;

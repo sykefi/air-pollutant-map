@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS gd_totals;
+DROP TABLE IF EXISTS grid_data_totals;
 
-CREATE TABLE IF NOT EXISTS gd_totals AS (
+CREATE TABLE grid_data_totals AS (
     SELECT GD.*, G.geom_web as geom
     FROM 
         (
