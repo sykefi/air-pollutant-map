@@ -35,29 +35,11 @@
           focusable="false"
           aria-hidden="true"
           id="icon-circle-down"
-          v-bind:class="[!showOptions ? '' : 'hidden-all', 'icon']"
+          v-bind:class="[!showOptions ? '' : 'rotate', 'icon']"
           role="img"
         >
           <path
             d="M23.245 4l-11.245 14.374-11.219-14.374-.781.619 12 15.381 12-15.391-.755-.609z"
-          />
-        </svg>
-        <svg
-          width="21"
-          height="21"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          focusable="false"
-          aria-hidden="true"
-          id="icon-circle-down"
-          class="icon"
-          role="img"
-          v-bind:class="[showOptions ? '' : 'hidden-all', 'icon']"
-        >
-          <path
-            d="M23.245 20l-11.245-14.374-11.219 14.374-.781-.619 12-15.381 12 15.391-.755.609z"
           />
         </svg>
       </span>
@@ -238,6 +220,11 @@ export default Vue.extend({
 .icon {
   fill: ButtonText;
   pointer-events: none;
+  transition-duration: 0.2s;
+  -webkit-transition-duration: 0.2s; /* Safari */
+}
+.rotate {
+  transform: rotate(180deg);
 }
 .hidden-all {
   display: none;

@@ -41,29 +41,11 @@
           focusable="false"
           aria-hidden="true"
           id="icon-circle-down"
-          :class="[!showOptions ? '' : 'hidden-all', 'icon']"
+          :class="[!showOptions ? '' : 'rotate', !initialized ? 'hidden-all' : '', 'icon']"
           role="img"
         >
           <path
             d="M23.245 4l-11.245 14.374-11.219-14.374-.781.619 12 15.381 12-15.391-.755-.609z"
-          />
-        </svg>
-        <svg
-          width="21"
-          height="21"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          focusable="false"
-          aria-hidden="true"
-          id="icon-circle-down"
-          class="icon"
-          role="img"
-          v-bind:class="[showOptions ? '' : 'hidden-all', 'icon']"
-        >
-          <path
-            d="M23.245 20l-11.245-14.374-11.219 14.374-.781-.619 12-15.381 12 15.391-.755.609z"
           />
         </svg>
       </span>
@@ -135,7 +117,8 @@ export default Vue.extend({
       combinedGnfr: undefined as Gnfr | undefined,
       showOptions: false as boolean,
       selectorState: "initial" as string,
-      disabled: false as boolean
+      disabled: false as boolean,
+      initialized: false as boolean
     };
   },
   methods: {
@@ -147,6 +130,7 @@ export default Vue.extend({
         this.combinedGnfr = combinedGnfr;
         this.gnfrInputValue = combinedGnfr.name["fi"];
         this.setSelectedGnfr(this.combinedGnfr);
+        this.initialized = true;
       } else {
         console.error("Could not find initial (combined) gnfr");
       }
@@ -165,7 +149,7 @@ export default Vue.extend({
       this.selectorState = state;
     },
     handleSelectorClick: function () {
-      if (this.disabled) {
+      if (this.disabled || !this.initialized) {
         return;
       }
       const currentFocus = findFocus();
@@ -329,6 +313,11 @@ export default Vue.extend({
 .icon {
   fill: ButtonText;
   pointer-events: none;
+  transition-duration: 0.2s;
+  -webkit-transition-duration: 0.2s; /* Safari */
+}
+.rotate {
+  transform: rotate(180deg);
 }
 .hidden-all {
   display: none;
