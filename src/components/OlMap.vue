@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="ol-map">
-      <div v-if="gnfr && isReady && mapDataType === mapDataTypes.GRID">
+      <div v-if="gnfr && pollutant && isReady && mapDataType === mapDataTypes.GRID">
         <OlGridDataLayer
           :gnfr="gnfr"
           :year="year"
@@ -11,7 +11,7 @@
           @set-grid-feature-popup="setGridFeaturePopup"
         />
       </div>
-      <div v-if="gnfr && isReady && mapDataType === mapDataTypes.MUNICIPALITY">
+      <div v-if="pollutant && isReady && mapDataType === mapDataTypes.MUNICIPALITY">
         <OlMuniDataLayer
           :year="year"
           :pollutant="pollutant"
@@ -76,7 +76,7 @@ export default Vue.extend({
   props: {
     year: Number,
     gnfr: String,
-    pollutant: { type: Object as PropType<Pollutant> },
+    pollutant: { type: Object as PropType<Pollutant | undefined> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
   data() {
@@ -152,8 +152,8 @@ export default Vue.extend({
       controls: defaultControls({ attribution: false }).extend([attribution]),
       view: new View({
         projection: "EPSG:3857",
-        center: [2897716, 9389901],
-        zoom: 6
+        center: [2871896, 9694576],
+        zoom: 5.6
       })
     });
     this.map.once("postrender", () => {

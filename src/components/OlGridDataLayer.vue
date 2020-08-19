@@ -45,7 +45,7 @@ export default Vue.extend({
       this.layerSource.refresh();
     },
     pollutant: function (newVal: Pollutant) {
-      console.log(`Pollutant changed to ${newVal.parlocRyhmaSelite}, refreshing grid data...`);
+      console.log(`Pollutant changed to ${newVal.name["fi"]}, refreshing grid data...`);
       this.colorFunction = undefined;
       this.layerSource.refresh();
     }
@@ -62,19 +62,17 @@ export default Vue.extend({
     },
     async updateStyle() {
       console.log(
-        `Has breakpoints (${this.pollutant.dbCol})? ${styleUtils.hasBreakPoints(
+        `Has breakpoints (${this.pollutant.id})? ${styleUtils.hasBreakPoints(
           MapDataType.GRID,
-          this.pollutant.dbCol
+          this.pollutant.id
         )}`
       );
       const maxValue = Math.ceil(
-        Math.max(
-          ...this.layerSource.getFeatures().map((feat) => feat.get(this.pollutant.dbCol))
-        )
+        Math.max(...this.layerSource.getFeatures().map((feat) => feat.get(this.pollutant.id)))
       );
       console.log("Found max value for the layer", maxValue);
 
-      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.dbCol)) {
+      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.id)) {
         if (this.gnfr === "COMBINED" && this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
@@ -82,16 +80,16 @@ export default Vue.extend({
           );
           const latestValues = this.layerSource
             .getFeatures()
-            .map((feat) => feat.get(this.pollutant.dbCol));
+            .map((feat) => feat.get(this.pollutant.id));
           styleUtils.setPollutantBreakPoints(
             MapDataType.GRID,
-            this.pollutant.dbCol,
+            this.pollutant.id,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
             MapDataType.GRID,
-            this.pollutant.dbCol,
+            this.pollutant.id,
             maxValue
           );
         } else {
@@ -104,18 +102,16 @@ export default Vue.extend({
             "COMBINED",
             this.pollutant
           );
-          const latestValues = fc.features.map(
-            (feat) => feat.properties[this.pollutant.dbCol]
-          );
+          const latestValues = fc.features.map((feat) => feat.properties[this.pollutant.id]);
           styleUtils.setPollutantBreakPoints(
             MapDataType.GRID,
-            this.pollutant.dbCol,
+            this.pollutant.id,
             latestValues,
             classCount
           );
           this.colorFunction = styleUtils.getColorFunction(
             MapDataType.GRID,
-            this.pollutant.dbCol,
+            this.pollutant.id,
             maxValue
           );
           // for some reason this async style update needs to be triggered manually
@@ -124,7 +120,7 @@ export default Vue.extend({
       } else {
         this.colorFunction = styleUtils.getColorFunction(
           MapDataType.GRID,
-          this.pollutant.dbCol,
+          this.pollutant.id,
           maxValue
         );
         console.log(`Updated to use previously created style function`);
@@ -133,7 +129,7 @@ export default Vue.extend({
       this.legend = styleUtils.getPollutantLegendObject(
         MapDataType.GRID,
         this.pollutant,
-        this.pollutant.dbCol,
+        this.pollutant.id,
         maxValue
       );
       this.$emit("update-legend", this.legend);
@@ -144,7 +140,7 @@ export default Vue.extend({
         this.$emit(
           "set-grid-feature-popup",
           event.coordinate,
-          feats[0].getProperties()[this.pollutant.dbCol]
+          feats[0].getProperties()[this.pollutant.id]
         );
       } else {
         console.log("no features found on click -> cannot set popup");
@@ -159,7 +155,7 @@ export default Vue.extend({
     }
   },
   mounted() {
-    console.log("mounting grid data:", this.pollutant.dbCol, "of year", this.year);
+    console.log("mounting grid data:", this.pollutant.id, "of year", this.year);
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {

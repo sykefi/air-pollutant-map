@@ -2,17 +2,16 @@ DROP TABLE IF EXISTS public.gnfr_meta;
 
 CREATE TABLE public.gnfr_meta
 (
-    id SERIAL PRIMARY KEY,
-    db_key VARCHAR(30),
-    nimi VARCHAR(30),
-    namn VARCHAR(30),
-    name VARCHAR(30),
-    use_dev BOOLEAN DEFAULT FALSE,
-    use_prod BOOLEAN DEFAULT FALSE
+    id VARCHAR(30) NOT NULL,
+    nimi VARCHAR(30) NOT NULL,
+    namn VARCHAR(30) NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    use_dev BOOLEAN NOT NULL DEFAULT FALSE,
+    use_prod BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 INSERT INTO 
-    public.gnfr_meta (db_key, nimi, namn, name, use_dev)
+    public.gnfr_meta (id, nimi, namn, name, use_dev)
 VALUES
     ('COMBINED', 'Kaikki', 'Combined_sv', 'Combined', 'TRUE'),
     ('I_Offroad', 'I_Offroad_fi', 'I_Offroad_sv', 'I_Offroad_en', 'TRUE'),

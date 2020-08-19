@@ -1,15 +1,6 @@
-export interface Pollutant {
-  parlocRyhmaTunnus: number;
-  dbCol: string;
-  parlocRyhmaNimi: string;
-  parlocRyhmaSelite: string;
-  raja_arvo: number;
-  yksikko: string;
-  rapYkskko: string;
-  kerroinRaportointiin: string;
-  seliteRaportoinnissa: string;
-  ryhma: string;
-  jarjestusraportissa: number | string;
+export enum MapDataType {
+  MUNICIPALITY = "Municipality",
+  GRID = "Grid"
 }
 
 interface ValueRange {
@@ -24,6 +15,13 @@ export interface PollutantLegend {
   unit: string;
 }
 
+export interface MuniFeatureProperties {
+  id: number;
+  nimi: string;
+  area: number;
+  [key: string]: number | string;
+}
+
 interface LangStringMap {
   fi: string;
   sv: string;
@@ -31,7 +29,7 @@ interface LangStringMap {
 }
 
 export interface DbGnfr {
-  db_key: string;
+  id: string;
   nimi: string;
   namn: string;
   name: string;
@@ -39,20 +37,36 @@ export interface DbGnfr {
   use_prod: boolean;
 }
 export interface Gnfr {
-  dbKey: string;
+  id: string;
   name: LangStringMap;
   useDev: boolean;
   useProd: boolean;
 }
 
-export enum MapDataType {
-  MUNICIPALITY = "Municipality",
-  GRID = "Grid"
+export interface DbPollutant {
+  id: string;
+  parloc_ryhma_tunnus: number;
+  parloc_ryhma_nimi: string;
+  nimi: string;
+  namn: string;
+  name: string;
+  raja_arvo: number | null;
+  yksikko: string;
+  rap_yksikko: string;
+  ryhma: string | null;
+  use_dev: boolean;
+  use_prod: boolean;
 }
 
-export interface MuniFeatureProperties {
-  id: number;
-  nimi: string;
-  area: number;
-  [key: string]: number | string;
+export interface Pollutant {
+  id: string;
+  parlocGroupId: number;
+  parlocGroupName: string;
+  name: LangStringMap;
+  threshold: number | null;
+  unit: string;
+  repUnit: string;
+  group: string | null;
+  useDev: boolean;
+  useProd: boolean;
 }
