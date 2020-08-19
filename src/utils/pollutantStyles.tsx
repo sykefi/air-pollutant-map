@@ -181,8 +181,8 @@ export const getPollutantLegendObject = (
   if (!breakPoints) {
     console.log(
       "Failed to load legend for pollutant (no breakpoints found)",
-      pollutant.dbCol,
-      pollutant.parlocRyhmaSelite
+      pollutant.id,
+      pollutant.name["fi"]
     );
     return undefined;
   }
@@ -207,7 +207,7 @@ export const getPollutantLegendObject = (
     },
     {
       classNames: [...Array(breakPoints.length).keys()].map((i) => i + 1),
-      unit: pollutant.yksikko
+      unit: pollutant.unit
     }
   );
 };
