@@ -79,7 +79,7 @@
           role="option"
         >
           {{ gnfr.name["fi"] }}
-          <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.dbKey }}</span>
+          <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.id }}</span>
         </li>
       </ul>
     </div>
@@ -97,9 +97,9 @@ const findFocus = () => {
 };
 
 const sortGnfrOptions = (a: Gnfr, b: Gnfr): number => {
-  if (a.dbKey === "COMBINED") {
+  if (a.id === "COMBINED") {
     return -1;
-  } else if (b.dbKey === "COMBINED") {
+  } else if (b.id === "COMBINED") {
     return 1;
   }
   if (a.name["fi"] < b.name["fi"]) {
@@ -142,7 +142,7 @@ export default Vue.extend({
     async initializeGnfrOptions() {
       const gnfrOptions = await fetchGnfrMeta();
       this.gnfrOptions = gnfrOptions.sort(sortGnfrOptions);
-      const combinedGnfr = this.gnfrOptions.find((gnfr) => gnfr.dbKey === "COMBINED");
+      const combinedGnfr = this.gnfrOptions.find((gnfr) => gnfr.id === "COMBINED");
       if (combinedGnfr) {
         this.combinedGnfr = combinedGnfr;
         this.gnfrInputValue = combinedGnfr.name["fi"];
@@ -152,7 +152,7 @@ export default Vue.extend({
       }
     },
     getGnfrByKey(gnfrKey: string): Gnfr | undefined {
-      return this.gnfrOptions.find((gnfr) => gnfr.dbKey === gnfrKey);
+      return this.gnfrOptions.find((gnfr) => gnfr.id === gnfrKey);
     },
     toggleGnfrSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
@@ -215,7 +215,7 @@ export default Vue.extend({
       }
     },
     setSelectedGnfr: function (selectedGnfr: Gnfr) {
-      this.$emit("set-selected-gnfr", selectedGnfr.dbKey);
+      this.$emit("set-selected-gnfr", selectedGnfr.id);
       this.gnfrInputValue = selectedGnfr.name["fi"];
     }
   },

@@ -29,7 +29,7 @@ interface LangStringMap {
 }
 
 export interface DbGnfr {
-  db_key: string;
+  id: string;
   nimi: string;
   namn: string;
   name: string;
@@ -37,29 +37,16 @@ export interface DbGnfr {
   use_prod: boolean;
 }
 export interface Gnfr {
-  dbKey: string;
+  id: string;
   name: LangStringMap;
-  useDev: boolean;
-  useProd: boolean;
-}
-
-export interface Pollutant {
-  parlocGroupId: number;
-  parlocGroupName: string;
-  dbCol: string;
-  name: LangStringMap;
-  threshold: number | null;
-  unit: string;
-  repUnit: string;
-  group: string | null;
   useDev: boolean;
   useProd: boolean;
 }
 
 export interface DbPollutant {
+  id: string;
   parloc_ryhma_tunnus: number;
   parloc_ryhma_nimi: string;
-  db_col: string;
   nimi: string;
   namn: string;
   name: string;
@@ -69,4 +56,17 @@ export interface DbPollutant {
   ryhma: string | null;
   use_dev: boolean;
   use_prod: boolean;
+}
+
+export interface Pollutant {
+  id: string;
+  parlocGroupId: number;
+  parlocGroupName: string;
+  name: LangStringMap;
+  threshold: number | null;
+  unit: string;
+  repUnit: string;
+  group: string | null;
+  useDev: boolean;
+  useProd: boolean;
 }

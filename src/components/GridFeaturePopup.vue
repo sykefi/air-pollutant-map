@@ -2,9 +2,7 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      <div class="olpopup-title">
-        {{ pollutant.parlocRyhmaSelite }} ({{ pollutant.yksikko }}):
-      </div>
+      <div class="olpopup-title">{{ pollutant.name["fi"] }} ({{ pollutant.unit }}):</div>
       <div class="olpopup-value">
         <span class="olpopup-value">{{ roundPollutantValue(popupValue) }}</span>
       </div>

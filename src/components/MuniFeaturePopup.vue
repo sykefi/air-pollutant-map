@@ -2,21 +2,19 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      <div class="olpopup-title">
-        {{ pollutant.parlocRyhmaSelite }} ({{ featProps.nimi }}):
-      </div>
+      <div class="olpopup-title">{{ pollutant.name["fi"] }} ({{ featProps.nimi }}):</div>
       <div class="olpopup-values">
         <div class="olpopup-value-row">
           <span class="olpopup-value">
-            {{ roundPollutantValue(featProps[pollutant.dbCol]) }}
+            {{ roundPollutantValue(featProps[pollutant.id]) }}
           </span>
-          <span>{{ pollutant.yksikko }} </span>
+          <span>{{ pollutant.unit }} </span>
         </div>
         <div class="olpopup-value-row">
           <span class="olpopup-value"
-            >{{ roundPollutantValue(featProps[pollutant.dbCol + "-density"]) }}
+            >{{ roundPollutantValue(featProps[pollutant.id + "-density"]) }}
           </span>
-          <span>{{ pollutant.yksikko }} / km<sup>2</sup> </span>
+          <span>{{ pollutant.unit }} / km<sup>2</sup> </span>
         </div>
       </div>
     </div>

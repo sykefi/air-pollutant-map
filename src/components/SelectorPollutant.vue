@@ -73,7 +73,7 @@
           role="option"
         >
           {{ pollutant.name["fi"] }}
-          <span> ({{ pollutant.dbCol }})</span>
+          <span> ({{ pollutant.id }})</span>
         </li>
       </ul>
     </div>
@@ -109,7 +109,7 @@ export default Vue.extend({
         .filter((feat) => feat.useDev)
         .sort((a, b) => a.name["fi"].localeCompare(b.name["fi"]));
 
-      const initialPollutant = this.pollutantOptions.find((feat) => feat.dbCol === "s16");
+      const initialPollutant = this.pollutantOptions.find((feat) => feat.id === "s16");
       if (initialPollutant) {
         this.setSelectedPollutant(initialPollutant);
       }
@@ -157,21 +157,21 @@ export default Vue.extend({
           break;
       }
     },
-    getPollutant: function (dbCol: string): Pollutant | undefined {
-      return this.pollutantOptions.filter((po) => po.dbCol === dbCol)[0];
+    getPollutant: function (pollutantId: string): Pollutant | undefined {
+      return this.pollutantOptions.filter((po) => po.id === pollutantId)[0];
     },
     makeChoice: function (whichOption) {
       // read pollutant identifier from hidden span element
-      const selectedDbCol = whichOption
+      const selectedPollutantId = whichOption
         .querySelector("span")
         .textContent.replace(/[{()}]/g, "")
         .trim();
 
-      const selectedPollutant = this.getPollutant(selectedDbCol);
+      const selectedPollutant = this.getPollutant(selectedPollutantId);
       if (selectedPollutant) {
         this.setSelectedPollutant(selectedPollutant);
       } else {
-        console.log("Could not select pollutant by id", selectedDbCol);
+        console.log("Could not select pollutant by id", selectedPollutantId);
       }
     },
     setSelectedPollutant: function (po: Pollutant) {

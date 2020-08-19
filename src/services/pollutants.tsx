@@ -12,18 +12,18 @@ const m2tokm2 = 1e-6;
 
 const getWfsGridDataUri = (year: number, gnfrKey: string, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${pollutant.dbCol}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${pollutant.id}
     ${outputFormat}&viewparams=year:${year};class:${gnfrKey}`.replace(/ /g, "");
 };
 
 const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant) => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=geom,${pollutant.dbCol}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=geom,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
 const getGridDataCacheKey = (year: number, gnfrKey: string, pollutant: Pollutant) => {
-  return `pollutant_map_grid_data_${year}_${gnfrKey}_${pollutant.dbCol}`;
+  return `pollutant_map_grid_data_${year}_${gnfrKey}_${pollutant.id}`;
 };
 
 export const fetchFeatures = async (year: number, gnfrKey: string, pollutant: Pollutant) => {
@@ -45,12 +45,12 @@ export const fetchFeatures = async (year: number, gnfrKey: string, pollutant: Po
 };
 
 const getMuniDataCacheKey = (year: number, pollutant: Pollutant) => {
-  return `pollutant_map_muni_data_${year}_${pollutant.dbCol}`;
+  return `pollutant_map_muni_data_${year}_${pollutant.id}`;
 };
 
 const getWfsMuniDataUri = (year: number, pollutant: Pollutant) => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${muniDataTable}&propertyName=geom,nimi,area,${pollutant.dbCol}
+    &request=GetFeature&typeName=paastotkartalla:${muniDataTable}&propertyName=geom,nimi,area,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
@@ -66,8 +66,8 @@ export const fetchMuniFeatures = async (year: number, pollutant: Pollutant) => {
   const fc = await response.json();
   // calculate pollutant densities to feature properties
   fc.features.forEach((feat) => {
-    feat.properties[pollutant.dbCol + "-density"] =
-      feat.properties[pollutant.dbCol] / (feat.properties.area * m2tokm2);
+    feat.properties[pollutant.id + "-density"] =
+      feat.properties[pollutant.id] / (feat.properties.area * m2tokm2);
   });
   cache.setToCache(cacheKey, fc);
   console.log("Fetched muni data from WFS");
@@ -76,7 +76,7 @@ export const fetchMuniFeatures = async (year: number, pollutant: Pollutant) => {
 
 const getGnfrObject = (props: DbGnfr): Gnfr => {
   const name = { fi: props.nimi, sv: props.namn, en: props.name };
-  return { dbKey: props.db_key, name, useDev: props.use_dev, useProd: props.use_prod };
+  return { id: props.id, name, useDev: props.use_dev, useProd: props.use_prod };
 };
 
 export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
@@ -89,9 +89,9 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
 
 const getPollutantObject = (props: DbPollutant): Pollutant => {
   return {
+    id: props.id,
     parlocGroupId: props.parloc_ryhma_tunnus,
     parlocGroupName: props.parloc_ryhma_nimi,
-    dbCol: props.db_col,
     name: { fi: props.nimi, sv: props.namn, en: props.name },
     threshold: props.raja_arvo,
     unit: props.yksikko,
