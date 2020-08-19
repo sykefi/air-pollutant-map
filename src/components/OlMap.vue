@@ -152,8 +152,8 @@ export default Vue.extend({
       controls: defaultControls({ attribution: false }).extend([attribution]),
       view: new View({
         projection: "EPSG:3857",
-        center: [2897716, 9389901],
-        zoom: 6
+        center: [2871896, 9694576],
+        zoom: 5.6
       })
     });
     this.map.once("postrender", () => {
