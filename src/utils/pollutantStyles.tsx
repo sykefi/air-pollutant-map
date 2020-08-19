@@ -181,7 +181,7 @@ export const getPollutantLegendObject = (
   if (!breakPoints) {
     console.log(
       "Failed to load legend for pollutant (no breakpoints found)",
-      pollutant.dbCol,
+      pollutant.id,
       pollutant.name["fi"]
     );
     return undefined;

@@ -30,7 +30,7 @@ export default Vue.extend({
       vectorLayer: new VectorLayer() as VectorLayer,
       colorFunction: undefined as Function | undefined,
       legend: undefined as PollutantLegend | undefined,
-      densityProp: (this.pollutant.dbCol + "-density") as string
+      densityProp: (this.pollutant.id + "-density") as string
     };
   },
   watch: {
@@ -40,7 +40,7 @@ export default Vue.extend({
     },
     pollutant: function (newVal: Pollutant) {
       console.log(`Pollutant changed to ${newVal.name["fi"]}, refreshing muni data...`);
-      this.densityProp = newVal.dbCol + "-density";
+      this.densityProp = newVal.id + "-density";
       this.colorFunction = undefined;
       this.layerSource.refresh();
     }
@@ -150,7 +150,7 @@ export default Vue.extend({
     }
   },
   mounted() {
-    console.log("mounting muni data:", this.pollutant.dbCol, "of year", this.year);
+    console.log("mounting muni data:", this.pollutant.id, "of year", this.year);
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {
