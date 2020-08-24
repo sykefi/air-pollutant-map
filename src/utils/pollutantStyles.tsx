@@ -4,13 +4,13 @@ import { Pollutant, PollutantLegend, MapDataType } from "../types";
 const breakPointDictionary: { [key: string]: number[] } = {};
 
 const colorScale: string[] = [
-  "#1a9850",
-  "#91cf60",
-  "#d9ef8b",
-  "#ffffbf",
-  "#fee08b",
-  "#fc8d59",
-  "#d73027"
+  "#edf8fb",
+  "#bfd3e6",
+  "#9ebcda",
+  "#8c96c6",
+  "#8c6bb1",
+  "#88419d",
+  "#6e016b"
 ];
 
 const getStyleId = (dataType: MapDataType, valuePropName: string) => dataType + valuePropName;
