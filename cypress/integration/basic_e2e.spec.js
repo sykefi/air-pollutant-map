@@ -18,7 +18,6 @@ describe("Page load and initial UI", () => {
     cy.contains("Kunnat");
   });
   it("show legend", () => {
-    cy.visit("http://localhost:8080/");
     cy.contains("Päästömäärä (t)");
   });
 });
@@ -108,7 +107,7 @@ describe("Pollutant selector", () => {
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
     });
   });
-  it("select pollutant by clicking an option (Rikkidioksidi)", () => {
+  it("select pollutant by clicking an option (rikkidioksidi)", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get(".pollutant-select").click();
       cy.contains("Rikkidioksidi").click();
@@ -208,7 +207,7 @@ describe("Municipality layer", () => {
       cy.contains("11 - 26");
     });
   });
-  it("show expected class ranges in legend (Rikkidioksidi)", () => {
+  it("show expected class ranges in legend (rikkidioksidi)", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get(".pollutant-select").click();
       cy.contains("Rikkidioksidi").click();
