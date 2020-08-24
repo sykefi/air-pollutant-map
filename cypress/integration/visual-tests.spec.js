@@ -59,6 +59,17 @@ describe("Visual regression tests", () => {
     cy.matchImageSnapshot();
   });
 
+  it("shows combined grid data layer: rikkidioksidi", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get(".gnfr-select").click();
+      cy.contains("li", "Kaikki").click();
+      cy.get("#gnfr-select-list").should("have.class", "hidden-all");
+      cy.contains("Kaikki");
+    });
+    cy.wait(1500);
+    cy.matchImageSnapshot();
+  });
+
   it("shows municipality layer rikkidioksidi", () => {
     cy.contains("Kunnat").click();
     cy.contains("Päästömäärä (t / km2)");
@@ -73,6 +84,13 @@ describe("Visual regression tests", () => {
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
       cy.contains("Typen oksidit");
     });
+    cy.wait(1500);
+    cy.matchImageSnapshot();
+  });
+
+  it("toggles back to grid data layer (typen oksidit)", () => {
+    cy.contains("Ruudukko").click();
+    cy.contains("Päästömäärä (t)");
     cy.wait(1500);
     cy.matchImageSnapshot();
   });
