@@ -5,7 +5,7 @@
       :class="[disabled ? 'gnfr-selector-disabled' : '', 'selector-label']"
       for="gnfr-select-input"
     >
-      Luokka
+      {{ "selector.gnfr.label" | translate }}
     </div>
     <div id="gnfr-select-status" class="hidden-visually" aria-live="polite"></div>
     <div

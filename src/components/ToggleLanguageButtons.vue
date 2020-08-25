@@ -37,6 +37,7 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import { mapState } from "vuex";
 import { Lang } from "@/store";
 
 export default Vue.extend({
@@ -45,11 +46,7 @@ export default Vue.extend({
       Lang: Object(Lang)
     };
   },
-  computed: {
-    lang() {
-      return this.$store.state.lang;
-    }
-  },
+  computed: mapState(["lang"]),
   methods: {
     setLanguage: function (lang: Lang) {
       this.$store.commit("setLang", lang);
@@ -81,10 +78,9 @@ export default Vue.extend({
 }
 .lang-button-hover:hover {
   color: black;
-  border-color: black;
-  z-index: 4;
 }
 #selector-left {
+  padding: 3px 8px 3px 7px;
   margin-right: -3px;
   border-radius: 5px 0 0 5px;
 }

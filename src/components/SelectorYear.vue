@@ -1,7 +1,9 @@
 <template>
   <div class="year-selector-div">
     <label class="hidden-visually" for="custom-select-input">Vuosi</label>
-    <div class="selector-label" for="custom-select-input">Vuosi</div>
+    <div class="selector-label" for="custom-select-input">
+      {{ "selector.vuosi.label" | translate }}
+    </div>
     <div id="custom-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
       class="custom-select"

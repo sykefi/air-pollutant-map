@@ -11,7 +11,7 @@
           'data-type-selector-button'
         ]"
       >
-        Ruudukko
+        {{ "selector.map.datatype.grid" | translate }}
       </div>
       <div
         id="selector-municipalities"
@@ -23,7 +23,7 @@
           'data-type-selector-button'
         ]"
       >
-        Kunnat
+        {{ "selector.map.datatype.muni" | translate }}
       </div>
     </div>
   </div>
@@ -75,8 +75,6 @@ export default Vue.extend({
 }
 .data-type-selector-hover:hover {
   color: black;
-  border-color: black;
-  z-index: 4;
 }
 #selector-municipalities {
   border-radius: 0 5px 5px 0;
