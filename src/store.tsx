@@ -17,5 +17,8 @@ export const store = new Vuex.Store({
     setLang(state, lang: Lang) {
       state.lang = lang;
     }
+  },
+  getters: {
+    lang: (state) => state.lang
   }
 });
