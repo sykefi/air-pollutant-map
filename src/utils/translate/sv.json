@@ -1,0 +1,8 @@
+{
+  "selector.vuosi.label": "Vuosi_sv",
+  "selector.gnfr.label": "Luokka_sv",
+  "selector.pollutant.label": "Saastuke_sv",
+  "selector.map.datatype.grid": "Ruudukko_sv",
+  "selector.map.datatype.muni": "Kunnat_sv",
+  "map.legend.title-without-unit": "Päästömäärä_sv"
+}

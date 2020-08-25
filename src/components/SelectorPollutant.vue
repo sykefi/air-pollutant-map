@@ -1,7 +1,9 @@
 <template>
   <div class="pollutant-selector-div">
     <label class="hidden-visually" for="pollutant-select-input">Saastuke</label>
-    <div class="selector-label" for="pollutant-select-input">Saastuke</div>
+    <div class="selector-label" for="pollutant-select-input">
+      {{ "selector.pollutant.label" | translate }}
+    </div>
     <div id="pollutant-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
       class="pollutant-select"
