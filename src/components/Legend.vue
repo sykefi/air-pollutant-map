@@ -46,7 +46,7 @@ export default {
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
 #legend-title {
-  margin: 0 0 7px 0;
+  margin: 0 0 8px 0;
   font-weight: 550;
 }
 .legend-class-row {
