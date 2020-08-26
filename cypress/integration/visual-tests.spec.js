@@ -2,7 +2,7 @@ describe("Visual regression tests", () => {
   it("renders initial map", () => {
     cy.visit("http://localhost:8080/");
     cy.contains("Päästömäärä (t)");
-    cy.wait(500);
+    cy.wait(1000);
     cy.matchImageSnapshot();
   });
 
