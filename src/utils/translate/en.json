@@ -1,0 +1,8 @@
+{
+  "selector.vuosi.label": "Year",
+  "selector.gnfr.label": "Sector",
+  "selector.pollutant.label": "Pollutant",
+  "selector.map.datatype.grid": "Grid",
+  "selector.map.datatype.muni": "Municipalities",
+  "map.legend.title-without-unit": "Pollution"
+}

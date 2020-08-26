@@ -1,7 +1,9 @@
 <template>
   <div class="pollutant-selector-div">
     <label class="hidden-visually" for="pollutant-select-input">Saastuke</label>
-    <div class="selector-label" for="pollutant-select-input">Saastuke</div>
+    <div class="selector-label" for="pollutant-select-input">
+      {{ "selector.pollutant.label" | translate }}
+    </div>
     <div id="pollutant-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
       class="pollutant-select"
@@ -58,7 +60,7 @@
           tabindex="-1"
           role="option"
         >
-          {{ pollutant.name["fi"] }}
+          {{ pollutant.name[lang] }}
           <span> ({{ pollutant.id }})</span>
         </li>
       </ul>
@@ -68,6 +70,7 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import { mapState } from "vuex";
 import { Pollutant } from "./../types";
 import { fetchPollutantMeta } from "./../services/pollutants";
 
@@ -89,12 +92,13 @@ export default Vue.extend({
       initialized: false as boolean
     };
   },
+  computed: mapState(["lang"]),
   methods: {
     async initializePollutantOptions() {
       const pollutantOptions = await fetchPollutantMeta();
       this.pollutantOptions = pollutantOptions
         .filter((feat) => feat.useDev)
-        .sort((a, b) => a.name["fi"].localeCompare(b.name["fi"]));
+        .sort((a, b) => a.name[this.lang].localeCompare(b.name[this.lang]));
 
       const initialPollutant = this.pollutantOptions.find((feat) => feat.id === "s16");
       if (initialPollutant) {
@@ -167,7 +171,7 @@ export default Vue.extend({
     },
     setSelectedPollutant: function (po: Pollutant) {
       this.$emit("set-selected-pollutant", po);
-      this.pollutantInputValue = po.name["fi"];
+      this.pollutantInputValue = po.name[this.lang];
     }
   },
   mounted() {

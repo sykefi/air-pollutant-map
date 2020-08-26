@@ -2,7 +2,7 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      <div class="olpopup-title">{{ pollutant.name["fi"] }} ({{ featProps.nimi }}):</div>
+      <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ featProps.nimi }}):</div>
       <div class="olpopup-values">
         <div class="olpopup-value-row">
           <span class="olpopup-value">
@@ -24,12 +24,14 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Pollutant, MuniFeatureProperties } from "@/types";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   props: {
     pollutant: { type: Object as PropType<Pollutant> },
     featProps: { type: Object as PropType<MuniFeatureProperties> }
   },
+  computed: mapState(["lang"]),
   methods: {
     closePopup() {
       this.$emit("close-popup");

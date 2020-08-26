@@ -5,7 +5,7 @@
       :class="[disabled ? 'gnfr-selector-disabled' : '', 'selector-label']"
       for="gnfr-select-input"
     >
-      Luokka
+      {{ "selector.gnfr.label" | translate }}
     </div>
     <div id="gnfr-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
@@ -60,7 +60,7 @@
           tabindex="-1"
           role="option"
         >
-          {{ gnfr.name["fi"] }}
+          {{ gnfr.name[lang] }}
           <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.id }}</span>
         </li>
       </ul>
@@ -70,26 +70,13 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { mapState } from "vuex";
 import { Gnfr, MapDataType } from "./../types";
 import { fetchGnfrMeta } from "@/services/pollutants";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
   return focusPoint;
-};
-
-const sortGnfrOptions = (a: Gnfr, b: Gnfr): number => {
-  if (a.id === "COMBINED") {
-    return -1;
-  } else if (b.id === "COMBINED") {
-    return 1;
-  }
-  if (a.name["fi"] < b.name["fi"]) {
-    return -1;
-  } else if (a.name["fi"] > b.name["fi"]) {
-    return 1;
-  }
-  return 0;
 };
 
 let selectorElement: Element | null = null;
@@ -121,19 +108,33 @@ export default Vue.extend({
       initialized: false as boolean
     };
   },
+  computed: mapState(["lang"]),
   methods: {
     async initializeGnfrOptions() {
       const gnfrOptions = await fetchGnfrMeta();
-      this.gnfrOptions = gnfrOptions.sort(sortGnfrOptions);
+      this.gnfrOptions = gnfrOptions.sort(this.sortGnfrOptions);
       const combinedGnfr = this.gnfrOptions.find((gnfr) => gnfr.id === "COMBINED");
       if (combinedGnfr) {
         this.combinedGnfr = combinedGnfr;
-        this.gnfrInputValue = combinedGnfr.name["fi"];
+        this.gnfrInputValue = combinedGnfr.name[this.lang];
         this.setSelectedGnfr(this.combinedGnfr);
         this.initialized = true;
       } else {
         console.error("Could not find initial (combined) gnfr");
       }
+    },
+    sortGnfrOptions(a: Gnfr, b: Gnfr): number {
+      if (a.id === "COMBINED") {
+        return -1;
+      } else if (b.id === "COMBINED") {
+        return 1;
+      }
+      if (a.name[this.lang] < b.name[this.lang]) {
+        return -1;
+      } else if (a.name[this.lang] > b.name[this.lang]) {
+        return 1;
+      }
+      return 0;
     },
     getGnfrByKey(gnfrId: string): Gnfr | undefined {
       return this.gnfrOptions.find((gnfr) => gnfr.id === gnfrId);
@@ -200,7 +201,7 @@ export default Vue.extend({
     },
     setSelectedGnfr: function (selectedGnfr: Gnfr) {
       this.$emit("set-selected-gnfr", selectedGnfr.id);
-      this.gnfrInputValue = selectedGnfr.name["fi"];
+      this.gnfrInputValue = selectedGnfr.name[this.lang];
     }
   },
   mounted() {
