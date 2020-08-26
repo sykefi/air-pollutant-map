@@ -2,7 +2,7 @@
   <div>
     <div id="legend-box">
       <div id="legend-title">
-        Päästömäärä
+        {{ "map.legend.title-without-unit" | translate }}
         <span v-if="mapDataType === mapDataTypes.MUNICIPALITY">
           ({{ legend.unit }} / km<sup>2</sup>)
         </span>
@@ -46,7 +46,7 @@ export default {
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
 #legend-title {
-  margin: 0 0 5px 0;
+  margin: 0 0 8px 0;
   font-weight: 550;
 }
 .legend-class-row {

@@ -8,11 +8,13 @@
       </div>
       <div id="map-container">
         <OlMap :gnfr="gnfr" :year="year" :pollutant="pollutant" :mapDataType="mapDataType" />
-        <SelectorDataType
-          id="map-data-type-selector-container"
-          :mapDataType="mapDataType"
-          @select-map-data-type="selectMapDataType"
-        />
+        <div id="map-controls-container">
+          <SelectorDataType
+            :mapDataType="mapDataType"
+            @select-map-data-type="selectMapDataType"
+          />
+          <ToggleLanguageButtons />
+        </div>
       </div>
     </div>
   </div>
@@ -25,6 +27,7 @@ import SelectorYear from "./components/SelectorYear.vue";
 import SelectorDataType from "./components/SelectorDataType.vue";
 import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
+import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import { Pollutant, MapDataType } from "./types";
 import * as constants from "./constants";
 
@@ -34,7 +37,8 @@ export default Vue.extend({
     SelectorYear,
     SelectorGnfr,
     SelectorPollutant,
-    SelectorDataType
+    SelectorDataType,
+    ToggleLanguageButtons
   },
   data() {
     return {
@@ -89,8 +93,9 @@ export default Vue.extend({
   text-align: center;
   color: #2c3e50;
 }
-#map-data-type-selector-container {
+#map-controls-container {
   position: absolute;
+  display: flex;
   top: 9px;
   left: 50px;
 }

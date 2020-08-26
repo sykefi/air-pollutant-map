@@ -1,31 +1,29 @@
 <template>
-  <div>
-    <div class="map-data-type-selector-wrapper">
-      <div class="map-data-type-selector-container">
-        <div
-          id="selector-grid"
-          v-on:click="() => selectMapDataType(mapDataTypes.GRID)"
-          v-bind:class="[
-            mapDataType === mapDataTypes.GRID
-              ? 'selected-data-type'
-              : 'data-type-selector-hover',
-            'data-type-selector-button'
-          ]"
-        >
-          Ruudukko
-        </div>
-        <div
-          id="selector-municipalities"
-          v-on:click="() => selectMapDataType(mapDataTypes.MUNICIPALITY)"
-          v-bind:class="[
-            mapDataType === mapDataTypes.MUNICIPALITY
-              ? 'selected-data-type'
-              : 'data-type-selector-hover',
-            'data-type-selector-button'
-          ]"
-        >
-          Kunnat
-        </div>
+  <div class="map-data-type-selector-wrapper">
+    <div class="map-data-type-selector-container">
+      <div
+        id="selector-grid"
+        v-on:click="() => selectMapDataType(mapDataTypes.GRID)"
+        v-bind:class="[
+          mapDataType === mapDataTypes.GRID
+            ? 'selected-data-type'
+            : 'data-type-selector-hover',
+          'data-type-selector-button'
+        ]"
+      >
+        {{ "selector.map.datatype.grid" | translate }}
+      </div>
+      <div
+        id="selector-municipalities"
+        v-on:click="() => selectMapDataType(mapDataTypes.MUNICIPALITY)"
+        v-bind:class="[
+          mapDataType === mapDataTypes.MUNICIPALITY
+            ? 'selected-data-type'
+            : 'data-type-selector-hover',
+          'data-type-selector-button'
+        ]"
+      >
+        {{ "selector.map.datatype.muni" | translate }}
       </div>
     </div>
   </div>
@@ -77,8 +75,6 @@ export default Vue.extend({
 }
 .data-type-selector-hover:hover {
   color: black;
-  border-color: black;
-  z-index: 4;
 }
 #selector-municipalities {
   border-radius: 0 5px 5px 0;
@@ -91,7 +87,7 @@ export default Vue.extend({
   z-index: 3;
   cursor: auto;
   color: white;
-  border-color: rgba(0, 60, 136, 0.5);
+  border-color: #3969a1;
   background-color: rgba(0, 60, 136, 0.5);
 }
 </style>
