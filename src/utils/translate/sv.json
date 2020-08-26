@@ -4,5 +4,7 @@
   "selector.pollutant.label": "Saastuke_sv",
   "selector.map.datatype.grid": "Ruudukko_sv",
   "selector.map.datatype.muni": "Kunnat_sv",
-  "map.legend.title-without-unit": "Päästömäärä_sv"
+  "map.legend.title-without-unit": "Päästömäärä_sv",
+  "aria.year.selector.status.text": "options (years) available",
+  "aria.year.selector.describe": "Arrow down for options (years)"
 }
