@@ -4,5 +4,7 @@
   "selector.pollutant.label": "Pollutant",
   "selector.map.datatype.grid": "Grid",
   "selector.map.datatype.muni": "Municipalities",
-  "map.legend.title-without-unit": "Pollution"
+  "map.legend.title-without-unit": "Pollution",
+  "aria.year.selector.status.text": "options (years) available",
+  "aria.year.selector.describe": "Arrow down for options (years)"
 }
