@@ -61,6 +61,13 @@ export default Vue.extend({
     selectMapDataType(mapDataType: MapDataType) {
       this.mapDataType = mapDataType;
     }
+  },
+  beforeCreate() {
+    if (process.env.VUE_APP_DETECT_LANGUAGE === "false") {
+      return;
+    } else {
+      this.$store.dispatch("setDetectedLang");
+    }
   }
 });
 </script>
