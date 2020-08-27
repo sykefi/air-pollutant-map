@@ -14,6 +14,7 @@
       id="gnfrSelectContainer"
       v-on:click="handleSelectorClick"
       v-on:keyup="doKeyAction"
+      v-on:keydown="preventKeyDownScroll"
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="gnfr-select-list"
@@ -77,6 +78,7 @@ import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
 import { Gnfr, MapDataType } from "./../types";
 import { fetchGnfrMeta } from "@/services/pollutants";
+import * as selectorUtils from "./../utils/selectorUtils";
 
 const findFocus = (): HTMLElement => {
   const focusPoint = document.activeElement;
@@ -254,6 +256,9 @@ export default Vue.extend({
           break;
         }
       }
+    },
+    preventKeyDownScroll: function (e) {
+      selectorUtils.preventKeyDownScroll(e);
     },
     doKeyAction: function (whichKey: KeyboardEvent) {
       const currentFocus = findFocus();
