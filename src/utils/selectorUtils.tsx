@@ -1,7 +1,5 @@
 export const preventKeyDownScroll = (e: KeyboardEvent) => {
   switch (e.keyCode) {
-    case 37:
-    case 39:
     case 38:
     case 40:
     case 32: // Arrow keys

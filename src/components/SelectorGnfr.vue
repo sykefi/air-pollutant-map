@@ -7,7 +7,7 @@
       {{ "selector.gnfr.label" | translate }}
     </label>
     <div id="gnfr-select-status" class="hidden-visually" aria-live="polite">
-      {{ gnfrOptions.length }} {{ "aria.gnfr.selector.status.text" | translate }}
+      {{ filteredGnfrOptions.length }} {{ "aria.gnfr.selector.status.text" | translate }}
     </div>
     <div
       class="gnfr-select-container"
@@ -17,6 +17,7 @@
       v-on:keydown="preventKeyDownScroll"
       role="combobox"
       aria-haspopup="listbox"
+      aria-autocomplete="list"
       aria-owns="gnfr-select-list"
       :aria-expanded="showOptions ? 'true' : 'false'"
     >
@@ -155,9 +156,10 @@ export default Vue.extend({
     toggleGnfrSelector(open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
-        // set previosly selected GNFR name to input if exiting selector
         if (!open && this.selectedGnfr) {
+          // set previosly selected GNFR name to input if exiting selector
           this.gnfrInputValue = this.selectedGnfr.name[this.lang];
+          this.filteredGnfrOptions = [...this.gnfrOptions];
         }
       } else {
         this.showOptions = !this.showOptions;
@@ -206,10 +208,7 @@ export default Vue.extend({
       }
     },
     getGnfrIdFromElement(element: HTMLElement): string {
-      return element!
-        .querySelector("span")!
-        .textContent!.replace(/[{()}]/g, "")
-        .trim();
+      return element!.querySelector("span")!.textContent!.trim();
     },
     makeChoice(whichOption): void {
       // read gnfr identifier from span element
