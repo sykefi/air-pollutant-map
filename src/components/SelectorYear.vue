@@ -342,10 +342,12 @@ export default Vue.extend({
   padding: 0.5em;
 }
 .custom-select-options li:hover {
-  background: blue;
-  color: #fff;
-  border: 1px solid blue;
-  border-width: 0 1px 0 1px;
+  background: #d1d1d1;
+}
+.custom-select-options li:focus {
+  background: #d1d1d1;
+  border: none;
+  outline: none;
 }
 .icon {
   fill: ButtonText;
