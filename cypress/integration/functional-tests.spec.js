@@ -24,7 +24,7 @@ describe("Page load and initial UI", () => {
 
 describe("Year selector", () => {
   it("toggles year options visible", () => {
-    cy.get(".year-selector-div").within(() => cy.get(".custom-select").click());
+    cy.get(".year-selector-div").within(() => cy.get(".year-select-container").click());
     cy.contains("2018");
     cy.contains("2015");
     cy.contains("2010");
@@ -35,25 +35,25 @@ describe("Year selector", () => {
 
   it("toggles year options hidden by clicking the input", () => {
     cy.get(".year-selector-div").within(() => {
-      cy.get(".custom-select").click();
-      cy.get("#custom-select-list").should("have.class", "hidden-all");
+      cy.get(".year-select-container").click();
+      cy.get("#year-select-list").should("have.class", "hidden-all");
     });
   });
 
   it("toggles year options hidden by clicking outside the input", () => {
-    cy.get(".year-selector-div").within(() => cy.get(".custom-select").click());
+    cy.get(".year-selector-div").within(() => cy.get(".year-select-container").click());
     cy.contains("2015");
     cy.get("#map-container").click(325, 520);
     cy.get(".year-selector-div").within(() => {
-      cy.get("#custom-select-list").should("have.class", "hidden-all");
+      cy.get("#year-select-list").should("have.class", "hidden-all");
     });
   });
 
   it("selects year by clicking an option (2010)", () => {
     cy.get(".year-selector-div").within(() => {
-      cy.get(".custom-select").click();
+      cy.get(".year-select-container").click();
       cy.contains("2010").click();
-      cy.get("#custom-select-list").should("have.class", "hidden-all");
+      cy.get("#year-select-list").should("have.class", "hidden-all");
       cy.contains("2010");
     });
   });
