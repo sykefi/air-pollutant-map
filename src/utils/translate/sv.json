@@ -8,5 +8,7 @@
   "aria.year.selector.status.text": "options (years) available",
   "aria.year.selector.describe": "Arrow down for options (years)",
   "aria.gnfr.selector.status.text": "options (pollution classes) available",
-  "aria.gnfr.selector.describe": "Arrow down for options (pollution classes)"
+  "aria.gnfr.selector.describe": "Arrow down for options (pollution classes)",
+  "aria.pollutant.selector.status.text": "options (pollutants) available",
+  "aria.pollutant.selector.describe": "Arrow down for options (pollutants)"
 }

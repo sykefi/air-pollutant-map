@@ -98,17 +98,21 @@ describe("GNFR selector", () => {
 
 describe("Pollutant selector", () => {
   it("toggles pollutant options visible", () => {
-    cy.get(".pollutant-selector-div").within(() => cy.get(".pollutant-select").click());
+    cy.get(".pollutant-selector-div").within(() =>
+      cy.get(".pollutant-select-container").click()
+    );
     cy.get("#pollutant-select-list").within(() => cy.contains("Rikkidioksidi"));
   });
   it("toggles pollutant options hidden by clicking the input", () => {
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select").click();
+      cy.get(".pollutant-select-container").click();
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
     });
   });
   it("toggles pollutant options hidden by clicking outside the input", () => {
-    cy.get(".pollutant-selector-div").within(() => cy.get(".pollutant-select").click());
+    cy.get(".pollutant-selector-div").within(() =>
+      cy.get(".pollutant-select-container").click()
+    );
     cy.contains("Rikkidioksidi");
     cy.get("#map-container").click(325, 520);
     cy.get(".pollutant-selector-div").within(() => {
@@ -117,7 +121,7 @@ describe("Pollutant selector", () => {
   });
   it("selects pollutant by clicking an option (rikkidioksidi)", () => {
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select").click();
+      cy.get(".pollutant-select-container").click();
       cy.contains("Rikkidioksidi").click();
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
       cy.contains("Rikkidioksidi");
@@ -130,7 +134,7 @@ describe("Grid data layer", () => {
     cy.visit("http://localhost:8080/");
     cy.contains("Typen oksidit");
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select").click();
+      cy.get(".pollutant-select-container").click();
       cy.contains("Rikkidioksidi").click();
     });
     // wait for the layer and legend to appear
@@ -157,7 +161,7 @@ describe("Grid data layer", () => {
   });
   it("shows expected class ranges in legend (combined: typen oksidit)", () => {
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select").click();
+      cy.get(".pollutant-select-container").click();
       cy.contains("Typen oksidit").click();
     });
     cy.get("#legend-box").within(() => {
@@ -191,7 +195,7 @@ describe("Municipality layer", () => {
   it("toggles municipality layer visible", () => {
     // switch back to typen oksidit
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select").click();
+      cy.get(".pollutant-select-container").click();
       cy.contains("Typen oksidit").click();
     });
     cy.contains("Kunnat").click();
@@ -220,7 +224,7 @@ describe("Municipality layer", () => {
   });
   it("shows expected class ranges in legend (rikkidioksidi)", () => {
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select").click();
+      cy.get(".pollutant-select-container").click();
       cy.contains("Rikkidioksidi").click();
     });
     cy.get("#legend-box").within(() => {

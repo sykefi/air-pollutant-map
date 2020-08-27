@@ -1,31 +1,34 @@
 <template>
   <div class="pollutant-selector-div">
-    <label class="hidden-visually" for="pollutant-select-input">Saastuke</label>
-    <div class="selector-label" for="pollutant-select-input">
+    <label class="selector-label" for="pollutant-select-input">
       {{ "selector.pollutant.label" | translate }}
+    </label>
+    <div id="pollutat-select-status" class="hidden-visually" aria-live="polite">
+      {{ pollutantOptions.length }} {{ "aria.pollutant.selector.status.text" | translate }}
     </div>
-    <div id="pollutant-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
-      class="pollutant-select"
-      id="pollutantSelector"
+      class="pollutant-select-container"
+      id="pollutantSelectContainer"
       v-on:click="handleSelectorClick"
+      v-on:keyup="doKeyAction"
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="pollutant-select-list"
+      :aria-expanded="showOptions ? 'true' : 'false'"
     >
       <input
         type="text"
         id="pollutant-select-input"
+        ref="pollutantSelectInput"
         v-model="pollutantInputValue"
         class="select-css"
         aria-describedby="pollutant-select-info"
-        aria-autocomplete="both"
         aria-controls="pollutant-select-list"
         readonly
       />
-      <span id="pollutant-select-info" class="hidden-visually"
-        >Arrow down for options or start typing to filter.</span
-      >
+      <span id="pollutant-select-info" class="hidden-visually">
+        {{ "aria.pollutant.selector.describe" | translate }}
+      </span>
       <span class="pollutant-select-icons">
         <svg
           width="21"
@@ -59,6 +62,7 @@
           :key="pollutant.parlocRyhmaTunnus"
           tabindex="-1"
           role="option"
+          ref="pollutantOptions"
         >
           {{ pollutant.name[lang] }}
           <span> ({{ pollutant.id }})</span>
@@ -74,13 +78,10 @@ import { mapState } from "vuex";
 import { Pollutant } from "./../types";
 import { fetchPollutantMeta } from "./../services/pollutants";
 
-const findFocus = () => {
+const findFocus = (): HTMLElement => {
   const focusPoint = document.activeElement;
-  return focusPoint;
+  return focusPoint as HTMLElement;
 };
-
-let selectorElement: Element | null = null;
-let pollutantInputElement: Element | null = null;
 
 export default Vue.extend({
   data() {
@@ -102,7 +103,7 @@ export default Vue.extend({
 
       const initialPollutant = this.pollutantOptions.find((feat) => feat.id === "s16");
       if (initialPollutant) {
-        this.setSelectedPollutant(initialPollutant);
+        this.setSelectedPollutant(initialPollutant, false);
       }
       this.initialized = true;
     },
@@ -116,6 +117,9 @@ export default Vue.extend({
     setState: function (state: string) {
       this.selectorState = state;
     },
+    getInputElement: function (): HTMLElement {
+      return this.$refs.pollutantSelectInput as HTMLElement;
+    },
     handleSelectorClick: function () {
       if (!this.initialized) {
         return;
@@ -127,7 +131,7 @@ export default Vue.extend({
           this.setState("opened");
           break;
         case "opened":
-          if (currentFocus === pollutantInputElement) {
+          if (currentFocus === this.getInputElement()) {
             this.togglePollutantSelector(false);
             this.setState("initial");
           } else if (currentFocus && currentFocus.tagName === "LI") {
@@ -155,35 +159,162 @@ export default Vue.extend({
     getPollutant: function (pollutantId: string): Pollutant | undefined {
       return this.pollutantOptions.filter((po) => po.id === pollutantId)[0];
     },
+    getPollutantIdFromElement: function (element: HTMLElement): string {
+      return element!
+        .querySelector("span")!
+        .textContent!.replace(/[{()}]/g, "")
+        .trim();
+    },
     makeChoice: function (whichOption) {
       // read pollutant identifier from hidden span element
-      const selectedPollutantId = whichOption
-        .querySelector("span")
-        .textContent.replace(/[{()}]/g, "")
-        .trim();
+      const selectedPollutantId = this.getPollutantIdFromElement(whichOption);
 
       const selectedPollutant = this.getPollutant(selectedPollutantId);
       if (selectedPollutant) {
-        this.setSelectedPollutant(selectedPollutant);
+        this.setSelectedPollutant(selectedPollutant, true);
       } else {
         console.log("Could not select pollutant by id", selectedPollutantId);
       }
     },
-    setSelectedPollutant: function (po: Pollutant) {
+    setSelectedPollutant: function (po: Pollutant, focusInput: boolean) {
       this.$emit("set-selected-pollutant", po);
       this.pollutantInputValue = po.name[this.lang];
+      if (focusInput) {
+        this.moveFocus(findFocus(), "input");
+      }
+    },
+    moveFocus: function (fromHere, toThere) {
+      if (toThere === "input") {
+        this.getInputElement().focus();
+        return;
+      }
+      switch (fromHere) {
+        case this.getInputElement():
+          if (toThere === "forward") {
+            this.$refs.pollutantOptions[0].focus();
+          } else if (toThere === "back") {
+            this.$refs.pollutantOptions[this.pollutantOptions.length - 1].focus();
+          }
+          break;
+        case this.$refs.pollutantOptions[0]:
+          if (toThere === "forward") {
+            this.$refs.pollutantOptions[1].focus();
+          } else if (toThere === "back") {
+            this.getInputElement().focus();
+          }
+          break;
+        case this.$refs.pollutantOptions[this.pollutantOptions.length - 1]:
+          if (toThere === "forward") {
+            this.$refs.pollutantOptions[0].focus();
+          } else if (toThere === "back") {
+            this.$refs.pollutantOptions[this.pollutantOptions.length - 2].focus();
+          }
+          break;
+        default: {
+          const currentItem = findFocus();
+          const pollutantId = currentItem ? this.getPollutantIdFromElement(currentItem) : "";
+          const indexOfPollutant = this.pollutantOptions
+            .map((pollutant) => pollutant.id)
+            .indexOf(pollutantId);
+          if (toThere === "forward") {
+            this.$refs.pollutantOptions[indexOfPollutant + 1].focus();
+          } else if (toThere === "back" && indexOfPollutant > 0) {
+            this.$refs.pollutantOptions[indexOfPollutant - 1].focus();
+          } else {
+            this.getInputElement().focus();
+          }
+          break;
+        }
+      }
+    },
+    doKeyAction: function (whichKey: KeyboardEvent) {
+      const currentFocus = findFocus();
+      switch (whichKey.code) {
+        case "Enter":
+          if (this.selectorState === "initial") {
+            this.togglePollutantSelector(true);
+            this.setState("opened");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.togglePollutantSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.togglePollutantSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.togglePollutantSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.togglePollutantSelector(true);
+            this.setState("opened");
+          } else {
+            this.togglePollutantSelector(true);
+            this.setState("filtered");
+          }
+          break;
+
+        case "Escape":
+          if (this.selectorState === "opened" || this.selectorState === "filtered") {
+            this.togglePollutantSelector(false);
+            this.setState("initial");
+          }
+          break;
+
+        case "ArrowDown":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.togglePollutantSelector(true);
+            this.moveFocus(this.getInputElement(), "forward");
+            this.setState("opened");
+          } else {
+            this.togglePollutantSelector(true);
+            this.moveFocus(currentFocus, "forward");
+          }
+          break;
+        case "ArrowUp":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.togglePollutantSelector(true);
+            this.moveFocus(this.getInputElement(), "back");
+            this.setState("opened");
+          } else {
+            this.moveFocus(currentFocus, "back");
+          }
+          break;
+        default:
+          if (this.selectorState === "initial") {
+            this.togglePollutantSelector(true);
+            this.setState("filtered");
+          } else if (this.selectorState === "opened") {
+            this.setState("filtered");
+          } else if (this.selectorState === "closed") {
+            this.setState("filtered");
+          }
+          break;
+      }
     }
   },
   mounted() {
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (target && !target.closest("#pollutantSelector")) {
+      if (target && !target.closest("#pollutantSelectContainer")) {
         this.togglePollutantSelector(false);
         this.setState("initial");
       }
     });
-    selectorElement = document.querySelector("#pollutantSelector");
-    pollutantInputElement = selectorElement ? selectorElement.querySelector("input") : null;
     this.initializePollutantOptions();
   }
 });
@@ -199,7 +330,7 @@ export default Vue.extend({
   max-width: 13em;
   margin: 12px;
 }
-.pollutant-select {
+.pollutant-select-container {
   position: relative;
 }
 .select-css {
@@ -264,10 +395,12 @@ export default Vue.extend({
   font-size: 0.9em;
 }
 .pollutant-select-options li:hover {
-  background: blue;
-  color: #fff;
-  border: 1px solid blue;
-  border-width: 0 1px 0 1px;
+  background: #d1d1d1;
+}
+.pollutant-select-options li:focus {
+  background: #d1d1d1;
+  border: none;
+  outline: none;
 }
 .icon {
   fill: ButtonText;
