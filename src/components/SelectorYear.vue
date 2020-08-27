@@ -11,6 +11,7 @@
       id="yearSelectContainer"
       v-on:click="handleSelectorClick"
       v-on:keyup="doKeyAction"
+      v-on:keydown="preventKeyDownScroll"
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="year-select-list"
@@ -70,6 +71,7 @@
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
 import * as constants from "./../constants";
+import * as selectorUtils from "./../utils/selectorUtils";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
@@ -178,6 +180,9 @@ export default Vue.extend({
           break;
         }
       }
+    },
+    preventKeyDownScroll: function (e) {
+      selectorUtils.preventKeyDownScroll(e);
     },
     doKeyAction: function (whichKey: KeyboardEvent) {
       const currentFocus = findFocus();

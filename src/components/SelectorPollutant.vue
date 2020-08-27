@@ -11,6 +11,7 @@
       id="pollutantSelectContainer"
       v-on:click="handleSelectorClick"
       v-on:keyup="doKeyAction"
+      v-on:keydown="preventKeyDownScroll"
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="pollutant-select-list"
@@ -77,6 +78,7 @@ import { Vue } from "vue-property-decorator";
 import { mapState } from "vuex";
 import { Pollutant } from "./../types";
 import { fetchPollutantMeta } from "./../services/pollutants";
+import * as selectorUtils from "./../utils/selectorUtils";
 
 const findFocus = (): HTMLElement => {
   const focusPoint = document.activeElement;
@@ -226,6 +228,9 @@ export default Vue.extend({
           break;
         }
       }
+    },
+    preventKeyDownScroll: function (e) {
+      selectorUtils.preventKeyDownScroll(e);
     },
     doKeyAction: function (whichKey: KeyboardEvent) {
       const currentFocus = findFocus();
