@@ -49,7 +49,7 @@
         </svg>
       </span>
       <ul
-        v-bind:class="[showOptions ? '' : 'hidden-all', 'custom-select-options']"
+        v-bind:class="[showOptions ? '' : 'hidden-all', 'year-select-options']"
         id="year-select-list"
         role="listbox"
       >
@@ -140,6 +140,7 @@ export default Vue.extend({
     moveFocus: function (fromHere, toThere) {
       if (toThere === "input") {
         this.getInputElement().focus();
+        return;
       }
       switch (fromHere) {
         case this.getInputElement():
@@ -322,7 +323,7 @@ export default Vue.extend({
   border: 1px solid white;
   background: transparent;
 }
-.custom-select-options {
+.year-select-options {
   border: 1px solid #aaa;
   border-radius: 0 0 0.25em 0.25em;
   line-height: 1.5;
@@ -338,13 +339,13 @@ export default Vue.extend({
   width: calc(100% - 2px);
   background-color: #ffffff;
 }
-.custom-select-options li {
+.year-select-options li {
   padding: 0.5em;
 }
-.custom-select-options li:hover {
+.year-select-options li:hover {
   background: #d1d1d1;
 }
-.custom-select-options li:focus {
+.year-select-options li:focus {
   background: #d1d1d1;
   border: none;
   outline: none;

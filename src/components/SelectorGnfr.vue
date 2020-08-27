@@ -1,35 +1,38 @@
 <template>
   <div class="gnfr-selector-div">
-    <label class="hidden-visually" for="gnfr-select-input">Luokka</label>
-    <div
+    <label
       :class="[disabled ? 'gnfr-selector-disabled' : '', 'selector-label']"
       for="gnfr-select-input"
     >
       {{ "selector.gnfr.label" | translate }}
+    </label>
+    <div id="gnfr-select-status" class="hidden-visually" aria-live="polite">
+      {{ gnfrOptions.length }} {{ "aria.gnfr.selector.status.text" | translate }}
     </div>
-    <div id="gnfr-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
-      class="gnfr-select"
-      id="gnfrSelector"
-      @click="handleSelectorClick"
+      class="gnfr-select-container"
+      id="gnfrSelectContainer"
+      v-on:click="handleSelectorClick"
+      v-on:keyup="doKeyAction"
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="gnfr-select-list"
+      :aria-expanded="showOptions ? 'true' : 'false'"
     >
       <input
         type="text"
         id="gnfr-select-input"
+        ref="gnfrSelectInput"
         v-model="gnfrInputValue"
         :disabled="disabled"
         class="select-css"
         aria-describedby="gnfr-select-info"
-        aria-autocomplete="both"
         aria-controls="gnfr-select-list"
         readonly
       />
-      <span id="gnfr-select-info" class="hidden-visually"
-        >Arrow down for options or start typing to filter.</span
-      >
+      <span id="gnfr-select-info" class="hidden-visually">
+        {{ "aria.gnfr.selector.describe" | translate }}
+      </span>
       <span class="gnfr-select-icons">
         <svg
           width="21"
@@ -59,6 +62,7 @@
           :key="gnfr.parlocRyhmaTunnus"
           tabindex="-1"
           role="option"
+          ref="gnfrOptions"
         >
           {{ gnfr.name[lang] }}
           <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.id }}</span>
@@ -74,13 +78,10 @@ import { mapState } from "vuex";
 import { Gnfr, MapDataType } from "./../types";
 import { fetchGnfrMeta } from "@/services/pollutants";
 
-const findFocus = () => {
+const findFocus = (): HTMLElement => {
   const focusPoint = document.activeElement;
-  return focusPoint;
+  return focusPoint as HTMLElement;
 };
-
-let selectorElement: Element | null = null;
-let gnfrInputElement: Element | null = null;
 
 export default Vue.extend({
   props: {
@@ -90,7 +91,7 @@ export default Vue.extend({
     mapDataType: function () {
       if (this.mapDataType === MapDataType.MUNICIPALITY) {
         // Disable GNFR selector for municipality data
-        this.setSelectedGnfr(this.combinedGnfr!);
+        this.setSelectedGnfr(this.combinedGnfr!, false);
         this.disabled = true;
       } else {
         this.disabled = false;
@@ -117,7 +118,7 @@ export default Vue.extend({
       if (combinedGnfr) {
         this.combinedGnfr = combinedGnfr;
         this.gnfrInputValue = combinedGnfr.name[this.lang];
-        this.setSelectedGnfr(this.combinedGnfr);
+        this.setSelectedGnfr(this.combinedGnfr, false);
         this.initialized = true;
       } else {
         console.error("Could not find initial (combined) gnfr");
@@ -149,6 +150,9 @@ export default Vue.extend({
     setState: function (state: string) {
       this.selectorState = state;
     },
+    getInputElement: function (): HTMLElement {
+      return this.$refs.gnfrSelectInput as HTMLElement;
+    },
     handleSelectorClick: function () {
       if (this.disabled || !this.initialized) {
         return;
@@ -160,7 +164,7 @@ export default Vue.extend({
           this.setState("opened");
           break;
         case "opened":
-          if (currentFocus === gnfrInputElement) {
+          if (currentFocus === this.getInputElement()) {
             this.toggleGnfrSelector(false);
             this.setState("initial");
           } else if (currentFocus && currentFocus.tagName === "LI") {
@@ -185,37 +189,161 @@ export default Vue.extend({
           break;
       }
     },
-    makeChoice: function (whichOption) {
-      // read gnfr identifier from span element
-      const selectedGnfrId = whichOption
-        .querySelector("span")
-        .textContent.replace(/[{()}]/g, "")
+    getGnfrIdFromElement: function (element: HTMLElement): string {
+      return element!
+        .querySelector("span")!
+        .textContent!.replace(/[{()}]/g, "")
         .trim();
+    },
+    makeChoice: function (whichOption): void {
+      // read gnfr identifier from span element
+      const selectedGnfrId = this.getGnfrIdFromElement(whichOption);
 
       const selectedGnfr = this.getGnfrByKey(selectedGnfrId);
       if (selectedGnfrId && selectedGnfr) {
-        this.setSelectedGnfr(selectedGnfr);
+        this.setSelectedGnfr(selectedGnfr, true);
       } else {
         console.log("Could not select gnfr by id", selectedGnfr);
       }
     },
-    setSelectedGnfr: function (selectedGnfr: Gnfr) {
+    setSelectedGnfr: function (selectedGnfr: Gnfr, focusInput: boolean): void {
       this.$emit("set-selected-gnfr", selectedGnfr.id);
       this.gnfrInputValue = selectedGnfr.name[this.lang];
+      if (focusInput) {
+        this.moveFocus(findFocus(), "input");
+      }
+    },
+    moveFocus: function (fromHere, toThere) {
+      if (toThere === "input") {
+        this.getInputElement().focus();
+        return;
+      }
+      switch (fromHere) {
+        case this.getInputElement():
+          if (toThere === "forward") {
+            this.$refs.gnfrOptions[0].focus();
+          } else if (toThere === "back") {
+            this.$refs.gnfrOptions[this.gnfrOptions.length - 1].focus();
+          }
+          break;
+        case this.$refs.gnfrOptions[0]:
+          if (toThere === "forward") {
+            this.$refs.gnfrOptions[1].focus();
+          } else if (toThere === "back") {
+            this.getInputElement().focus();
+          }
+          break;
+        case this.$refs.gnfrOptions[this.gnfrOptions.length - 1]:
+          if (toThere === "forward") {
+            this.$refs.gnfrOptions[0].focus();
+          } else if (toThere === "back") {
+            this.$refs.gnfrOptions[this.gnfrOptions.length - 2].focus();
+          }
+          break;
+        default: {
+          const currentItem = findFocus();
+          const gnfrId = currentItem ? this.getGnfrIdFromElement(currentItem) : "";
+          const indexOfGnfr = this.gnfrOptions.map((gnfr) => gnfr.id).indexOf(gnfrId);
+          if (toThere === "forward") {
+            this.$refs.gnfrOptions[indexOfGnfr + 1].focus();
+          } else if (toThere === "back" && indexOfGnfr > 0) {
+            this.$refs.gnfrOptions[indexOfGnfr - 1].focus();
+          } else {
+            this.getInputElement().focus();
+          }
+          break;
+        }
+      }
+    },
+    doKeyAction: function (whichKey: KeyboardEvent) {
+      const currentFocus = findFocus();
+      switch (whichKey.code) {
+        case "Enter":
+          if (this.selectorState === "initial") {
+            this.toggleGnfrSelector(true);
+            this.setState("opened");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.toggleGnfrSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.toggleGnfrSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.toggleGnfrSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.toggleGnfrSelector(true);
+            this.setState("opened");
+          } else {
+            this.toggleGnfrSelector(true);
+            this.setState("filtered");
+          }
+          break;
+
+        case "Escape":
+          if (this.selectorState === "opened" || this.selectorState === "filtered") {
+            this.toggleGnfrSelector(false);
+            this.setState("initial");
+          }
+          break;
+
+        case "ArrowDown":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleGnfrSelector(true);
+            this.moveFocus(this.getInputElement(), "forward");
+            this.setState("opened");
+          } else {
+            this.toggleGnfrSelector(true);
+            this.moveFocus(currentFocus, "forward");
+          }
+          break;
+        case "ArrowUp":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleGnfrSelector(true);
+            this.moveFocus(this.getInputElement(), "back");
+            this.setState("opened");
+          } else {
+            this.moveFocus(currentFocus, "back");
+          }
+          break;
+        default:
+          if (this.selectorState === "initial") {
+            this.toggleGnfrSelector(true);
+            this.setState("filtered");
+          } else if (this.selectorState === "opened") {
+            this.setState("filtered");
+          } else if (this.selectorState === "closed") {
+            this.setState("filtered");
+          }
+          break;
+      }
     }
   },
   mounted() {
     this.initializeGnfrOptions();
-
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (target && !target.closest("#gnfrSelector")) {
+      if (target && !target.closest("#gnfrSelectContainer")) {
         this.toggleGnfrSelector(false);
         this.setState("initial");
       }
     });
-    selectorElement = document.querySelector("#gnfrSelector");
-    gnfrInputElement = selectorElement ? selectorElement.querySelector("input") : null;
   }
 });
 </script>
@@ -230,7 +358,7 @@ export default Vue.extend({
   max-width: 14em;
   margin: 12px;
 }
-.gnfr-select {
+.gnfr-select-container {
   position: relative;
 }
 .select-css {
@@ -306,10 +434,12 @@ export default Vue.extend({
   font-size: 0.9em;
 }
 .gnfr-select-options li:hover {
-  background: blue;
-  color: #fff;
-  border: 1px solid blue;
-  border-width: 0 1px 0 1px;
+  background: #d1d1d1;
+}
+.gnfr-select-options li:focus {
+  background: #d1d1d1;
+  border: none;
+  outline: none;
 }
 .icon {
   fill: ButtonText;
