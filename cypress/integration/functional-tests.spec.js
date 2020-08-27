@@ -61,17 +61,17 @@ describe("Year selector", () => {
 
 describe("GNFR selector", () => {
   it("toggles gnfr options visible", () => {
-    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select").click());
+    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
     cy.get("#gnfr-select-list").within(() => cy.contains("li", "Shipping"));
   });
   it("toggles gnfr options hidden by clicking the input", () => {
     cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select").click();
+      cy.get(".gnfr-select-container").click();
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
     });
   });
   it("toggles gnfr options hidden by clicking outside the input", () => {
-    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select").click());
+    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
     cy.contains("Shipping");
     cy.get("#map-container").click(325, 520);
     cy.get(".gnfr-selector-div").within(() => {
@@ -80,7 +80,7 @@ describe("GNFR selector", () => {
   });
   it("selects GNFR by clicking an option (public power)", () => {
     cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select").click();
+      cy.get(".gnfr-select-container").click();
       cy.contains("li", "Public").click();
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
       cy.contains("Public");
@@ -88,7 +88,7 @@ describe("GNFR selector", () => {
   });
   it("selects combined GNFR", () => {
     cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select").click();
+      cy.get(".gnfr-select-container").click();
       cy.contains("li", "Kaikki").click();
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
       cy.contains("Kaikki");
@@ -171,7 +171,7 @@ describe("Grid data layer", () => {
     });
   });
   it("shows expected class ranges in legend (road/transport: typen oksidit)", () => {
-    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select").click());
+    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
     cy.get("#gnfr-select-list").within(() => cy.contains("li", "Road").click());
     cy.get("#gnfr-select-list").should("have.class", "hidden-all");
     cy.contains("Road");

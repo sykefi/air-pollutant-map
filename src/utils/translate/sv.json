@@ -6,5 +6,7 @@
   "selector.map.datatype.muni": "Kunnat_sv",
   "map.legend.title-without-unit": "Päästömäärä_sv",
   "aria.year.selector.status.text": "options (years) available",
-  "aria.year.selector.describe": "Arrow down for options (years)"
+  "aria.year.selector.describe": "Arrow down for options (years)",
+  "aria.gnfr.selector.status.text": "options (pollution classes) available",
+  "aria.gnfr.selector.describe": "Arrow down for options (pollution classes)"
 }

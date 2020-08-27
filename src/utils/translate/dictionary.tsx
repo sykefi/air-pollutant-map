@@ -15,7 +15,7 @@ if (process.env.NODE_ENV !== "production") {
       Object.values(Lang).forEach((checkDict) => {
         if (checkDict !== checkLang) {
           if (!(key in dict[checkDict])) {
-            console.error(`missing key from ${checkDict} dict:", ${key}`);
+            console.error(`missing key from ${checkDict} dict: ${key}`);
           }
         }
       });
