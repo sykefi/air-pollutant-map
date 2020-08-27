@@ -4,7 +4,8 @@
       {{ "selector.pollutant.label" | translate }}
     </label>
     <div id="pollutat-select-status" class="hidden-visually" aria-live="polite">
-      {{ pollutantOptions.length }} {{ "aria.pollutant.selector.status.text" | translate }}
+      {{ filteredPollutantOptions.length }}
+      {{ "aria.pollutant.selector.status.text" | translate }}
     </div>
     <div
       class="pollutant-select-container"
@@ -14,6 +15,7 @@
       v-on:keydown="preventKeyDownScroll"
       role="combobox"
       aria-haspopup="listbox"
+      aria-autocomplete="list"
       aria-owns="pollutant-select-list"
       :aria-expanded="showOptions ? 'true' : 'false'"
     >
@@ -25,7 +27,6 @@
         class="select-css"
         aria-describedby="pollutant-select-info"
         aria-controls="pollutant-select-list"
-        readonly
       />
       <span id="pollutant-select-info" class="hidden-visually">
         {{ "aria.pollutant.selector.describe" | translate }}
@@ -54,19 +55,22 @@
         </svg>
       </span>
       <ul
-        v-bind:class="[showOptions ? '' : 'hidden-all', 'pollutant-select-options']"
+        v-bind:class="[
+          showOptions && filteredPollutantOptions.length > 0 ? '' : 'hidden-all',
+          'pollutant-select-options'
+        ]"
         id="pollutant-select-list"
         role="listbox"
       >
         <li
-          v-for="pollutant in pollutantOptions"
+          v-for="pollutant in filteredPollutantOptions"
           :key="pollutant.parlocRyhmaTunnus"
           tabindex="-1"
           role="option"
           ref="pollutantOptions"
         >
           {{ pollutant.name[lang] }}
-          <span> ({{ pollutant.id }})</span>
+          <span class="hidden-all"> {{ pollutant.id }}</span>
         </li>
       </ul>
     </div>
@@ -89,7 +93,9 @@ export default Vue.extend({
   data() {
     return {
       pollutantOptions: [] as Pollutant[],
+      filteredPollutantOptions: [] as Pollutant[],
       pollutantInputValue: "" as string,
+      selectedPollutant: undefined as Pollutant | undefined,
       showOptions: false as boolean,
       selectorState: "initial" as string,
       initialized: false as boolean
@@ -107,11 +113,24 @@ export default Vue.extend({
       if (initialPollutant) {
         this.setSelectedPollutant(initialPollutant, false);
       }
+      this.filteredPollutantOptions = [...this.pollutantOptions];
       this.initialized = true;
+    },
+    filterPollutantOptions(): void {
+      this.filteredPollutantOptions = this.pollutantOptions.filter((p) => {
+        return p.name[this.lang]
+          .toLowerCase()
+          .includes(this.pollutantInputValue.toLowerCase());
+      });
     },
     togglePollutantSelector: function (open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
+        if (!open && this.selectedPollutant) {
+          // set previosly selected pollutant name to input if exiting selector
+          this.pollutantInputValue = this.selectedPollutant.name[this.lang];
+          this.filteredPollutantOptions = [...this.pollutantOptions];
+        }
       } else {
         this.showOptions = !this.showOptions;
       }
@@ -162,10 +181,7 @@ export default Vue.extend({
       return this.pollutantOptions.filter((po) => po.id === pollutantId)[0];
     },
     getPollutantIdFromElement: function (element: HTMLElement): string {
-      return element!
-        .querySelector("span")!
-        .textContent!.replace(/[{()}]/g, "")
-        .trim();
+      return element!.querySelector("span")!.textContent!.trim();
     },
     makeChoice: function (whichOption) {
       // read pollutant identifier from hidden span element
@@ -180,6 +196,7 @@ export default Vue.extend({
     },
     setSelectedPollutant: function (po: Pollutant, focusInput: boolean) {
       this.$emit("set-selected-pollutant", po);
+      this.selectedPollutant = po;
       this.pollutantInputValue = po.name[this.lang];
       if (focusInput) {
         this.moveFocus(findFocus(), "input");
@@ -195,27 +212,27 @@ export default Vue.extend({
           if (toThere === "forward") {
             this.$refs.pollutantOptions[0].focus();
           } else if (toThere === "back") {
-            this.$refs.pollutantOptions[this.pollutantOptions.length - 1].focus();
+            this.$refs.pollutantOptions[this.filteredPollutantOptions.length - 1].focus();
           }
           break;
         case this.$refs.pollutantOptions[0]:
-          if (toThere === "forward") {
+          if (toThere === "forward" && this.$refs.pollutantOptions[1]) {
             this.$refs.pollutantOptions[1].focus();
           } else if (toThere === "back") {
             this.getInputElement().focus();
           }
           break;
-        case this.$refs.pollutantOptions[this.pollutantOptions.length - 1]:
+        case this.$refs.pollutantOptions[this.filteredPollutantOptions.length - 1]:
           if (toThere === "forward") {
             this.$refs.pollutantOptions[0].focus();
           } else if (toThere === "back") {
-            this.$refs.pollutantOptions[this.pollutantOptions.length - 2].focus();
+            this.$refs.pollutantOptions[this.filteredPollutantOptions.length - 2].focus();
           }
           break;
         default: {
           const currentItem = findFocus();
           const pollutantId = currentItem ? this.getPollutantIdFromElement(currentItem) : "";
-          const indexOfPollutant = this.pollutantOptions
+          const indexOfPollutant = this.filteredPollutantOptions
             .map((pollutant) => pollutant.id)
             .indexOf(pollutantId);
           if (toThere === "forward") {
@@ -300,12 +317,11 @@ export default Vue.extend({
           }
           break;
         default:
-          if (this.selectorState === "initial") {
+          this.filterPollutantOptions();
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
             this.togglePollutantSelector(true);
             this.setState("filtered");
           } else if (this.selectorState === "opened") {
-            this.setState("filtered");
-          } else if (this.selectorState === "closed") {
             this.setState("filtered");
           }
           break;
