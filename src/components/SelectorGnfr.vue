@@ -29,7 +29,6 @@
         class="select-css"
         aria-describedby="gnfr-select-info"
         aria-controls="gnfr-select-list"
-        readonly
       />
       <span id="gnfr-select-info" class="hidden-visually">
         {{ "aria.gnfr.selector.describe" | translate }}
@@ -54,12 +53,15 @@
         </svg>
       </span>
       <ul
-        v-bind:class="[showOptions ? '' : 'hidden-all', 'gnfr-select-options']"
+        v-bind:class="[
+          showOptions && filteredGnfrOptions.length > 0 ? '' : 'hidden-all',
+          'gnfr-select-options'
+        ]"
         id="gnfr-select-list"
         role="listbox"
       >
         <li
-          v-for="gnfr in gnfrOptions"
+          v-for="gnfr in filteredGnfrOptions"
           :key="gnfr.parlocRyhmaTunnus"
           tabindex="-1"
           role="option"
@@ -90,7 +92,7 @@ export default Vue.extend({
     mapDataType: { type: String as PropType<MapDataType> }
   },
   watch: {
-    mapDataType: function () {
+    mapDataType() {
       if (this.mapDataType === MapDataType.MUNICIPALITY) {
         // Disable GNFR selector for municipality data
         this.setSelectedGnfr(this.combinedGnfr!, false);
@@ -103,7 +105,9 @@ export default Vue.extend({
   data() {
     return {
       gnfrOptions: [] as Gnfr[],
+      filteredGnfrOptions: [] as Gnfr[],
       gnfrInputValue: "" as string,
+      selectedGnfr: undefined as Gnfr | undefined,
       combinedGnfr: undefined as Gnfr | undefined,
       showOptions: false as boolean,
       selectorState: "initial" as string,
@@ -116,6 +120,7 @@ export default Vue.extend({
     async initializeGnfrOptions() {
       const gnfrOptions = await fetchGnfrMeta();
       this.gnfrOptions = gnfrOptions.sort(this.sortGnfrOptions);
+      this.filteredGnfrOptions = [...this.gnfrOptions];
       const combinedGnfr = this.gnfrOptions.find((gnfr) => gnfr.id === "COMBINED");
       if (combinedGnfr) {
         this.combinedGnfr = combinedGnfr;
@@ -139,23 +144,32 @@ export default Vue.extend({
       }
       return 0;
     },
+    filterGnfrOptions(): void {
+      this.filteredGnfrOptions = this.gnfrOptions.filter((gnfr) => {
+        return gnfr.name[this.lang].toLowerCase().includes(this.gnfrInputValue.toLowerCase());
+      });
+    },
     getGnfrByKey(gnfrId: string): Gnfr | undefined {
       return this.gnfrOptions.find((gnfr) => gnfr.id === gnfrId);
     },
-    toggleGnfrSelector: function (open: boolean | undefined = undefined) {
+    toggleGnfrSelector(open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
+        // set previosly selected GNFR name to input if exiting selector
+        if (!open && this.selectedGnfr) {
+          this.gnfrInputValue = this.selectedGnfr.name[this.lang];
+        }
       } else {
         this.showOptions = !this.showOptions;
       }
     },
-    setState: function (state: string) {
+    setState(state: string) {
       this.selectorState = state;
     },
-    getInputElement: function (): HTMLElement {
+    getInputElement(): HTMLElement {
       return this.$refs.gnfrSelectInput as HTMLElement;
     },
-    handleSelectorClick: function () {
+    handleSelectorClick() {
       if (this.disabled || !this.initialized) {
         return;
       }
@@ -191,13 +205,13 @@ export default Vue.extend({
           break;
       }
     },
-    getGnfrIdFromElement: function (element: HTMLElement): string {
+    getGnfrIdFromElement(element: HTMLElement): string {
       return element!
         .querySelector("span")!
         .textContent!.replace(/[{()}]/g, "")
         .trim();
     },
-    makeChoice: function (whichOption): void {
+    makeChoice(whichOption): void {
       // read gnfr identifier from span element
       const selectedGnfrId = this.getGnfrIdFromElement(whichOption);
 
@@ -208,14 +222,15 @@ export default Vue.extend({
         console.log("Could not select gnfr by id", selectedGnfr);
       }
     },
-    setSelectedGnfr: function (selectedGnfr: Gnfr, focusInput: boolean): void {
+    setSelectedGnfr(selectedGnfr: Gnfr, focusInput: boolean): void {
       this.$emit("set-selected-gnfr", selectedGnfr.id);
+      this.selectedGnfr = selectedGnfr;
       this.gnfrInputValue = selectedGnfr.name[this.lang];
       if (focusInput) {
         this.moveFocus(findFocus(), "input");
       }
     },
-    moveFocus: function (fromHere, toThere) {
+    moveFocus(fromHere, toThere) {
       if (toThere === "input") {
         this.getInputElement().focus();
         return;
@@ -225,27 +240,27 @@ export default Vue.extend({
           if (toThere === "forward") {
             this.$refs.gnfrOptions[0].focus();
           } else if (toThere === "back") {
-            this.$refs.gnfrOptions[this.gnfrOptions.length - 1].focus();
+            this.$refs.gnfrOptions[this.filteredGnfrOptions.length - 1].focus();
           }
           break;
         case this.$refs.gnfrOptions[0]:
-          if (toThere === "forward") {
+          if (toThere === "forward" && this.$refs.gnfrOptions[1]) {
             this.$refs.gnfrOptions[1].focus();
           } else if (toThere === "back") {
             this.getInputElement().focus();
           }
           break;
-        case this.$refs.gnfrOptions[this.gnfrOptions.length - 1]:
+        case this.$refs.gnfrOptions[this.filteredGnfrOptions.length - 1]:
           if (toThere === "forward") {
             this.$refs.gnfrOptions[0].focus();
           } else if (toThere === "back") {
-            this.$refs.gnfrOptions[this.gnfrOptions.length - 2].focus();
+            this.$refs.gnfrOptions[this.filteredGnfrOptions.length - 2].focus();
           }
           break;
         default: {
           const currentItem = findFocus();
           const gnfrId = currentItem ? this.getGnfrIdFromElement(currentItem) : "";
-          const indexOfGnfr = this.gnfrOptions.map((gnfr) => gnfr.id).indexOf(gnfrId);
+          const indexOfGnfr = this.filteredGnfrOptions.map((gnfr) => gnfr.id).indexOf(gnfrId);
           if (toThere === "forward") {
             this.$refs.gnfrOptions[indexOfGnfr + 1].focus();
           } else if (toThere === "back" && indexOfGnfr > 0) {
@@ -257,10 +272,10 @@ export default Vue.extend({
         }
       }
     },
-    preventKeyDownScroll: function (e) {
+    preventKeyDownScroll(e) {
       selectorUtils.preventKeyDownScroll(e);
     },
-    doKeyAction: function (whichKey: KeyboardEvent) {
+    doKeyAction(whichKey: KeyboardEvent) {
       const currentFocus = findFocus();
       switch (whichKey.code) {
         case "Enter":
@@ -328,12 +343,11 @@ export default Vue.extend({
           }
           break;
         default:
-          if (this.selectorState === "initial") {
+          this.filterGnfrOptions();
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
             this.toggleGnfrSelector(true);
             this.setState("filtered");
           } else if (this.selectorState === "opened") {
-            this.setState("filtered");
-          } else if (this.selectorState === "closed") {
             this.setState("filtered");
           }
           break;
