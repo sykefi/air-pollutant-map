@@ -25,6 +25,8 @@ CREATE TABLE public.grid_data
   s7 double precision,
   s8 double precision,
   s14 double precision,
+  s37 double precision,
+  s25 double precision,
   s19 double precision,
   s17 double precision,
   s38 double precision,
