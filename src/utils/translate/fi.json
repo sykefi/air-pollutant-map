@@ -10,5 +10,7 @@
   "aria.gnfr.selector.status.text": "vaihtoehtoa (päästöluokkaa) valittavana",
   "aria.gnfr.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (päästöluokat)",
   "aria.pollutant.selector.status.text": "vaihtoehtoa (saastuketta) valittavana",
-  "aria.pollutant.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (saastukkeet)"
+  "aria.pollutant.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (saastukkeet)",
+  "aria.mapdatatype.selector.label": "Valitse kartalla näytettävä data kahdesta vaihtoehdosta (ruudukko & kunnat)",
+  "aria.language.selector.label": "Valitse päästökartan kieli (FI -> suomi, SV -> ruotsi, EN -> englanti)"
 }

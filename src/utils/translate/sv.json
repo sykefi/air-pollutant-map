@@ -10,5 +10,7 @@
   "aria.gnfr.selector.status.text": "options (pollution classes) available",
   "aria.gnfr.selector.describe": "Arrow down for options (pollution classes)",
   "aria.pollutant.selector.status.text": "options (pollutants) available",
-  "aria.pollutant.selector.describe": "Arrow down for options (pollutants)"
+  "aria.pollutant.selector.describe": "Arrow down for options (pollutants)",
+  "aria.mapdatatype.selector.label": "Select map data type from two options (grid & municipalities)",
+  "aria.language.selector.label": "Select language language of the ari pollution map (FI -> Finnish, SV -> Swedish, EN -> English)"
 }

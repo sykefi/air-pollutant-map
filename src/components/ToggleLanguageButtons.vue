@@ -1,8 +1,8 @@
 <template>
   <div>
-    <label class="visually-hidden" for="lang-selector-wrapper"
-      >Select your language (FI -> Finnish, SV -> Swedish, EN -> English)</label
-    >
+    <label class="visually-hidden" for="lang-selector-wrapper">
+      {{ "aria.language.selector.label" | translate }}
+    </label>
     <div class="lang-selector-wrapper">
       <div style="display: flex;">
         <div
