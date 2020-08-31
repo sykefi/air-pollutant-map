@@ -188,11 +188,9 @@ describe("Grid data layer", () => {
   });
   it("shows expected class ranges in legend (combined: rikkidioksidi)", () => {
     cy.get("#legend-box").within(() => {
-      cy.contains("0 - 0.0031");
-      cy.contains("0.0031 - 0.053");
-      cy.contains("0.053 - 0.17");
-      cy.contains("0.17 - 0.52");
-      cy.contains("0.52 - 89");
+      cy.contains("0 - 0.0072");
+      cy.contains("0.0072 - 0.063");
+      cy.contains("0.063 - 0.19");
       cy.contains("89 - 255");
       cy.contains("255 - 4129");
     });
@@ -203,13 +201,10 @@ describe("Grid data layer", () => {
       cy.contains("Typen oksidit").click();
     });
     cy.get("#legend-box").within(() => {
-      cy.contains("0 - 0.63");
-      cy.contains("0.63 - 1.8");
-      cy.contains("1.8 - 4.3");
-      cy.contains("4.3 - 11");
-      cy.contains("11 - 133");
-      cy.contains("133 - 366");
-      cy.contains("366 - 3282");
+      cy.contains("0 - 0.28");
+      cy.contains("0.28 - 1.6");
+      cy.contains("137 - 381");
+      cy.contains("381 - 3300");
     });
   });
   it("shows expected class ranges in legend (road/transport: typen oksidit)", () => {
@@ -218,13 +213,10 @@ describe("Grid data layer", () => {
     cy.get("#gnfr-select-list").should("have.class", "hidden-all");
     cy.contains("Road");
     cy.get("#legend-box").within(() => {
-      cy.contains("0 - 0.63");
-      cy.contains("0.63 - 1.8");
-      cy.contains("1.8 - 4.3");
-      cy.contains("4.3 - 11");
-      cy.contains("11 - 133");
-      cy.contains("133 - 366");
-      cy.contains("366 - 842");
+      cy.contains("0 - 0.28");
+      cy.contains("0.28 - 1.6");
+      cy.contains("137 - 381");
+      cy.contains("381 - 842");
     });
   });
 });
@@ -290,11 +282,8 @@ describe("Toggle back to grid data layer", () => {
   });
   it("shows expected class ranges in legend (combined: rikkidioksidi)", () => {
     cy.get("#legend-box").within(() => {
-      cy.contains("0 - 0.0031");
-      cy.contains("0.0031 - 0.053");
-      cy.contains("0.053 - 0.17");
-      cy.contains("0.17 - 0.52");
-      cy.contains("0.52 - 89");
+      cy.contains("0 - 0.0072");
+      cy.contains("0.0072 - 0.063");
       cy.contains("89 - 255");
       cy.contains("255 - 4129");
     });
