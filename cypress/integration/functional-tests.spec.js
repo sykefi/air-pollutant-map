@@ -243,8 +243,8 @@ describe("Municipality layer", () => {
   it("shows municipality layer popup", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Typen oksidit (Vaala):");
-    cy.contains("120.6 t");
-    cy.contains("0.068 t / km2");
+    cy.contains("117 t");
+    cy.contains("0.066 t / km2");
   });
   it("closes popup", () => {
     cy.get(".olpopup-closer").click();
@@ -252,12 +252,12 @@ describe("Municipality layer", () => {
   it("shows expected class ranges in legend (Typen oksidit)", () => {
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.11");
-      cy.contains("0.11 - 0.2");
-      cy.contains("0.2 - 0.37");
+      cy.contains("0.11 - 0.19");
+      cy.contains("0.19 - 0.37");
       cy.contains("0.37 - 0.66");
-      cy.contains("0.66 - 3.7");
-      cy.contains("3.7 - 11");
-      cy.contains("11 - 26");
+      cy.contains("0.66 - 4.8");
+      cy.contains("4.8 - 14");
+      cy.contains("14 - 32");
     });
   });
   it("shows expected class ranges in legend (rikkidioksidi)", () => {
@@ -268,11 +268,11 @@ describe("Municipality layer", () => {
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.0058");
       cy.contains("0.0058 - 0.012");
-      cy.contains("0.012 - 0.027");
-      cy.contains("0.027 - 0.085");
-      cy.contains("0.085 - 1.5");
-      cy.contains("1.5 - 4");
-      cy.contains("4 - 13");
+      cy.contains("0.012 - 0.024");
+      cy.contains("0.024 - 0.079");
+      cy.contains("0.079 - 3.5");
+      cy.contains("3.5 - 6.5");
+      cy.contains("6.5 - 25");
     });
   });
 });

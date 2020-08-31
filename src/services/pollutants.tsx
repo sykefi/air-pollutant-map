@@ -5,7 +5,7 @@ import { m2tokm2 } from "./../constants";
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 const gridDataTable = "p_grid_data_gnfr";
 const gridDataTotalsTable = "p_grid_data_totals";
-const muniDataTable = "p_muni_data";
+const muniDataTable = "p_muni_data_totals";
 const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";
 const outputFormat = "&outputFormat=application/json";
