@@ -6,6 +6,7 @@ CREATE TABLE public.muni_data
     vuosi integer,
     nimi varchar(30),
     kuntanro integer,
+    gnfr varchar(25),
     s1 double precision,
     s43 double precision,
     s3 double precision,
