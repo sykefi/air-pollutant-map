@@ -1,35 +1,49 @@
 <template>
-  <div class="lang-selector-wrapper">
-    <div style="display: flex;">
-      <div
-        id="selector-left"
-        v-on:click="() => setLanguage(Lang.FI)"
-        v-bind:class="[
-          lang === Lang.FI ? 'selected-lang' : 'lang-button-hover',
-          'lang-button'
-        ]"
-      >
-        FI
-      </div>
-      <div
-        id="selector-middle"
-        v-on:click="() => setLanguage(Lang.SV)"
-        v-bind:class="[
-          lang === Lang.SV ? 'selected-lang' : 'lang-button-hover',
-          'lang-button'
-        ]"
-      >
-        SV
-      </div>
-      <div
-        id="selector-right"
-        v-on:click="() => setLanguage(Lang.EN)"
-        v-bind:class="[
-          lang === Lang.EN ? 'selected-lang' : 'lang-button-hover',
-          'lang-button'
-        ]"
-      >
-        EN
+  <div>
+    <label class="visually-hidden" for="lang-selector-wrapper"
+      >Select your language (FI -> Finnish, SV -> Swedish, EN -> English)</label
+    >
+    <div class="lang-selector-wrapper">
+      <div style="display: flex;">
+        <div
+          id="selector-left"
+          role="button"
+          tabindex="0"
+          :aria-pressed="lang === Lang.FI"
+          v-on:click="() => setLanguage(Lang.FI)"
+          v-bind:class="[
+            lang === Lang.FI ? 'selected-lang' : 'lang-button-hover',
+            'lang-button'
+          ]"
+        >
+          FI
+        </div>
+        <div
+          id="selector-middle"
+          role="button"
+          tabindex="0"
+          :aria-pressed="lang === Lang.SV"
+          v-on:click="() => setLanguage(Lang.SV)"
+          v-bind:class="[
+            lang === Lang.SV ? 'selected-lang' : 'lang-button-hover',
+            'lang-button'
+          ]"
+        >
+          SV
+        </div>
+        <div
+          id="selector-right"
+          role="button"
+          tabindex="0"
+          :aria-pressed="lang === Lang.EN"
+          v-on:click="() => setLanguage(Lang.EN)"
+          v-bind:class="[
+            lang === Lang.EN ? 'selected-lang' : 'lang-button-hover',
+            'lang-button'
+          ]"
+        >
+          EN
+        </div>
       </div>
     </div>
   </div>
@@ -76,6 +90,9 @@ export default Vue.extend({
   transition-duration: 0.15s;
   -webkit-transition-duration: 0.15s; /* Safari */
 }
+.lang-button:focus {
+  outline: none;
+}
 .lang-button-hover:hover {
   color: black;
 }
@@ -96,5 +113,14 @@ export default Vue.extend({
   color: white;
   border-color: #3969a1;
   background-color: rgba(0, 60, 136, 0.5);
+}
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 </style>
