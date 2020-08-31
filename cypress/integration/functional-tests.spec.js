@@ -91,7 +91,26 @@ describe("GNFR selector", () => {
       cy.get(".gnfr-select-container").click();
       cy.contains("li", "Kaikki").click();
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
-      cy.contains("Kaikki");
+      cy.get("#gnfr-select-input").should("have.value", "Kaikki");
+    });
+  });
+  it("finds & selects option by input value (road & transport)", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("#gnfr-select-input").click().clear().type("roadTranspor");
+      cy.get("li").click();
+      cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
+    });
+  });
+  it("shows previously selected GNFR after exiting selector", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("#gnfr-select-input").click().clear().type("kaikki{esc}");
+      cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
+    });
+  });
+  it("selects option with keyboard actions (combined GNFR)", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("#gnfr-select-input").click().clear().type("kaikki{downarrow}{enter}");
+      cy.get("#gnfr-select-input").should("have.value", "Kaikki");
     });
   });
 });
@@ -124,7 +143,26 @@ describe("Pollutant selector", () => {
       cy.get(".pollutant-select-container").click();
       cy.contains("Rikkidioksidi").click();
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
-      cy.contains("Rikkidioksidi");
+      cy.get("#pollutant-select-input").should("have.value", "Rikkidioksidi");
+    });
+  });
+  it("finds & selects option by input value (road & transport)", () => {
+    cy.get(".pollutant-selector-div").within(() => {
+      cy.get("#pollutant-select-input").click().clear().type("hiilimono");
+      cy.get("li").click();
+      cy.get("#pollutant-select-input").should("have.value", "Hiilimonoksidi");
+    });
+  });
+  it("shows previously selected pollutant after exiting selector", () => {
+    cy.get(".pollutant-selector-div").within(() => {
+      cy.get("#pollutant-select-input").click().clear().type("rikkidio{esc}");
+      cy.get("#pollutant-select-input").should("have.value", "Hiilimonoksidi");
+    });
+  });
+  it("selects option with keyboard actions (combined GNFR)", () => {
+    cy.get(".pollutant-selector-div").within(() => {
+      cy.get("#pollutant-select-input").click().clear().type("rikkidioksi{downarrow}{enter}");
+      cy.get("#pollutant-select-input").should("have.value", "Rikkidioksidi");
     });
   });
 });
