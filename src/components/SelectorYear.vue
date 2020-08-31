@@ -1,31 +1,35 @@
 <template>
   <div class="year-selector-div">
-    <label class="hidden-visually" for="custom-select-input">Vuosi</label>
-    <div class="selector-label" for="custom-select-input">
+    <label class="selector-label" for="year-select-input">
       {{ "selector.vuosi.label" | translate }}
+    </label>
+    <div id="year-select-status" class="hidden-visually" aria-live="polite">
+      {{ yearOptions.length }} {{ "aria.year.selector.status.text" | translate }}
     </div>
-    <div id="custom-select-status" class="hidden-visually" aria-live="polite"></div>
     <div
-      class="custom-select"
-      id="myCustomSelect"
+      class="year-select-container"
+      id="yearSelectContainer"
       v-on:click="handleSelectorClick"
+      v-on:keyup="doKeyAction"
+      v-on:keydown="preventKeyDownScroll"
       role="combobox"
       aria-haspopup="listbox"
-      aria-owns="custom-select-list"
+      aria-owns="year-select-list"
+      :aria-expanded="showOptions ? 'true' : 'false'"
     >
       <input
         type="text"
-        id="custom-select-input"
+        id="year-select-input"
+        ref="yearSelectInput"
         v-model="yearInputValue"
         class="select-css"
-        aria-describedby="custom-select-info"
-        aria-autocomplete="both"
-        aria-controls="custom-select-list"
+        aria-describedby="year-select-info"
+        aria-controls="year-select-list"
         readonly
       />
-      <span id="custom-select-info" class="hidden-visually"
-        >Arrow down for options or start typing to filter.</span
-      >
+      <span id="year-select-info" class="hidden-visually">
+        {{ "aria.year.selector.describe" | translate }}
+      </span>
       <span class="custom-select-icons">
         <svg
           width="21"
@@ -46,11 +50,17 @@
         </svg>
       </span>
       <ul
-        v-bind:class="[showOptions ? '' : 'hidden-all', 'custom-select-options']"
-        id="custom-select-list"
+        v-bind:class="[showOptions ? '' : 'hidden-all', 'year-select-options']"
+        id="year-select-list"
         role="listbox"
       >
-        <li v-for="year in yearOptions" :key="year" tabindex="-1" role="option">
+        <li
+          v-for="year in yearOptions"
+          :key="year"
+          tabindex="-1"
+          role="option"
+          ref="yearOptions"
+        >
           {{ year }}
         </li>
       </ul>
@@ -61,14 +71,12 @@
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
 import * as constants from "./../constants";
+import * as selectorUtils from "./../utils/selectorUtils";
 
 const findFocus = () => {
   const focusPoint = document.activeElement;
   return focusPoint;
 };
-
-let selectorElement: Element | null = null;
-let yearInputElement: Element | null = null;
 
 export default Vue.extend({
   data() {
@@ -90,7 +98,10 @@ export default Vue.extend({
     setState: function (state: string) {
       this.selectorState = state;
     },
-    handleSelectorClick: function () {
+    getInputElement: function (): HTMLElement {
+      return this.$refs.yearSelectInput as HTMLElement;
+    },
+    handleSelectorClick: function (): void {
       const currentFocus = findFocus();
       switch (this.selectorState) {
         case "initial":
@@ -98,7 +109,7 @@ export default Vue.extend({
           this.setState("opened");
           break;
         case "opened":
-          if (currentFocus === yearInputElement) {
+          if (currentFocus === this.getInputElement()) {
             this.toggleYearSelector(false);
             this.setState("initial");
           } else if (currentFocus && currentFocus.tagName === "LI") {
@@ -125,19 +136,142 @@ export default Vue.extend({
     },
     makeChoice: function (whichOption) {
       this.yearInputValue = parseInt(whichOption.textContent.trim());
+      this.moveFocus(findFocus(), "input");
       this.$emit("set-selected-year", this.yearInputValue);
+    },
+    moveFocus: function (fromHere, toThere) {
+      if (toThere === "input") {
+        this.getInputElement().focus();
+        return;
+      }
+      switch (fromHere) {
+        case this.getInputElement():
+          if (toThere === "forward") {
+            this.$refs.yearOptions[0].focus();
+          } else if (toThere === "back") {
+            this.$refs.yearOptions[this.yearOptions.length - 1].focus();
+          }
+          break;
+        case this.$refs.yearOptions[0]:
+          if (toThere === "forward") {
+            this.$refs.yearOptions[1].focus();
+          } else if (toThere === "back") {
+            this.getInputElement().focus();
+          }
+          break;
+        case this.$refs.yearOptions[this.yearOptions.length - 1]:
+          if (toThere === "forward") {
+            this.$refs.yearOptions[0].focus();
+          } else if (toThere === "back") {
+            this.$refs.yearOptions[this.yearOptions.length - 2].focus();
+          }
+          break;
+        default: {
+          const currentItem = findFocus();
+          const yearOption = parseInt(currentItem!.textContent!.trim());
+          const indexOfYear = this.yearOptions.indexOf(yearOption);
+          if (toThere === "forward") {
+            this.$refs.yearOptions[indexOfYear + 1].focus();
+          } else if (toThere === "back" && indexOfYear > 0) {
+            this.$refs.yearOptions[indexOfYear - 1].focus();
+          } else {
+            this.getInputElement().focus();
+          }
+          break;
+        }
+      }
+    },
+    preventKeyDownScroll: function (e) {
+      selectorUtils.preventKeyDownScroll(e);
+    },
+    doKeyAction: function (whichKey: KeyboardEvent) {
+      const currentFocus = findFocus();
+      switch (whichKey.code) {
+        case "Enter":
+          if (this.selectorState === "initial") {
+            this.toggleYearSelector(true);
+            this.setState("opened");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.toggleYearSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.toggleYearSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.toggleYearSelector(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.toggleYearSelector(true);
+            this.setState("opened");
+          } else {
+            this.toggleYearSelector(true);
+            this.setState("filtered");
+          }
+          break;
+
+        case "Escape":
+          if (this.selectorState === "opened" || this.selectorState === "filtered") {
+            this.toggleYearSelector(false);
+            this.setState("initial");
+          }
+          break;
+
+        case "ArrowDown":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleYearSelector(true);
+            this.moveFocus(this.getInputElement(), "forward");
+            this.setState("opened");
+          } else {
+            this.toggleYearSelector(true);
+            this.moveFocus(currentFocus, "forward");
+          }
+          break;
+        case "ArrowUp":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleYearSelector(true);
+            this.moveFocus(this.getInputElement(), "back");
+            this.setState("opened");
+          } else {
+            this.moveFocus(currentFocus, "back");
+          }
+          break;
+        default:
+          if (this.selectorState === "initial") {
+            this.toggleYearSelector(true);
+            this.setState("filtered");
+          } else if (this.selectorState === "opened") {
+            this.setState("filtered");
+          } else if (this.selectorState === "closed") {
+            this.setState("filtered");
+          }
+          break;
+      }
     }
   },
   mounted() {
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (target && !target.closest("#myCustomSelect")) {
+      if (target && !target.closest("#yearSelectContainer")) {
         this.toggleYearSelector(false);
         this.setState("initial");
       }
     });
-    selectorElement = document.querySelector("#myCustomSelect");
-    yearInputElement = selectorElement ? selectorElement.querySelector("input") : null;
   }
 });
 </script>
@@ -152,7 +286,7 @@ export default Vue.extend({
   max-width: 6em;
   margin: 12px;
 }
-.custom-select {
+.year-select-container {
   position: relative;
 }
 .select-css {
@@ -194,7 +328,7 @@ export default Vue.extend({
   border: 1px solid white;
   background: transparent;
 }
-.custom-select-options {
+.year-select-options {
   border: 1px solid #aaa;
   border-radius: 0 0 0.25em 0.25em;
   line-height: 1.5;
@@ -210,14 +344,16 @@ export default Vue.extend({
   width: calc(100% - 2px);
   background-color: #ffffff;
 }
-.custom-select-options li {
+.year-select-options li {
   padding: 0.5em;
 }
-.custom-select-options li:hover {
-  background: blue;
-  color: #fff;
-  border: 1px solid blue;
-  border-width: 0 1px 0 1px;
+.year-select-options li:hover {
+  background: #d1d1d1;
+}
+.year-select-options li:focus {
+  background: #d1d1d1;
+  border: none;
+  outline: none;
 }
 .icon {
   fill: ButtonText;
