@@ -1,8 +1,14 @@
 <template>
   <div class="map-data-type-selector-wrapper">
+    <label class="visually-hidden" for="map-data-type-selector-container">
+      {{ "aria.mapdatatype.selector.label" | translate }}
+    </label>
     <div class="map-data-type-selector-container">
       <div
         id="selector-grid"
+        role="button"
+        tabindex="0"
+        :aria-pressed="mapDataType === mapDataTypes.GRID"
         v-on:click="() => selectMapDataType(mapDataTypes.GRID)"
         v-bind:class="[
           mapDataType === mapDataTypes.GRID
@@ -15,6 +21,9 @@
       </div>
       <div
         id="selector-municipalities"
+        role="button"
+        tabindex="0"
+        :aria-pressed="mapDataType === mapDataTypes.MUNICIPALITY"
         v-on:click="() => selectMapDataType(mapDataTypes.MUNICIPALITY)"
         v-bind:class="[
           mapDataType === mapDataTypes.MUNICIPALITY
@@ -73,6 +82,9 @@ export default Vue.extend({
   transition-duration: 0.15s;
   -webkit-transition-duration: 0.15s; /* Safari */
 }
+.data-type-selector-button:focus {
+  outline: none;
+}
 .data-type-selector-hover:hover {
   color: black;
 }
@@ -89,5 +101,14 @@ export default Vue.extend({
   color: white;
   border-color: #3969a1;
   background-color: rgba(0, 60, 136, 0.5);
+}
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 </style>

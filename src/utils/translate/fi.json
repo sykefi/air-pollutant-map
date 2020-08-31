@@ -4,5 +4,13 @@
   "selector.pollutant.label": "Saastuke",
   "selector.map.datatype.grid": "Ruudukko",
   "selector.map.datatype.muni": "Kunnat",
-  "map.legend.title-without-unit": "Päästömäärä"
+  "map.legend.title-without-unit": "Päästömäärä",
+  "aria.year.selector.status.text": "vaihtoehtoa (vuotta) valittavana",
+  "aria.year.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (vuodet)",
+  "aria.gnfr.selector.status.text": "vaihtoehtoa (päästöluokkaa) valittavana",
+  "aria.gnfr.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (päästöluokat)",
+  "aria.pollutant.selector.status.text": "vaihtoehtoa (saastuketta) valittavana",
+  "aria.pollutant.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (saastukkeet)",
+  "aria.mapdatatype.selector.label": "Valitse kartalla näytettävä data kahdesta vaihtoehdosta (ruudukko & kunnat)",
+  "aria.language.selector.label": "Valitse päästökartan kieli (FI -> suomi, SV -> ruotsi, EN -> englanti)"
 }
