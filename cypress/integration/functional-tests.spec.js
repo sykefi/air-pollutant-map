@@ -208,7 +208,7 @@ describe("Grid data layer", () => {
   });
 
   it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.0072");
       cy.contains("0.0072 - 0.063");
       cy.contains("0.063 - 0.19");
@@ -222,7 +222,7 @@ describe("Grid data layer", () => {
       cy.get(".pollutant-select-container").click();
       cy.contains("Typen oksidit").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.28");
       cy.contains("0.28 - 1.6");
       cy.contains("137 - 381");
@@ -235,7 +235,7 @@ describe("Grid data layer", () => {
       cy.get("input").click();
       cy.contains("li", "2010").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.28");
       cy.contains("0.28 - 1.6");
       cy.contains("137 - 381");
@@ -248,7 +248,7 @@ describe("Grid data layer", () => {
       cy.get(".gnfr-select-container").click();
       cy.contains("li", "Aviation").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.28");
       cy.contains("0.28 - 1.6");
       cy.contains("12 - 137");
@@ -265,7 +265,7 @@ describe("Grid data layer", () => {
       cy.get("input").click();
       cy.contains("li", "2018").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.28");
       cy.contains("0.28 - 1.6");
       cy.contains("137 - 381");
@@ -303,7 +303,7 @@ describe("Municipality layer", () => {
   });
 
   it("shows expected class ranges in legend (2018 combined: typen oksidit)", () => {
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.11");
       cy.contains("0.11 - 0.19");
       cy.contains("4.8 - 14");
@@ -320,7 +320,7 @@ describe("Municipality layer", () => {
       cy.get("input").click();
       cy.contains("Rikkidioksidi").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.0058");
       cy.contains("0.0058 - 0.012");
       cy.contains("0.079 - 3.5");
@@ -341,7 +341,7 @@ describe("Municipality layer", () => {
       cy.get("input").click();
       cy.contains("li", "Aviation").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.11");
       cy.contains("0.11 - 0.19");
       cy.contains("0.66 - 4.8");
@@ -354,7 +354,7 @@ describe("Municipality layer", () => {
       cy.get("input").click();
       cy.contains("li", "Kaikki").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.11");
       cy.contains("0.11 - 0.19");
       cy.contains("4.8 - 14");
@@ -372,7 +372,7 @@ describe("Municipality layer", () => {
       cy.get(".pollutant-select-container").click();
       cy.contains("Rikkidioksidi").click();
     });
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.0058");
       cy.contains("0.0058 - 0.012");
       cy.contains("3.5 - 6.5");
@@ -395,7 +395,7 @@ describe("Toggle back to grid data layer", () => {
   });
 
   it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
-    cy.get("#legend-box").within(() => {
+    cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.0072");
       cy.contains("0.0072 - 0.063");
       cy.contains("89 - 255");
