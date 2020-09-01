@@ -7,7 +7,12 @@
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="map-container">
-        <OlMap :gnfr="gnfr" :year="year" :pollutant="pollutant" :mapDataType="mapDataType" />
+        <OlMap
+          :year="year"
+          :gnfrId="gnfrId"
+          :pollutant="pollutant"
+          :mapDataType="mapDataType"
+        />
         <div id="map-controls-container">
           <SelectorDataType
             :mapDataType="mapDataType"
@@ -29,6 +34,7 @@ import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import { Pollutant, MapDataType } from "./types";
+import { Dispatch } from "./store";
 import * as constants from "./constants";
 
 export default Vue.extend({
@@ -43,7 +49,7 @@ export default Vue.extend({
   data() {
     return {
       year: constants.initialYear as number,
-      gnfr: undefined as string | undefined,
+      gnfrId: undefined as string | undefined,
       pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType
     };
@@ -53,7 +59,7 @@ export default Vue.extend({
       this.year = year;
     },
     setSelectedGnfr(gnfrId: string) {
-      this.gnfr = gnfrId;
+      this.gnfrId = gnfrId;
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
@@ -66,7 +72,7 @@ export default Vue.extend({
     if (process.env.VUE_APP_DETECT_LANGUAGE === "false") {
       return;
     } else {
-      this.$store.dispatch("setDetectedLang");
+      this.$store.dispatch(Dispatch.setDetectedLang);
     }
   }
 });

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div id="ol-map">
-      <div v-if="gnfr && pollutant && isReady && mapDataType === mapDataTypes.GRID">
+      <div v-if="gnfrId && pollutant && isReady && mapDataType === mapDataTypes.GRID">
         <OlGridDataLayer
-          :gnfr="gnfr"
           :year="year"
+          :gnfrId="gnfrId"
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
@@ -14,6 +14,7 @@
       <div v-if="pollutant && isReady && mapDataType === mapDataTypes.MUNICIPALITY">
         <OlMuniDataLayer
           :year="year"
+          :gnfrId="gnfrId"
           :pollutant="pollutant"
           :map="map"
           @update-legend="updateLegend"
@@ -21,12 +22,7 @@
         />
       </div>
     </div>
-    <Legend
-      v-if="legend"
-      id="map-legend-container"
-      :legend="legend"
-      :mapDataType="mapDataType"
-    />
+    <Legend id="map-legend-container" :legend="legend" :mapDataType="mapDataType" />
     <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupFeat">
       <GridFeaturePopup
         v-if="gridPopupValue"
@@ -75,7 +71,7 @@ export default Vue.extend({
   },
   props: {
     year: Number,
-    gnfr: String,
+    gnfrId: String,
     pollutant: { type: Object as PropType<Pollutant | undefined> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
@@ -94,7 +90,7 @@ export default Vue.extend({
     year: function () {
       this.closePopup();
     },
-    gnfr: function () {
+    gnfrId: function () {
       this.closePopup();
     },
     pollutant: function () {

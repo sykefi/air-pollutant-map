@@ -14,6 +14,7 @@ import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
+import { Dispatch } from "@/store";
 import * as constants from "./../constants";
 
 const classCount = 7;
@@ -22,6 +23,7 @@ export default Vue.extend({
   props: {
     map: { type: Object as PropType<Map> },
     year: Number,
+    gnfrId: String,
     pollutant: { type: Object as PropType<Pollutant> }
   },
   data() {
@@ -36,6 +38,10 @@ export default Vue.extend({
   watch: {
     year: function (newVal) {
       console.log(`Year changed to ${newVal}, refreshing muni data...`);
+      this.layerSource.refresh();
+    },
+    gnfrId: function (newVal: string) {
+      console.log(`Gnfr changed to ${newVal}, refreshing muni data...`);
       this.layerSource.refresh();
     },
     pollutant: function (newVal: Pollutant) {
@@ -73,10 +79,10 @@ export default Vue.extend({
       console.log("Found max value for the layer", maxValue);
 
       if (!styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.densityProp)) {
-        if (this.year === constants.latestYear) {
+        if (this.year === constants.latestYear && this.gnfrId === "COMBINED") {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
-            `Calculating breakpoints from visible features (${constants.latestYear})`
+            `Calculating breakpoints from visible features (combined ${constants.latestYear})`
           );
           const latestValues = this.layerSource
             .getFeatures()
@@ -99,6 +105,7 @@ export default Vue.extend({
           );
           const fc = await pollutantService.fetchMuniFeatures(
             constants.latestYear,
+            "COMBINED",
             this.pollutant
           );
           const latestValues = fc.features.map((feat) => feat.properties[this.densityProp]);
@@ -154,13 +161,19 @@ export default Vue.extend({
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {
-        const fc = await pollutantService.fetchMuniFeatures(this.year, this.pollutant);
+        this.$store.dispatch(Dispatch.setLoading);
+        const fc = await pollutantService.fetchMuniFeatures(
+          this.year,
+          this.gnfrId,
+          this.pollutant
+        );
         this.layerSource.clear();
         this.layerSource.addFeatures(
           // @ts-ignore
           this.layerSource.getFormat().readFeatures(fc)
         );
         this.updateStyle();
+        this.$store.dispatch(Dispatch.setLoaded);
       },
       strategy: allStrategy
     });

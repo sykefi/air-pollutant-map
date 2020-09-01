@@ -1,9 +1,6 @@
 <template>
   <div class="gnfr-selector-div">
-    <label
-      :class="[disabled ? 'gnfr-selector-disabled' : '', 'selector-label']"
-      for="gnfr-select-input"
-    >
+    <label class="selector-label" for="gnfr-select-input">
       {{ "selector.gnfr.label" | translate }}
     </label>
     <div id="gnfr-select-status" class="hidden-visually" aria-live="polite">
@@ -26,7 +23,6 @@
         id="gnfr-select-input"
         ref="gnfrSelectInput"
         v-model="gnfrInputValue"
-        :disabled="disabled"
         class="select-css"
         aria-describedby="gnfr-select-info"
         aria-controls="gnfr-select-list"
@@ -92,17 +88,6 @@ export default Vue.extend({
   props: {
     mapDataType: { type: String as PropType<MapDataType> }
   },
-  watch: {
-    mapDataType() {
-      if (this.mapDataType === MapDataType.MUNICIPALITY) {
-        // Disable GNFR selector for municipality data
-        this.setSelectedGnfr(this.combinedGnfr!, false);
-        this.disabled = true;
-      } else {
-        this.disabled = false;
-      }
-    }
-  },
   data() {
     return {
       gnfrOptions: [] as Gnfr[],
@@ -112,7 +97,6 @@ export default Vue.extend({
       combinedGnfr: undefined as Gnfr | undefined,
       showOptions: false as boolean,
       selectorState: "initial" as string,
-      disabled: false as boolean,
       initialized: false as boolean
     };
   },
@@ -172,7 +156,7 @@ export default Vue.extend({
       return this.$refs.gnfrSelectInput as HTMLElement;
     },
     handleSelectorClick() {
-      if (this.disabled || !this.initialized) {
+      if (!this.initialized) {
         return;
       }
       const currentFocus = findFocus();
@@ -412,13 +396,6 @@ export default Vue.extend({
 .select-css:disabled {
   border-color: grey;
   color: grey;
-}
-.gnfr-selector-disabled {
-  color: grey;
-}
-.gnfr-selector-disabled:hover {
-  color: grey;
-  cursor: initial;
 }
 .gnfr-select-icons {
   pointer-events: none;
