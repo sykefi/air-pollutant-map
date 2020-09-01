@@ -23,8 +23,8 @@ export default Vue.extend({
   props: {
     map: { type: Object as PropType<Map> },
     year: Number,
-    pollutant: { type: Object as PropType<Pollutant> },
-    gnfr: String
+    gnfrId: String,
+    pollutant: { type: Object as PropType<Pollutant> }
   },
   data() {
     return {
@@ -40,7 +40,7 @@ export default Vue.extend({
       console.log(`Year changed to ${newVal}, refreshing grid data...`);
       this.layerSource.refresh();
     },
-    gnfr: function (newVal: Gnfr) {
+    gnfrId: function (newVal: string) {
       console.log(`Gnfr changed to ${newVal}, refreshing grid data...`);
       this.layerSource.refresh();
     },
@@ -73,10 +73,10 @@ export default Vue.extend({
       console.log("Found max value for the layer", maxValue);
 
       if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.id)) {
-        if (this.gnfr === "COMBINED" && this.year === constants.latestYear) {
+        if (this.gnfrId === "COMBINED" && this.year === constants.latestYear) {
           // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
           console.log(
-            `Calculating breakpoints from visible features (${constants.latestYear})`
+            `Calculating breakpoints from visible features (combined ${constants.latestYear})`
           );
           const latestValues = this.layerSource
             .getFeatures()
@@ -97,7 +97,7 @@ export default Vue.extend({
           console.log(
             `Fetching features of ${constants.latestYear} and calculating breakpoints`
           );
-          const fc = await pollutantService.fetchFeatures(
+          const fc = await pollutantService.fetchGridFeatures(
             constants.latestYear,
             "COMBINED",
             this.pollutant
@@ -159,7 +159,11 @@ export default Vue.extend({
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {
-        const fc = await pollutantService.fetchFeatures(this.year, this.gnfr, this.pollutant);
+        const fc = await pollutantService.fetchGridFeatures(
+          this.year,
+          this.gnfrId,
+          this.pollutant
+        );
         this.layerSource.clear();
         this.layerSource.addFeatures(
           // @ts-ignore

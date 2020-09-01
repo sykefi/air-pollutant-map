@@ -7,7 +7,12 @@
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div id="map-container">
-        <OlMap :gnfr="gnfr" :year="year" :pollutant="pollutant" :mapDataType="mapDataType" />
+        <OlMap
+          :year="year"
+          :gnfrId="gnfrId"
+          :pollutant="pollutant"
+          :mapDataType="mapDataType"
+        />
         <div id="map-controls-container">
           <SelectorDataType
             :mapDataType="mapDataType"
@@ -43,7 +48,7 @@ export default Vue.extend({
   data() {
     return {
       year: constants.initialYear as number,
-      gnfr: undefined as string | undefined,
+      gnfrId: undefined as string | undefined,
       pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType
     };
@@ -53,7 +58,7 @@ export default Vue.extend({
       this.year = year;
     },
     setSelectedGnfr(gnfrId: string) {
-      this.gnfr = gnfrId;
+      this.gnfrId = gnfrId;
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
