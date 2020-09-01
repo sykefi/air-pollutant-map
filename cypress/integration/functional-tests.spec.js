@@ -3,20 +3,25 @@ describe("Page load and initial UI", () => {
     cy.visit("http://localhost:8080/");
     cy.get("div#app-wrapper");
   });
+
   it("shows year selector", () => {
     cy.contains("Vuosi");
   });
+
   it("shows gnfr selector", () => {
     cy.contains("Luokka");
   });
+
   it("shows pollutant selector", () => {
     cy.contains("Saastuke");
     cy.contains("Typen oksidit");
   });
+
   it("shows map data type selector (ruudukko/kunnat)", () => {
     cy.contains("Ruudukko");
     cy.contains("Kunnat");
   });
+
   it("shows legend", () => {
     cy.contains("Päästömäärä (t)");
   });
@@ -64,12 +69,14 @@ describe("GNFR selector", () => {
     cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
     cy.get("#gnfr-select-list").within(() => cy.contains("li", "Shipping"));
   });
+
   it("toggles gnfr options hidden by clicking the input", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get(".gnfr-select-container").click();
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
     });
   });
+
   it("toggles gnfr options hidden by clicking outside the input", () => {
     cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
     cy.contains("Shipping");
@@ -78,6 +85,7 @@ describe("GNFR selector", () => {
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
     });
   });
+
   it("selects GNFR by clicking an option (public power)", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get(".gnfr-select-container").click();
@@ -86,6 +94,7 @@ describe("GNFR selector", () => {
       cy.contains("Public");
     });
   });
+
   it("selects combined GNFR", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get(".gnfr-select-container").click();
@@ -94,6 +103,7 @@ describe("GNFR selector", () => {
       cy.get("#gnfr-select-input").should("have.value", "Kaikki");
     });
   });
+
   it("finds & selects option by input value (road & transport)", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get("#gnfr-select-input").click().clear().type("roadTranspor");
@@ -101,12 +111,14 @@ describe("GNFR selector", () => {
       cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
     });
   });
+
   it("shows previously selected GNFR after exiting selector", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get("#gnfr-select-input").click().clear().type("kaikki{esc}");
       cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
     });
   });
+
   it("selects option with keyboard actions (combined GNFR)", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get("#gnfr-select-input").click().clear().type("kaikki{downarrow}{enter}");
@@ -122,12 +134,14 @@ describe("Pollutant selector", () => {
     );
     cy.get("#pollutant-select-list").within(() => cy.contains("Rikkidioksidi"));
   });
+
   it("toggles pollutant options hidden by clicking the input", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get(".pollutant-select-container").click();
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
     });
   });
+
   it("toggles pollutant options hidden by clicking outside the input", () => {
     cy.get(".pollutant-selector-div").within(() =>
       cy.get(".pollutant-select-container").click()
@@ -138,6 +152,7 @@ describe("Pollutant selector", () => {
       cy.get("#pollutant-select-list").should("have.class", "hidden-all");
     });
   });
+
   it("selects pollutant by clicking an option (rikkidioksidi)", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get(".pollutant-select-container").click();
@@ -146,6 +161,7 @@ describe("Pollutant selector", () => {
       cy.get("#pollutant-select-input").should("have.value", "Rikkidioksidi");
     });
   });
+
   it("finds & selects option by input value (road & transport)", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get("#pollutant-select-input").click().clear().type("hiilimono");
@@ -153,12 +169,14 @@ describe("Pollutant selector", () => {
       cy.get("#pollutant-select-input").should("have.value", "Hiilimonoksidi");
     });
   });
+
   it("shows previously selected pollutant after exiting selector", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get("#pollutant-select-input").click().clear().type("rikkidio{esc}");
       cy.get("#pollutant-select-input").should("have.value", "Hiilimonoksidi");
     });
   });
+
   it("selects option with keyboard actions (combined GNFR)", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get("#pollutant-select-input").click().clear().type("rikkidioksi{downarrow}{enter}");
@@ -178,15 +196,18 @@ describe("Grid data layer", () => {
     // wait for the layer and legend to appear
     cy.contains("Päästömäärä (t)");
   });
+
   it("shows grid layer popup on click", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Rikkidioksidi (t):");
     cy.contains("0.45");
   });
+
   it("closes popup", () => {
     cy.get(".olpopup-closer").click();
   });
-  it("shows expected class ranges in legend (combined: rikkidioksidi)", () => {
+
+  it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.0072");
       cy.contains("0.0072 - 0.063");
@@ -195,7 +216,8 @@ describe("Grid data layer", () => {
       cy.contains("255 - 4129");
     });
   });
-  it("shows expected class ranges in legend (combined: typen oksidit)", () => {
+
+  it("shows expected class ranges in legend (2018 combined: typen oksidit)", () => {
     cy.get(".pollutant-selector-div").within(() => {
       cy.get(".pollutant-select-container").click();
       cy.contains("Typen oksidit").click();
@@ -207,11 +229,42 @@ describe("Grid data layer", () => {
       cy.contains("381 - 3300");
     });
   });
-  it("shows expected class ranges in legend (road/transport: typen oksidit)", () => {
-    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
-    cy.get("#gnfr-select-list").within(() => cy.contains("li", "Road").click());
-    cy.get("#gnfr-select-list").should("have.class", "hidden-all");
-    cy.contains("Road");
+
+  it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
+    cy.get(".year-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "2010").click();
+    });
+    cy.get("#legend-box").within(() => {
+      cy.contains("0 - 0.28");
+      cy.contains("0.28 - 1.6");
+      cy.contains("137 - 381");
+      cy.contains("381 - 4591");
+    });
+  });
+
+  it("shows expected class ranges in legend (2010 aviation: typen oksidit)", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get(".gnfr-select-container").click();
+      cy.contains("li", "Aviation").click();
+    });
+    cy.get("#legend-box").within(() => {
+      cy.contains("0 - 0.28");
+      cy.contains("0.28 - 1.6");
+      cy.contains("12 - 137");
+      cy.contains("137 - 381");
+    });
+  });
+
+  it("shows expected class ranges in legend (2018 road/transport: typen oksidit)", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get(".gnfr-select-container").click();
+      cy.contains("li", "Road").click();
+    });
+    cy.get(".year-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "2018").click();
+    });
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.28");
       cy.contains("0.28 - 1.6");
@@ -225,34 +278,96 @@ describe("Municipality layer", () => {
   it("toggles municipality layer visible", () => {
     // switch back to typen oksidit
     cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select-container").click();
+      cy.get("input").click();
       cy.contains("Typen oksidit").click();
+    });
+    // switch back to combined data
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "Kaikki").click();
     });
     cy.contains("Kunnat").click();
     cy.contains("Kaikki");
     cy.contains("Päästömäärä (t / km2)");
   });
-  it("shows municipality layer popup", () => {
+
+  it("shows municipality layer popup (2018 combined: typen oksidit)", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Typen oksidit (Vaala):");
     cy.contains("117 t");
     cy.contains("0.066 t / km2");
   });
+
   it("closes popup", () => {
     cy.get(".olpopup-closer").click();
   });
-  it("shows expected class ranges in legend (Typen oksidit)", () => {
+
+  it("shows expected class ranges in legend (2018 combined: typen oksidit)", () => {
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.11");
       cy.contains("0.11 - 0.19");
-      cy.contains("0.19 - 0.37");
-      cy.contains("0.37 - 0.66");
-      cy.contains("0.66 - 4.8");
       cy.contains("4.8 - 14");
       cy.contains("14 - 32");
     });
   });
-  it("shows expected class ranges in legend (rikkidioksidi)", () => {
+
+  it("shows expected class ranges in legend (2018 road/transport: rikkidioksidi)", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "Road").click();
+    });
+    cy.get(".pollutant-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("Rikkidioksidi").click();
+    });
+    cy.get("#legend-box").within(() => {
+      cy.contains("0 - 0.0058");
+      cy.contains("0.0058 - 0.012");
+      cy.contains("0.079 - 3.5");
+      cy.get("div").last().contains("3.5 - 6.5");
+    });
+  });
+
+  it("shows expected class ranges in legend (2010 aviation: typen oksidit)", () => {
+    cy.get(".pollutant-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("Typen oksidit").click();
+    });
+    cy.get(".year-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "2010").click();
+    });
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "Aviation").click();
+    });
+    cy.get("#legend-box").within(() => {
+      cy.contains("0 - 0.11");
+      cy.contains("0.11 - 0.19");
+      cy.contains("0.66 - 4.8");
+      cy.get("div").last().contains("4.8 - 14");
+    });
+  });
+
+  it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
+    cy.get(".gnfr-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "Kaikki").click();
+    });
+    cy.get("#legend-box").within(() => {
+      cy.contains("0 - 0.11");
+      cy.contains("0.11 - 0.19");
+      cy.contains("4.8 - 14");
+      cy.get("div").last().contains("14 - 48");
+    });
+  });
+
+  it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
+    // switch back to year 2018
+    cy.get(".year-selector-div").within(() => {
+      cy.get("input").click();
+      cy.contains("li", "2018").click();
+    });
     cy.get(".pollutant-selector-div").within(() => {
       cy.get(".pollutant-select-container").click();
       cy.contains("Rikkidioksidi").click();
@@ -260,9 +375,6 @@ describe("Municipality layer", () => {
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.0058");
       cy.contains("0.0058 - 0.012");
-      cy.contains("0.012 - 0.024");
-      cy.contains("0.024 - 0.079");
-      cy.contains("0.079 - 3.5");
       cy.contains("3.5 - 6.5");
       cy.contains("6.5 - 25");
     });
@@ -274,13 +386,15 @@ describe("Toggle back to grid data layer", () => {
     cy.contains("Ruudukko").click();
     cy.contains("Päästömäärä (t)");
   });
+
   it("popups keep working", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Rikkidioksidi (t):");
     cy.contains("0.45");
     cy.get(".olpopup-closer").click();
   });
-  it("shows expected class ranges in legend (combined: rikkidioksidi)", () => {
+
+  it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
     cy.get("#legend-box").within(() => {
       cy.contains("0 - 0.0072");
       cy.contains("0.0072 - 0.063");
