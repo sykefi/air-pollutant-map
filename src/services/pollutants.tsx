@@ -3,16 +3,17 @@ import * as cache from "./cache";
 import { m2tokm2 } from "./../constants";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
-const gridDataTable = "p_grid_data_gnfr";
+const gridDataGnfrTable = "p_grid_data_gnfr";
 const gridDataTotalsTable = "p_grid_data_totals";
-const muniDataTable = "p_muni_data_totals";
+const muniDataGnfrTable = "p_muni_data_gnfr";
+const muniDataTotalsTable = "p_muni_data_totals";
 const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";
 const outputFormat = "&outputFormat=application/json";
 
 const getWfsGridDataUri = (year: number, gnfrId: string, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataTable}&propertyName=geom,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataGnfrTable}&propertyName=geom,${pollutant.id}
     ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
@@ -26,7 +27,11 @@ const getGridDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant)
   return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutant.id}`;
 };
 
-export const fetchFeatures = async (year: number, gnfrId: string, pollutant: Pollutant) => {
+export const fetchGridFeatures = async (
+  year: number,
+  gnfrId: string,
+  pollutant: Pollutant
+) => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsTotalGridDataUri(year, pollutant)
@@ -44,22 +49,35 @@ export const fetchFeatures = async (year: number, gnfrId: string, pollutant: Pol
   return fc;
 };
 
-const getMuniDataCacheKey = (year: number, pollutant: Pollutant) => {
-  return `pollutant_map_muni_data_${year}_${pollutant.id}`;
+const getMuniDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant) => {
+  return `pollutant_map_muni_data_${year}_${gnfrId}_${pollutant.id}`;
 };
 
-const getWfsMuniDataUri = (year: number, pollutant: Pollutant) => {
+const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutant: Pollutant) => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${muniDataTable}&propertyName=geom,nimi,area,${pollutant.id}
+  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,area,${pollutant.id}
+  ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
+};
+
+const getWfsMuniDataTotalsUri = (year: number, pollutant: Pollutant) => {
+  return `${gsUri}ows?service=WFS&version=1.0.0
+    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,area,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
-export const fetchMuniFeatures = async (year: number, pollutant: Pollutant) => {
-  const uri = getWfsMuniDataUri(year, pollutant);
-  const cacheKey = getMuniDataCacheKey(year, pollutant);
+export const fetchMuniFeatures = async (
+  year: number,
+  gnfrId: string,
+  pollutant: Pollutant
+) => {
+  const uri =
+    gnfrId === "COMBINED"
+      ? getWfsMuniDataTotalsUri(year, pollutant)
+      : getWfsMuniDataGnfrUri(year, gnfrId, pollutant);
+  const cacheKey = getMuniDataCacheKey(year, gnfrId, pollutant);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
-    console.log("Fetched grid data from cache");
+    console.log("Fetched muni data from cache");
     return cached;
   }
   const response = await fetch(encodeURI(uri));
