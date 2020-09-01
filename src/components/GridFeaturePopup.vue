@@ -4,7 +4,9 @@
     <div class="olpopup-content">
       <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ pollutant.unit }}):</div>
       <div class="olpopup-value">
-        <span class="olpopup-value">{{ roundPollutantValue(popupValue) }}</span>
+        <span class="olpopup-value">{{
+          popupValue ? roundPollutantValue(popupValue) : 0
+        }}</span>
       </div>
     </div>
   </div>

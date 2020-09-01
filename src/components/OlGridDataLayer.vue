@@ -137,7 +137,7 @@ export default Vue.extend({
     },
     async setFeaturePopup(event) {
       const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
-      if (feats.length > 0) {
+      if (feats.length > 0 && feats[0].getProperties()[this.pollutant.id]) {
         this.$emit(
           "set-grid-feature-popup",
           event.coordinate,
