@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="legend-box">
+    <div v-if="!loading && legend" class="legend-box legend-container">
       <div id="legend-title">
         {{ "map.legend.title-without-unit" | translate }}
         <span v-if="mapDataType === mapDataTypes.MUNICIPALITY">
@@ -16,18 +16,27 @@
         <div>{{ legend[className].min }} - {{ legend[className].max }}</div>
       </div>
     </div>
+    <div v-else class="legend-box loading-wrapper">
+      <LoadingAnimation />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { PropType } from "vue";
+import { mapState } from "vuex";
 import { PollutantLegend, MapDataType } from "./../types";
+import LoadingAnimation from "./LoadingAnimation.vue";
 
 export default {
+  components: {
+    LoadingAnimation
+  },
   props: {
     legend: { type: Object as PropType<PollutantLegend> },
     mapDataType: { type: String as PropType<MapDataType> }
   },
+  computed: mapState(["loading"]),
   data() {
     return {
       mapDataTypes: Object(MapDataType)
@@ -37,13 +46,18 @@ export default {
 </script>
 
 <style scoped>
-#legend-box {
+.legend-box {
   border-radius: 5px;
   background-color: rgb(0 0 0 / 70%);
   color: white;
-  padding: 11px 10px 11px 10px;
   font-size: 0.9em;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
+}
+.legend-container {
+  padding: 11px 10px 11px 10px;
+}
+.loading-wrapper {
+  padding: 10px;
 }
 #legend-title {
   margin: 0 0 8px 0;
