@@ -14,6 +14,7 @@ import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
+import { Dispatch } from "@/store";
 import * as constants from "./../constants";
 
 const classCount = 7;
@@ -160,6 +161,7 @@ export default Vue.extend({
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {
+        this.$store.dispatch(Dispatch.setLoading);
         const fc = await pollutantService.fetchMuniFeatures(
           this.year,
           this.gnfrId,
@@ -171,6 +173,7 @@ export default Vue.extend({
           this.layerSource.getFormat().readFeatures(fc)
         );
         this.updateStyle();
+        this.$store.dispatch(Dispatch.setLoaded);
       },
       strategy: allStrategy
     });

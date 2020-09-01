@@ -22,12 +22,7 @@
         />
       </div>
     </div>
-    <Legend
-      v-if="legend"
-      id="map-legend-container"
-      :legend="legend"
-      :mapDataType="mapDataType"
-    />
+    <Legend id="map-legend-container" :legend="legend" :mapDataType="mapDataType" />
     <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupFeat">
       <GridFeaturePopup
         v-if="gridPopupValue"
