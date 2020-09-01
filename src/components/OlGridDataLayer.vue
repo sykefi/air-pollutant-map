@@ -13,7 +13,7 @@ import { Fill, Style } from "ol/style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
-import { Pollutant, PollutantLegend, Gnfr, MapDataType } from "../types";
+import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import * as constants from "./../constants";
 
