@@ -34,6 +34,7 @@ import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import { Pollutant, MapDataType } from "./types";
+import { Dispatch } from "./store";
 import * as constants from "./constants";
 
 export default Vue.extend({
@@ -71,7 +72,7 @@ export default Vue.extend({
     if (process.env.VUE_APP_DETECT_LANGUAGE === "false") {
       return;
     } else {
-      this.$store.dispatch("setDetectedLang");
+      this.$store.dispatch(Dispatch.setDetectedLang);
     }
   }
 });
