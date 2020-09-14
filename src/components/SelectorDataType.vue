@@ -39,8 +39,7 @@
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
-import { PropType } from "vue";
+import Vue, { PropType } from "vue";
 import { MapDataType } from "@/types";
 
 export default Vue.extend({
