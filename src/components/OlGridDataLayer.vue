@@ -3,8 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
-import { PropType } from "vue";
+import Vue, { PropType } from "vue";
 import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";

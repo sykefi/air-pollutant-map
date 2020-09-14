@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
+import Vue from "vue";
 import { mapState } from "vuex";
 import { Pollutant } from "./../types";
 import { fetchPollutantMeta } from "./../services/pollutants";
