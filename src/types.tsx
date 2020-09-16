@@ -1,3 +1,28 @@
+interface PollutantValues {
+  s16?: number;
+  s15?: number;
+  s22?: number;
+  s13?: number;
+  s28?: number;
+  s29?: number;
+  s27?: number;
+  s43?: number;
+  s5?: number;
+  s18?: number;
+  s3?: number;
+  s12?: number;
+  s1?: number;
+  s7?: number;
+  s8?: number;
+  s14?: number;
+  s37?: number;
+  s25?: number;
+  s19?: number;
+  s17?: number;
+  s38?: number;
+  s40?: number;
+}
+
 export enum MapDataType {
   MUNICIPALITY = "Municipality",
   GRID = "Grid"
@@ -15,11 +40,60 @@ export interface PollutantLegend {
   unit: string;
 }
 
-export interface MuniFeatureProperties {
+interface Polygon {
+  coordinates: number[][];
+  type: "Polgyon";
+}
+
+interface MultiPolygon {
+  coordinates: number[][][];
+  type: "MultiPolygon";
+}
+
+interface FeatureCollection {
+  type: "FeatureCollection";
+}
+
+interface GridFeature {
+  geometry: Polygon;
+  properties: PollutantValues;
+}
+
+export interface GridFeatureCollection extends FeatureCollection {
+  features: GridFeature[];
+}
+
+export interface WfsMuniFeatureProperties extends PollutantValues {
   id: number;
   nimi: string;
+  namn: string;
   area: number;
-  [key: string]: number | string;
+}
+
+interface WfsMuniFeature {
+  type: "Feature";
+  geometry: MultiPolygon;
+  properties: WfsMuniFeatureProperties;
+}
+
+export interface WfsMuniFeatureCollection extends FeatureCollection {
+  features: WfsMuniFeature[];
+}
+
+export interface MuniFeatureProperties extends PollutantValues {
+  id: number;
+  name: LangStringMap;
+  area: number;
+}
+
+export interface MuniFeature {
+  type: "Feature";
+  geometry: MultiPolygon;
+  properties: MuniFeatureProperties;
+}
+
+export interface MuniFeatureCollection extends FeatureCollection {
+  features: MuniFeature[];
 }
 
 interface LangStringMap {
