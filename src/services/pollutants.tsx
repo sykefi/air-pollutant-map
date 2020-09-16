@@ -1,4 +1,13 @@
-import { Gnfr, Pollutant, DbGnfr, DbPollutant } from "@/types";
+import {
+  Gnfr,
+  Pollutant,
+  DbGnfr,
+  DbPollutant,
+  MuniFeatureCollection,
+  WfsMuniFeatureCollection,
+  MuniFeature,
+  GridFeatureCollection
+} from "@/types";
 import * as cache from "./cache";
 import { m2tokm2 } from "./../constants";
 
@@ -17,13 +26,13 @@ const getWfsGridDataUri = (year: number, gnfrId: string, pollutant: Pollutant): 
     ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
-const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant) => {
+const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=geom,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
-const getGridDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant) => {
+const getGridDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant): string => {
   return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutant.id}`;
 };
 
@@ -31,7 +40,7 @@ export const fetchGridFeatures = async (
   year: number,
   gnfrId: string,
   pollutant: Pollutant
-) => {
+): Promise<GridFeatureCollection> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsTotalGridDataUri(year, pollutant)
@@ -49,17 +58,17 @@ export const fetchGridFeatures = async (
   return fc;
 };
 
-const getMuniDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant) => {
+const getMuniDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant): string => {
   return `pollutant_map_muni_data_${year}_${gnfrId}_${pollutant.id}`;
 };
 
-const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutant: Pollutant) => {
+const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
   &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,namn,area,${pollutant.id}
   ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
-const getWfsMuniDataTotalsUri = (year: number, pollutant: Pollutant) => {
+const getWfsMuniDataTotalsUri = (year: number, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,namn,area,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
@@ -69,7 +78,7 @@ export const fetchMuniFeatures = async (
   year: number,
   gnfrId: string,
   pollutant: Pollutant
-) => {
+): Promise<MuniFeatureCollection> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsMuniDataTotalsUri(year, pollutant)
@@ -81,12 +90,25 @@ export const fetchMuniFeatures = async (
     return cached;
   }
   const response = await fetch(encodeURI(uri));
-  const fc = await response.json();
+  const rawFc = (await response.json()) as WfsMuniFeatureCollection;
   // calculate pollutant densities to feature properties
-  fc.features.forEach((feat) => {
-    feat.properties[pollutant.id + "-density"] =
+  const features: MuniFeature[] = rawFc.features.map((feat) => {
+    const name = {
+      fi: feat.properties.nimi,
+      sv: feat.properties.namn,
+      en: feat.properties.nimi
+    };
+    const props = { id: feat.properties.id, name, area: feat.properties.area };
+    props[pollutant.id] = feat.properties[pollutant.id];
+    props[pollutant.id + "-density"] =
       feat.properties[pollutant.id] / (feat.properties.area * m2tokm2);
+    const feature = { geometry: feat.geometry, type: feat.type, properties: props };
+    return feature;
   });
+  const fc = {
+    type: "FeatureCollection",
+    features: features
+  } as MuniFeatureCollection;
   cache.setToCache(cacheKey, fc);
   console.log("Fetched muni data from WFS");
   return fc;

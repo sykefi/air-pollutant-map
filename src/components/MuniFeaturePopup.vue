@@ -2,7 +2,7 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ featProps.nimi }}):</div>
+      <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ featProps.name[lang] }}):</div>
       <div class="olpopup-values">
         <div class="olpopup-value-row">
           <span class="olpopup-value">
