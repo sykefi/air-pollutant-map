@@ -304,8 +304,8 @@ describe("Municipality layer", () => {
 
   it("shows expected class ranges in legend (2018 combined: typen oksidit)", () => {
     cy.get(".legend-box").within(() => {
-      cy.contains("0 - 0.11");
-      cy.contains("0.11 - 0.19");
+      cy.contains("0 - 0.1");
+      cy.contains("0.1 - 0.19");
       cy.contains("4.8 - 14");
       cy.contains("14 - 32");
     });
@@ -342,8 +342,8 @@ describe("Municipality layer", () => {
       cy.contains("li", "Aviation").click();
     });
     cy.get(".legend-box").within(() => {
-      cy.contains("0 - 0.11");
-      cy.contains("0.11 - 0.19");
+      cy.contains("0 - 0.1");
+      cy.contains("0.1 - 0.19");
       cy.contains("0.66 - 4.8");
       cy.get("div").last().contains("4.8 - 14");
     });
@@ -355,8 +355,8 @@ describe("Municipality layer", () => {
       cy.contains("li", "Kaikki").click();
     });
     cy.get(".legend-box").within(() => {
-      cy.contains("0 - 0.11");
-      cy.contains("0.11 - 0.19");
+      cy.contains("0 - 0.1");
+      cy.contains("0.1 - 0.19");
       cy.contains("4.8 - 14");
       cy.get("div").last().contains("14 - 48");
     });

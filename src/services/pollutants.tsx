@@ -55,13 +55,13 @@ const getMuniDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant)
 
 const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutant: Pollutant) => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,area,${pollutant.id}
+  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,namn,area,${pollutant.id}
   ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
 const getWfsMuniDataTotalsUri = (year: number, pollutant: Pollutant) => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,area,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,namn,area,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 

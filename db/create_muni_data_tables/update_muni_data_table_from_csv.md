@@ -1,3 +1,7 @@
+### Update municipality geometries
+
+See [kuntajaon_paivitys.md](./kuntajaon_paivitys.md)
+
 ### Update municipality data
 
 1. Run the SQL script: [create_muni_data_table.sql](./create_muni_data_table.sql) to drop the old table and create a new one.
@@ -9,3 +13,4 @@ C:\"Program Files\pgAdmin 4\v4\runtime\psql.exe" -h kkxpgdbt1 -d PaastotKartalla
 ```
 
 4. Run the SQL script: [join_muni_data_geom.sql](./join_muni_data_geom.sql) to add geometry column (with geometries) to the newly created table.
+5. Finally, to update muni_data_totals table, run the script [create_muni_data_totals_table.sql](./create_muni_data_totals_table.sql)
