@@ -6,13 +6,17 @@ import {
   MuniFeatureCollection,
   WfsMuniFeatureCollection,
   MuniFeature,
-  GridFeatureCollection
+  GridFeatureCollection,
+  NodeEnv
 } from "@/types";
 import * as cache from "./cache";
 import { m2tokm2 } from "./../constants";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
-const gridDataGnfrTable = "p_grid_data_gnfr_dev";
+const gridDataGnfrTable =
+  process.env.NODE_ENV === NodeEnv.PRODUCTION
+    ? "p_grid_data_gnfr_prod"
+    : "p_grid_data_gnfr_dev";
 const gridDataTotalsTable = "p_grid_data_totals";
 const muniDataGnfrTable = "p_muni_data_gnfr";
 const muniDataTotalsTable = "p_muni_data_totals";
@@ -125,7 +129,14 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
   &typeName=paastotkartalla:${gnfrMetaTable}&outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
-  return fc.features.map((feat) => getGnfrObject(feat.properties));
+  return fc.features
+    .map((feat) => getGnfrObject(feat.properties))
+    .filter((gnfr: Gnfr) => {
+      if (process.env.NODE_ENV === NodeEnv.PRODUCTION) {
+        return gnfr.useProd;
+      }
+      return gnfr.useDev;
+    });
 };
 
 const getPollutantObject = (props: DbPollutant): Pollutant => {

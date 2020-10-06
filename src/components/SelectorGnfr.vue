@@ -65,7 +65,7 @@
           ref="gnfrOptions"
         >
           {{ gnfr.name[lang] }}
-          <span class="hidden-gnfr-key" style="display: none;"> {{ gnfr.id }}</span>
+          <span class="hidden-gnfr-key" style="display: none;">{{ gnfr.id }}</span>
         </li>
       </ul>
     </div>
