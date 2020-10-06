@@ -116,7 +116,8 @@ export const fetchMuniFeatures = async (
 
 const getGnfrObject = (props: DbGnfr): Gnfr => {
   const name = { fi: props.nimi, sv: props.namn, en: props.name };
-  return { id: props.id, name, useDev: props.use_dev, useProd: props.use_prod };
+  const desc = { fi: props.desc_fi, sv: props.desc_sv, en: props.desc_en };
+  return { id: props.id, name, desc, useDev: props.use_dev, useProd: props.use_prod };
 };
 
 export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {

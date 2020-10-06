@@ -6,10 +6,13 @@
         <SelectorGnfr :mapDataType="mapDataType" @set-selected-gnfr="setSelectedGnfr" />
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
+      <div id="gnfr-desc">
+        <GnfrDescription :gnfr="gnfr" />
+      </div>
       <div id="map-container">
         <OlMap
           :year="year"
-          :gnfrId="gnfrId"
+          :gnfrId="gnfr ? gnfr.id : undefined"
           :pollutant="pollutant"
           :mapDataType="mapDataType"
         />
@@ -33,7 +36,8 @@ import SelectorDataType from "./components/SelectorDataType.vue";
 import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
-import { Pollutant, MapDataType } from "./types";
+import GnfrDescription from "./components/GnfrDescription.vue";
+import { Pollutant, MapDataType, Gnfr } from "./types";
 import { Dispatch } from "./store";
 import * as constants from "./constants";
 
@@ -44,12 +48,13 @@ export default Vue.extend({
     SelectorGnfr,
     SelectorPollutant,
     SelectorDataType,
-    ToggleLanguageButtons
+    ToggleLanguageButtons,
+    GnfrDescription
   },
   data() {
     return {
       year: constants.initialYear as number,
-      gnfrId: undefined as string | undefined,
+      gnfr: undefined as Gnfr | undefined,
       pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType
     };
@@ -58,8 +63,8 @@ export default Vue.extend({
     setSelectedYear(year: number) {
       this.year = year;
     },
-    setSelectedGnfr(gnfrId: string) {
-      this.gnfrId = gnfrId;
+    setSelectedGnfr(gnfr: Gnfr) {
+      this.gnfr = gnfr;
     },
     setSelectedPollutant(pollutant: Pollutant) {
       this.pollutant = pollutant;
@@ -97,6 +102,10 @@ export default Vue.extend({
   width: 100%;
   display: flex;
   z-index: 5;
+}
+#gnfr-desc {
+  width: 100%;
+  display: flex;
 }
 #map-container {
   position: relative;
