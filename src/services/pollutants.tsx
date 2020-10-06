@@ -18,7 +18,10 @@ const gridDataGnfrTable =
     ? "p_grid_data_gnfr_prod"
     : "p_grid_data_gnfr_dev";
 const gridDataTotalsTable = "p_grid_data_totals";
-const muniDataGnfrTable = "p_muni_data_gnfr";
+const muniDataGnfrTable =
+  process.env.NODE_ENV === NodeEnv.PRODUCTION
+    ? "p_muni_data_gnfr_prod"
+    : "p_muni_data_gnfr_dev";
 const muniDataTotalsTable = "p_muni_data_totals";
 const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";

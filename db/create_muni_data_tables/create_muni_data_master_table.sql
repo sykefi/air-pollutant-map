@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS public.muni_data;
+DROP TABLE IF EXISTS public.muni_data_master;
 
-CREATE TABLE public.muni_data
+CREATE TABLE public.muni_data_master
 (
     id SERIAL PRIMARY KEY,
     vuosi integer,
