@@ -206,7 +206,7 @@ export default Vue.extend({
       }
     },
     setSelectedGnfr(selectedGnfr: Gnfr, focusInput: boolean): void {
-      this.$emit("set-selected-gnfr", selectedGnfr.id);
+      this.$emit("set-selected-gnfr", selectedGnfr);
       this.selectedGnfr = selectedGnfr;
       this.gnfrInputValue = selectedGnfr.name[this.lang];
       if (focusInput) {

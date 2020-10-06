@@ -107,12 +107,16 @@ export interface DbGnfr {
   nimi: string;
   namn: string;
   name: string;
+  desc_fi: string;
+  desc_sv: string;
+  desc_en: string;
   use_dev: boolean;
   use_prod: boolean;
 }
 export interface Gnfr {
   id: string;
   name: LangStringMap;
+  desc: LangStringMap;
   useDev: boolean;
   useProd: boolean;
 }
