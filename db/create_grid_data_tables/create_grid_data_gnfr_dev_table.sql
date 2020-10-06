@@ -5,4 +5,4 @@ CREATE TABLE grid_data_gnfr_dev AS (
     INNER JOIN emep_grid_01 AS G ON G.ruutu_id = GD.rivi
 );
 
-CREATE INDEX year_gnfr_idx ON grid_data_gnfr_dev (vuosi, gnfr);
+CREATE INDEX gnfr_dev_year_gnfr_idx ON grid_data_gnfr_dev (vuosi, gnfr);
