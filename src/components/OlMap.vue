@@ -54,7 +54,7 @@ import OlMuniDataLayer from "./OlMuniDataLayer.vue";
 import GridFeaturePopup from "./GridFeaturePopup.vue";
 import MuniFeaturePopup from "./MuniFeaturePopup.vue";
 import Legend from "./Legend.vue";
-import { Pollutant, MapDataType, MuniFeatureProperties } from "../types";
+import { NodeEnv, Pollutant, MapDataType, MuniFeatureProperties } from "@/types";
 import { PollutantLegend } from "../types";
 
 const attribution = new Attribution({
@@ -144,12 +144,15 @@ export default Vue.extend({
   mounted() {
     this.map = new Map({
       target: "ol-map",
-      layers: [new TileLayer({ source: new OSM() })],
+      layers:
+        process.env.NODE_ENV === NodeEnv.PRODUCTION
+          ? []
+          : [new TileLayer({ source: new OSM() })],
       controls: defaultControls({ attribution: false }).extend([attribution]),
       view: new View({
         projection: "EPSG:3857",
         center: [2871896, 9694576],
-        zoom: 5.6
+        zoom: 5.5
       })
     });
     this.map.once("postrender", () => {
@@ -164,7 +167,7 @@ export default Vue.extend({
 <style scoped>
 @import "~ol/ol.css";
 #ol-map {
-  height: 900px;
+  height: calc(100vh - 205px);
   width: 100%;
   z-index: 0;
 }
