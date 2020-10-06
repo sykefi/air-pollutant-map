@@ -98,9 +98,9 @@ describe("GNFR selector", () => {
   it("selects combined GNFR", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get(".gnfr-select-container").click();
-      cy.contains("li", "Kaikki").click();
+      cy.contains("li", "Kokonaisp").click();
       cy.get("#gnfr-select-list").should("have.class", "hidden-all");
-      cy.get("#gnfr-select-input").should("have.value", "Kaikki");
+      cy.get("#gnfr-select-input").should("have.value", "Kokonaispäästöt");
     });
   });
 
@@ -114,15 +114,15 @@ describe("GNFR selector", () => {
 
   it("shows previously selected GNFR after exiting selector", () => {
     cy.get(".gnfr-selector-div").within(() => {
-      cy.get("#gnfr-select-input").click().clear().type("kaikki{esc}");
+      cy.get("#gnfr-select-input").click().clear().type("kokonais{esc}");
       cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
     });
   });
 
   it("selects option with keyboard actions (combined GNFR)", () => {
     cy.get(".gnfr-selector-div").within(() => {
-      cy.get("#gnfr-select-input").click().clear().type("kaikki{downarrow}{enter}");
-      cy.get("#gnfr-select-input").should("have.value", "Kaikki");
+      cy.get("#gnfr-select-input").click().clear().type("kokonais{downarrow}{enter}");
+      cy.get("#gnfr-select-input").should("have.value", "Kokonaispäästöt");
     });
   });
 });
@@ -284,10 +284,10 @@ describe("Municipality layer", () => {
     // switch back to combined data
     cy.get(".gnfr-selector-div").within(() => {
       cy.get("input").click();
-      cy.contains("li", "Kaikki").click();
+      cy.contains("li", "Kokonaisp").click();
     });
     cy.contains("Kunnat").click();
-    cy.contains("Kaikki");
+    cy.contains("Kokonaisp");
     cy.contains("Päästömäärä (t / km2)");
   });
 
@@ -352,7 +352,7 @@ describe("Municipality layer", () => {
   it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
     cy.get(".gnfr-selector-div").within(() => {
       cy.get("input").click();
-      cy.contains("li", "Kaikki").click();
+      cy.contains("li", "Kokonaisp").click();
     });
     cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.1");
