@@ -12,7 +12,7 @@ import * as cache from "./cache";
 import { m2tokm2 } from "./../constants";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
-const gridDataGnfrTable = "p_grid_data_gnfr";
+const gridDataGnfrTable = "p_grid_data_gnfr_dev";
 const gridDataTotalsTable = "p_grid_data_totals";
 const muniDataGnfrTable = "p_muni_data_gnfr";
 const muniDataTotalsTable = "p_muni_data_totals";

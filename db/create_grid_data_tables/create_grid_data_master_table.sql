@@ -1,7 +1,7 @@
 
-DROP TABLE IF EXISTS public.grid_data;
+DROP TABLE IF EXISTS public.grid_data_master;
 
-CREATE TABLE public.grid_data
+CREATE TABLE public.grid_data_master
 (
   id SERIAL PRIMARY KEY,
   vuosi integer,
