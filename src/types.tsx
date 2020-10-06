@@ -1,3 +1,9 @@
+export enum NodeEnv {
+  DEVELOPMENT = "development",
+  PRODUCTION = "production",
+  TEST = "test"
+}
+
 interface PollutantValues {
   s16?: number;
   s15?: number;
