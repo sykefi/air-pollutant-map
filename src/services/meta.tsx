@@ -2,8 +2,8 @@ import {
   DbGnfr,
   DbPollutant,
   Gnfr,
-  GnfrPollutantCalcShare,
-  DbGnfrPollutantCalcShare,
+  GnfrPollutantMeta,
+  DbGnfrPollutantMeta,
   NodeEnv,
   Pollutant
 } from "@/types";
@@ -58,9 +58,7 @@ export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
   return fc.features.map((feat) => getPollutantObject(feat.properties));
 };
 
-const getGnfrPollutantCalcObject = (
-  props: DbGnfrPollutantCalcShare
-): GnfrPollutantCalcShare => {
+const getGnfrPollutantMetaObject = (props: DbGnfrPollutantMeta): GnfrPollutantMeta => {
   return {
     year: props.year,
     gnfr: props.gnfr,
@@ -70,12 +68,12 @@ const getGnfrPollutantCalcObject = (
   };
 };
 
-export const fetchGnfrPollutantCalcShares = async (): Promise<GnfrPollutantCalcShare[]> => {
+export const fetchGnfrPollutantMetas = async (): Promise<GnfrPollutantMeta[]> => {
   const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${pollutantGnfrMetaTable}
   &outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   console.log("response", fc);
-  return fc.features.map((feat) => getGnfrPollutantCalcObject(feat.properties));
+  return fc.features.map((feat) => getGnfrPollutantMetaObject(feat.properties));
 };
