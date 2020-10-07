@@ -154,3 +154,19 @@ export interface Pollutant {
   useDev: boolean;
   useProd: boolean;
 }
+
+export interface DbGnfrPollutantCalcShare {
+  year: number;
+  gnfr: string;
+  pollutant: string;
+  rep_share: number;
+  calc_share: number;
+}
+
+export interface GnfrPollutantCalcShare {
+  year: number;
+  gnfr: string;
+  pollutant: string;
+  repShare: number;
+  calcShare: number;
+}

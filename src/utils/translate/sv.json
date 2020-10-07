@@ -12,5 +12,7 @@
   "aria.pollutant.selector.status.text": "options (pollutants) available",
   "aria.pollutant.selector.describe": "Arrow down for options (pollutants)",
   "aria.mapdatatype.selector.label": "Select map data type from two options (grid & municipalities)",
-  "aria.language.selector.label": "Select language language of the air pollution map (FI -> Finnish, SV -> Swedish, EN -> English)"
+  "aria.language.selector.label": "Select language language of the air pollution map (FI -> Finnish, SV -> Swedish, EN -> English)",
+  "gnfr.description.share.of.reported": "SV_Raportoitujen päästömäärien osuus",
+  "gnfr.description.share.of.calculated": "SV_laskennallisten"
 }
