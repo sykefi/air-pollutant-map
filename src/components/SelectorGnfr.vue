@@ -76,7 +76,7 @@
 import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
 import { Gnfr, MapDataType } from "./../types";
-import { fetchGnfrMeta } from "@/services/pollutants";
+import { fetchGnfrMeta } from "@/services/meta";
 import * as selectorUtils from "./../utils/selectorUtils";
 
 const findFocus = (): HTMLElement => {

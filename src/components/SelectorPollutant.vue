@@ -81,7 +81,7 @@
 import Vue from "vue";
 import { mapState } from "vuex";
 import { Pollutant } from "./../types";
-import { fetchPollutantMeta } from "./../services/pollutants";
+import { fetchPollutantMeta } from "./../services/meta";
 import * as selectorUtils from "./../utils/selectorUtils";
 
 const findFocus = (): HTMLElement => {
