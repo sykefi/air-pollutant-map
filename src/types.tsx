@@ -155,7 +155,7 @@ export interface Pollutant {
   useProd: boolean;
 }
 
-export interface DbGnfrPollutantCalcShare {
+export interface DbGnfrPollutantMeta {
   year: number;
   gnfr: string;
   pollutant: string;
@@ -163,7 +163,7 @@ export interface DbGnfrPollutantCalcShare {
   calc_share: number;
 }
 
-export interface GnfrPollutantCalcShare {
+export interface GnfrPollutantMeta {
   year: number;
   gnfr: string;
   pollutant: string;

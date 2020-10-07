@@ -200,7 +200,7 @@ describe("Grid data layer", () => {
   it("shows grid layer popup on click", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Rikkidioksidi (t):");
-    cy.contains("1.2");
+    cy.contains("0.38");
   });
 
   it("closes popup", () => {
@@ -390,7 +390,7 @@ describe("Toggle back to grid data layer", () => {
   it("popups keep working", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Rikkidioksidi (t):");
-    cy.contains("1.2");
+    cy.contains("0.38");
     cy.get(".olpopup-closer").click();
   });
 

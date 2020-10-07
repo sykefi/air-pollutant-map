@@ -14,10 +14,10 @@
 </template>
 
 <script lang="ts">
-import { Gnfr, GnfrPollutantCalcShare, Pollutant } from "@/types";
+import { Gnfr, GnfrPollutantMeta, Pollutant } from "@/types";
 import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
-import { fetchGnfrPollutantCalcShares } from "../services/meta";
+import { fetchGnfrPollutantMetas } from "../services/meta";
 
 export default Vue.extend({
   props: {
@@ -28,13 +28,13 @@ export default Vue.extend({
   computed: mapState(["lang"]),
   data() {
     return {
-      gnfrPollutantCalcShares: undefined as GnfrPollutantCalcShare[] | undefined
+      gnfrPollutantMetas: undefined as GnfrPollutantMeta[] | undefined
     };
   },
   methods: {
-    getCalcRepShareObject(): GnfrPollutantCalcShare | undefined {
-      if (this.year && this.gnfr && this.pollutant && this.gnfrPollutantCalcShares) {
-        return this.gnfrPollutantCalcShares.find((o) => {
+    getCalcRepShareObject(): GnfrPollutantMeta | undefined {
+      if (this.year && this.gnfr && this.pollutant && this.gnfrPollutantMetas) {
+        return this.gnfrPollutantMetas.find((o) => {
           return (
             o.year === this.year &&
             o.gnfr === this.gnfr.id &&
@@ -60,7 +60,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    this.gnfrPollutantCalcShares = await fetchGnfrPollutantCalcShares();
+    this.gnfrPollutantMetas = await fetchGnfrPollutantMetas();
   }
 });
 </script>
