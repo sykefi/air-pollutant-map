@@ -1,22 +1,67 @@
 <template>
   <div class="desc-box">
     <div class="desc">
-      <span class="gnfr-name"> {{ gnfr && gnfr.name[lang] }} </span>
+      <span class="gnfr-name">{{ gnfr && gnfr.name[lang] }}</span>
       {{ gnfr && gnfr.desc[lang] }}
+      <div v-if="gnfr && gnfr.id !== 'COMBINED'" class="rep-ratio">
+        {{ "gnfr.description.share.of.reported" | translate }}:
+        <span class="percentage"> {{ getRepRatio() }} %</span>
+        ({{ "gnfr.description.share.of.calculated" | translate }}:
+        <span class="percentage">{{ getCalcRatio() }} %</span>)
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Gnfr } from "@/types";
+import { Gnfr, GnfrPollutantCalcShare, Pollutant } from "@/types";
 import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
+import { fetchGnfrPollutantCalcShares } from "../services/meta";
 
 export default Vue.extend({
   props: {
-    gnfr: { type: Object as PropType<Gnfr> }
+    year: Number,
+    gnfr: { type: Object as PropType<Gnfr> },
+    pollutant: { type: Object as PropType<Pollutant | undefined> }
   },
-  computed: mapState(["lang"])
+  computed: mapState(["lang"]),
+  data() {
+    return {
+      gnfrPollutantCalcShares: undefined as GnfrPollutantCalcShare[] | undefined
+    };
+  },
+  methods: {
+    getCalcRepShareObject(): GnfrPollutantCalcShare | undefined {
+      if (this.year && this.gnfr && this.pollutant && this.gnfrPollutantCalcShares) {
+        return this.gnfrPollutantCalcShares.find((o) => {
+          return (
+            o.year === this.year &&
+            o.gnfr === this.gnfr.id &&
+            o.pollutant === this.pollutant!.id
+          );
+        });
+      }
+      return undefined;
+    },
+    getRepRatio() {
+      const gnfrPollutantShare = this.getCalcRepShareObject();
+      if (gnfrPollutantShare) {
+        return Math.round(gnfrPollutantShare.repShare * 1000) / 10;
+      }
+      return "?";
+    },
+    getCalcRatio() {
+      const gnfrPollutantShare = this.getCalcRepShareObject();
+      if (gnfrPollutantShare) {
+        return Math.round(gnfrPollutantShare.calcShare * 1000) / 10;
+      }
+      return "?";
+    }
+  },
+  async mounted() {
+    this.gnfrPollutantCalcShares = await fetchGnfrPollutantCalcShares();
+  }
 });
 </script>
 
@@ -29,9 +74,15 @@ export default Vue.extend({
 }
 .gnfr-name {
   font-weight: 550;
-  margin-right: 3px;
+  margin-right: 1px;
 }
 .desc {
   color: black;
+}
+.rep-ratio {
+  margin: 7px 0px 0px 0px;
+}
+.percentage {
+  color: #007ac9;
 }
 </style>

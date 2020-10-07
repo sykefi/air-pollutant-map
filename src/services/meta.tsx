@@ -1,8 +1,17 @@
-import { DbGnfr, DbPollutant, Gnfr, NodeEnv, Pollutant } from "@/types";
+import {
+  DbGnfr,
+  DbPollutant,
+  Gnfr,
+  GnfrPollutantCalcShare,
+  DbGnfrPollutantCalcShare,
+  NodeEnv,
+  Pollutant
+} from "@/types";
 
 const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";
+const pollutantGnfrMetaTable = "p_gnfr_pollutant_meta";
 
 const getGnfrObject = (props: DbGnfr): Gnfr => {
   const name = { fi: props.nimi, sv: props.namn, en: props.name };
@@ -47,4 +56,26 @@ export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   return fc.features.map((feat) => getPollutantObject(feat.properties));
+};
+
+const getGnfrPollutantCalcObject = (
+  props: DbGnfrPollutantCalcShare
+): GnfrPollutantCalcShare => {
+  return {
+    year: props.year,
+    gnfr: props.gnfr,
+    pollutant: "s" + props.pollutant,
+    calcShare: props.calc_share,
+    repShare: props.rep_share
+  };
+};
+
+export const fetchGnfrPollutantCalcShares = async (): Promise<GnfrPollutantCalcShare[]> => {
+  const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
+  &typeName=paastotkartalla:${pollutantGnfrMetaTable}
+  &outputFormat=application/json`.replace(/ /g, "");
+  const response = await fetch(encodeURI(uri));
+  const fc = await response.json();
+  console.log("response", fc);
+  return fc.features.map((feat) => getGnfrPollutantCalcObject(feat.properties));
 };

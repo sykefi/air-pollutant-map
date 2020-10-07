@@ -6,8 +6,8 @@
         <SelectorGnfr :mapDataType="mapDataType" @set-selected-gnfr="setSelectedGnfr" />
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
-      <div id="gnfr-desc">
-        <GnfrDescription :gnfr="gnfr" />
+      <div v-if="gnfr" id="gnfr-desc">
+        <GnfrDescription :year="year" :gnfr="gnfr" :pollutant="pollutant" />
       </div>
       <div id="map-container" :class="[nodeEnv === 'production' ? 'map-border' : '']">
         <OlMap
