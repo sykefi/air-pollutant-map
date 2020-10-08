@@ -3,18 +3,33 @@
     <div class="desc">
       <span class="gnfr-name">{{ gnfr && gnfr.name[lang] }}</span>
       {{ gnfr && gnfr.desc[lang] }}
-      <div v-if="gnfr && gnfr.id !== 'COMBINED'" class="rep-ratio">
-        {{ "gnfr.description.share.of.reported" | translate }}:
-        <span class="percentage"> {{ getRepRatio() }} %</span>
-        ({{ "gnfr.description.share.of.calculated" | translate }}:
-        <span class="percentage">{{ getCalcRatio() }} %</span>)
+      <div v-if="totalPollutionStats" class="stats">
+        <div v-if="gnfr && gnfr.id !== 'COMBINED'">
+          {{ "gnfr.description.share.of.reported" | translate }}:
+          <span class="formatted-number"> {{ getRepRatio() }} %</span> ({{
+            "gnfr.description.share.of.calculated" | translate
+          }}: <span class="formatted-number">{{ getCalcRatio() }} %</span>)
+        </div>
+        <div v-if="totalPollutionStats.gnfrId !== 'COMBINED'">
+          Luokan päästöjen osuus kokonaispäästöistä:
+          <span class="formatted-number">
+            {{ getShareOfGnfrPollution(totalPollutionStats) }} %
+          </span>
+        </div>
+        <div>
+          Valitun luokan päästöt yhteensä:
+          <span class="formatted-number">
+            {{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
+            {{ totalPollutionStats.unit }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Gnfr, GnfrPollutantMeta, Pollutant } from "@/types";
+import { Gnfr, GnfrPollutantMeta, Pollutant, TotalPollutionStats } from "@/types";
 import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
 import { fetchGnfrPollutantMetas } from "../services/meta";
@@ -23,7 +38,8 @@ export default Vue.extend({
   props: {
     year: Number,
     gnfr: { type: Object as PropType<Gnfr> },
-    pollutant: { type: Object as PropType<Pollutant | undefined> }
+    pollutant: { type: Object as PropType<Pollutant | undefined> },
+    totalPollutionStats: { type: Object as PropType<TotalPollutionStats | undefined> }
   },
   computed: mapState(["lang"]),
   data() {
@@ -57,6 +73,22 @@ export default Vue.extend({
         return Math.round(gnfrPollutantShare.calcShare * 1000) / 10;
       }
       return "?";
+    },
+    roundTotalPollution(pollution: number) {
+      return Math.round(pollution * 10) / 10;
+    },
+    roundPercentage(n: number) {
+      // round breakpoint values to at least two significant figures
+      for (let i = 1; i < Math.pow(10, 10); i = i * 10) {
+        const divider = 10 / i;
+        if (n > divider) {
+          return Math.round(n * i) / i;
+        }
+      }
+      return n;
+    },
+    getShareOfGnfrPollution(tpi: TotalPollutionStats) {
+      return this.roundPercentage((tpi.gnfrPollution / tpi.totalPollution) * 100);
     }
   },
   async mounted() {
@@ -79,10 +111,11 @@ export default Vue.extend({
 .desc {
   color: black;
 }
-.rep-ratio {
-  margin: 7px 0px 0px 0px;
+.stats {
+  margin: 7px 0px -1px 0px;
+  line-height: 110%;
 }
-.percentage {
+.formatted-number {
   color: #007ac9;
 }
 </style>
