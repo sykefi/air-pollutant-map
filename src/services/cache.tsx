@@ -6,7 +6,7 @@ interface Cached {
   data: any;
 }
 
-const cache: Record<string, Cached> = {};
+const cache: Map<string, Cached> = new Map();
 const cacheKeys: string[] = [];
 
 const keepCacheUnderMaxSize = (key: string): void => {
@@ -14,14 +14,14 @@ const keepCacheUnderMaxSize = (key: string): void => {
   if (cacheKeys.length > maxCacheSize) {
     const keyToRemove = cacheKeys.pop();
     if (keyToRemove && keyToRemove in cache) {
-      delete cache[keyToRemove];
+      cache.delete(keyToRemove);
     }
   }
 };
 
 const removeCachedItem = (key: string): void => {
-  if (key in cache) {
-    delete cache[key];
+  if (cache.has(key)) {
+    cache.delete(key);
   }
   const index = cacheKeys.indexOf(key);
   if (index > -1) {
@@ -31,7 +31,7 @@ const removeCachedItem = (key: string): void => {
 
 export const setToCacheWithExpiry = (key: string, data: any, maxAgeS: number | null) => {
   const timestamp = new Date().getTime();
-  cache[key] = { data, timestamp, maxAgeS };
+  cache.set(key, { data, timestamp, maxAgeS });
   keepCacheUnderMaxSize(key);
 };
 
@@ -40,11 +40,12 @@ export const setToCache = (key: string, data: any): void => {
 };
 
 export const getFromCache = (key: string): any | null => {
-  if (key in cache) {
+  if (cache.has(key)) {
+    const cacheHit = cache.get(key)!;
     const timestamp = new Date().getTime();
-    const ageS = Math.round((timestamp - cache[key].timestamp) / 1000);
-    if (!cache[key].maxAgeS || ageS < cache[key].maxAgeS!) {
-      return cache[key].data;
+    const ageS = Math.round((timestamp - cacheHit.timestamp) / 1000);
+    if (!cacheHit.maxAgeS || ageS < cacheHit.maxAgeS!) {
+      return cacheHit.data;
     } else {
       removeCachedItem(key);
       return null;
