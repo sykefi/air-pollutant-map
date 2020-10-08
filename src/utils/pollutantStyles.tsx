@@ -1,7 +1,7 @@
 import { FeatureLike } from "ol/Feature";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 
-const breakPointDictionary: { [key: string]: number[] } = {};
+const breakPointCache: Map<string, number[]> = new Map();
 
 const colorScale: string[] = [
   "#edf8fb",
@@ -73,16 +73,15 @@ const getBreakPoints = (
   dataType: MapDataType,
   valuePropName: string
 ): number[] | undefined => {
-  let breakPoints: number[] | undefined = undefined;
   const styleId = getStyleId(dataType, valuePropName);
-  if (styleId in breakPointDictionary) {
-    breakPoints = breakPointDictionary[styleId];
+  if (breakPointCache.has(styleId)) {
+    return [...breakPointCache.get(styleId)!];
   }
-  return breakPoints ? [...breakPoints] : breakPoints;
+  return undefined;
 };
 
 export const hasBreakPoints = (dataType: MapDataType, valuePropName: string): boolean => {
-  return getStyleId(dataType, valuePropName) in breakPointDictionary;
+  return breakPointCache.has(getStyleId(dataType, valuePropName));
 };
 
 export const setPollutantBreakPoints = (
@@ -99,9 +98,9 @@ export const setPollutantBreakPoints = (
     console.log(validSortedValues);
   }
 
-  breakPointDictionary[getStyleId(dataType, valuePropName)] = calculateAdjustedBreakPoints(
-    validSortedValues,
-    classCount
+  breakPointCache.set(
+    getStyleId(dataType, valuePropName),
+    calculateAdjustedBreakPoints(validSortedValues, classCount)
   );
 };
 
