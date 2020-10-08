@@ -74,6 +74,5 @@ export const fetchGnfrPollutantMetas = async (): Promise<GnfrPollutantMeta[]> =>
   &outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
-  console.log("response", fc);
   return fc.features.map((feat) => getGnfrPollutantMetaObject(feat.properties));
 };

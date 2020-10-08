@@ -4,7 +4,9 @@ import {
   WfsMuniFeatureCollection,
   MuniFeature,
   GridFeatureCollection,
-  NodeEnv
+  NodeEnv,
+  PollutantValues,
+  TotalPollutionStats
 } from "@/types";
 import * as cache from "./cache";
 import { m2tokm2 } from "./../constants";
@@ -45,7 +47,7 @@ export const fetchGridFeatures = async (
   year: number,
   gnfrId: string,
   pollutant: Pollutant
-): Promise<GridFeatureCollection> => {
+): Promise<GridFeatureCollection | undefined> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsTotalGridDataUri(year, pollutant)
@@ -53,14 +55,16 @@ export const fetchGridFeatures = async (
   const cacheKey = getGridDataCacheKey(year, gnfrId, pollutant);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
-    console.log("Fetched grid data from cache");
     return cached;
   }
-  const response = await fetch(encodeURI(uri));
-  const fc = await response.json();
-  cache.setToCache(cacheKey, fc);
-  console.log("Fetched grid data from WFS");
-  return fc;
+  try {
+    const response = await fetch(encodeURI(uri));
+    const fc = await response.json();
+    cache.setToCache(cacheKey, fc);
+    return fc;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getMuniDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant): string => {
@@ -83,7 +87,7 @@ export const fetchMuniFeatures = async (
   year: number,
   gnfrId: string,
   pollutant: Pollutant
-): Promise<MuniFeatureCollection> => {
+): Promise<MuniFeatureCollection | undefined> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsMuniDataTotalsUri(year, pollutant)
@@ -91,30 +95,71 @@ export const fetchMuniFeatures = async (
   const cacheKey = getMuniDataCacheKey(year, gnfrId, pollutant);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
-    console.log("Fetched muni data from cache");
     return cached;
   }
-  const response = await fetch(encodeURI(uri));
-  const rawFc = (await response.json()) as WfsMuniFeatureCollection;
-  // calculate pollutant densities to feature properties
-  const features: MuniFeature[] = rawFc.features.map((feat) => {
-    const name = {
-      fi: feat.properties.nimi,
-      sv: feat.properties.namn,
-      en: feat.properties.nimi
-    };
-    const props = { id: feat.properties.id, name, area: feat.properties.area };
-    props[pollutant.id] = feat.properties[pollutant.id];
-    props[pollutant.id + "-density"] =
-      feat.properties[pollutant.id] / (feat.properties.area * m2tokm2);
-    const feature = { geometry: feat.geometry, type: feat.type, properties: props };
-    return feature;
-  });
-  const fc = {
-    type: "FeatureCollection",
-    features: features
-  } as MuniFeatureCollection;
-  cache.setToCache(cacheKey, fc);
-  console.log("Fetched muni data from WFS");
-  return fc;
+  try {
+    const response = await fetch(encodeURI(uri));
+    const rawFc = (await response.json()) as WfsMuniFeatureCollection;
+    // calculate pollutant densities to feature properties
+    const features: MuniFeature[] = rawFc.features.map((feat) => {
+      const name = {
+        fi: feat.properties.nimi,
+        sv: feat.properties.namn,
+        en: feat.properties.nimi
+      };
+      const props = { id: feat.properties.id, name, area: feat.properties.area };
+      props[pollutant.id] = feat.properties[pollutant.id];
+      props[pollutant.id + "-density"] =
+        feat.properties[pollutant.id] / (feat.properties.area * m2tokm2);
+      const feature = { geometry: feat.geometry, type: feat.type, properties: props };
+      return feature;
+    });
+    const fc = {
+      type: "FeatureCollection",
+      features: features
+    } as MuniFeatureCollection;
+    cache.setToCache(cacheKey, fc);
+    return fc;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const calculateTotalPollution = (fc: MuniFeatureCollection, pollutant: Pollutant): number => {
+  return fc.features
+    .map((feat) => feat.properties)
+    .reduce((sum: number, props: PollutantValues) => {
+      return props[pollutant.id] ? sum + props[pollutant.id] : sum;
+    }, 0);
+};
+
+const getTotalPollution = async (
+  year: number,
+  gnfrId: string,
+  pollutant: Pollutant
+): Promise<number | undefined> => {
+  const totalPollutionId = `${year}_${gnfrId}_${pollutant.id}_total`;
+
+  if (cache.hasKey(totalPollutionId)) {
+    return cache.getFromCache(totalPollutionId);
+  }
+  const fc = await fetchMuniFeatures(year, gnfrId, pollutant);
+  if (fc) {
+    const totalPollution = calculateTotalPollution(fc, pollutant);
+    cache.setToCache(totalPollutionId, totalPollution);
+    return totalPollution;
+  }
+};
+
+export const getTotalPollutionStats = async (
+  year: number,
+  gnfrId: string,
+  pollutant: Pollutant
+): Promise<TotalPollutionStats | undefined> => {
+  const gnfrPollution = await getTotalPollution(year, gnfrId, pollutant);
+  const totalPollution = await getTotalPollution(year, "COMBINED", pollutant);
+  if (gnfrPollution && totalPollution) {
+    return { gnfrId, gnfrPollution, totalPollution, unit: pollutant.unit };
+  }
+  return undefined;
 };

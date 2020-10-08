@@ -4,7 +4,7 @@ export enum NodeEnv {
   TEST = "test"
 }
 
-interface PollutantValues {
+export interface PollutantValues {
   s16?: number;
   s15?: number;
   s22?: number;
@@ -60,7 +60,7 @@ interface FeatureCollection {
   type: "FeatureCollection";
 }
 
-interface GridFeature {
+export interface GridFeature {
   geometry: Polygon;
   properties: PollutantValues;
 }
@@ -169,4 +169,11 @@ export interface GnfrPollutantMeta {
   pollutant: string;
   repShare: number;
   calcShare: number;
+}
+
+export interface TotalPollutionStats {
+  gnfrId: string;
+  unit: string;
+  gnfrPollution: number;
+  totalPollution: number;
 }

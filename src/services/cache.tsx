@@ -29,6 +29,8 @@ const removeCachedItem = (key: string): void => {
   }
 };
 
+export const hasKey = (key: string): boolean => cache.has(key);
+
 export const setToCacheWithExpiry = (key: string, data: any, maxAgeS: number | null) => {
   const timestamp = new Date().getTime();
   cache.set(key, { data, timestamp, maxAgeS });

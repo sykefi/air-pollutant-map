@@ -7,7 +7,12 @@
         <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
       </div>
       <div v-if="gnfr" id="gnfr-desc">
-        <GnfrDescription :year="year" :gnfr="gnfr" :pollutant="pollutant" />
+        <GnfrDescription
+          :year="year"
+          :gnfr="gnfr"
+          :pollutant="pollutant"
+          :totalPollutionStats="totalPollutionStats"
+        />
       </div>
       <div id="map-container" :class="[nodeEnv === 'production' ? 'map-border' : '']">
         <OlMap
@@ -15,6 +20,7 @@
           :gnfrId="gnfr ? gnfr.id : undefined"
           :pollutant="pollutant"
           :mapDataType="mapDataType"
+          @update-total-pollution-stats="(tps) => (totalPollutionStats = tps)"
         />
         <div id="map-controls-container">
           <SelectorDataType
@@ -37,7 +43,7 @@ import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import GnfrDescription from "./components/GnfrDescription.vue";
-import { Pollutant, MapDataType, Gnfr, NodeEnv } from "./types";
+import { Pollutant, MapDataType, Gnfr, NodeEnv, TotalPollutionStats } from "./types";
 import { Dispatch } from "./store";
 import * as constants from "./constants";
 
@@ -57,7 +63,8 @@ export default Vue.extend({
       year: constants.initialYear as number,
       gnfr: undefined as Gnfr | undefined,
       pollutant: undefined as Pollutant | undefined,
-      mapDataType: MapDataType.GRID as MapDataType
+      mapDataType: MapDataType.GRID as MapDataType,
+      totalPollutionStats: undefined as TotalPollutionStats | undefined
     };
   },
   methods: {
