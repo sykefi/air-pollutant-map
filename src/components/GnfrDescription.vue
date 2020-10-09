@@ -3,20 +3,24 @@
     <div class="desc">
       <span class="gnfr-name">{{ gnfr && gnfr.name[lang] }}</span>
       {{ gnfr && gnfr.desc[lang] }}
-      <div v-if="totalPollutionStats" class="stats">
+      <div class="stats">
         <div v-if="gnfr && gnfr.id !== 'COMBINED'">
           {{ "gnfr.description.share.of.reported" | translate }}:
           <span class="formatted-number"> {{ getRepRatio() }} %</span> ({{
             "gnfr.description.share.of.calculated" | translate
           }}: <span class="formatted-number">{{ getCalcRatio() }} %</span>)
         </div>
-        <div v-if="totalPollutionStats.gnfrId !== 'COMBINED'">
+        <div v-if="totalPollutionStats && totalPollutionStats.gnfrId !== 'COMBINED'">
           Luokan päästöjen osuus kokonaispäästöistä:
           <span class="formatted-number">
             {{ getShareOfGnfrPollution(totalPollutionStats) }} %
           </span>
+          (<span class="formatted-number"
+            >{{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
+            {{ totalPollutionStats.unit }}</span
+          >)
         </div>
-        <div>
+        <div v-if="totalPollutionStats && totalPollutionStats.gnfrId === 'COMBINED'">
           Valitun luokan päästöt yhteensä:
           <span class="formatted-number">
             {{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
@@ -24,7 +28,7 @@
           </span>
         </div>
       </div>
-      <div v-else class="load-animation-container">
+      <div v-if="!gnfrPollutantMetas || !totalPollutionStats" class="load-animation-container">
         <LoadingAnimation color="black" :size="17" />
       </div>
     </div>
@@ -120,7 +124,7 @@ export default Vue.extend({
 }
 .stats {
   margin: 7px 0px -1px 0px;
-  line-height: 110%;
+  line-height: 115%;
 }
 .formatted-number {
   color: #007ac9;

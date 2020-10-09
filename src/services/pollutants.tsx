@@ -158,7 +158,7 @@ export const getTotalPollutionStats = async (
 ): Promise<TotalPollutionStats | undefined> => {
   const gnfrPollution = await getTotalPollution(year, gnfrId, pollutant);
   const totalPollution = await getTotalPollution(year, "COMBINED", pollutant);
-  if (gnfrPollution && totalPollution) {
+  if ((gnfrPollution || gnfrPollution === 0) && totalPollution) {
     return { gnfrId, gnfrPollution, totalPollution, unit: pollutant.unit };
   }
   return undefined;
