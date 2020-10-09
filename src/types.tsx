@@ -179,8 +179,8 @@ export interface TotalPollutionStats {
 }
 
 export interface Option {
-  label: string;
   id: string;
+  label: LangStringMap;
   showFirst: boolean;
-  value: string | number | null;
+  value: string | number | Gnfr | Pollutant | null;
 }

@@ -66,121 +66,121 @@ describe("Year selector", () => {
 
 describe("GNFR selector", () => {
   it("toggles gnfr options visible", () => {
-    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
-    cy.get("#gnfr-select-list").within(() => cy.contains("li", "Shipping"));
+    cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
+    cy.get("#select-list-gnfr").within(() => cy.contains("li", "Shipping"));
   });
 
   it("toggles gnfr options hidden by clicking the input", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select-container").click();
-      cy.get("#gnfr-select-list").should("have.class", "hidden-all");
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-container-gnfr").click();
+      cy.get("#select-list-gnfr").should("have.class", "hidden-all");
     });
   });
 
   it("toggles gnfr options hidden by clicking outside the input", () => {
-    cy.get(".gnfr-selector-div").within(() => cy.get(".gnfr-select-container").click());
+    cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
     cy.contains("Shipping");
     cy.get("#map-container").click(325, 520);
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get("#gnfr-select-list").should("have.class", "hidden-all");
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-list-gnfr").should("have.class", "hidden-all");
     });
   });
 
   it("selects GNFR by clicking an option (public power)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select-container").click();
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-container-gnfr").click();
       cy.contains("li", "Public").click();
-      cy.get("#gnfr-select-list").should("have.class", "hidden-all");
+      cy.get("#select-list-gnfr").should("have.class", "hidden-all");
       cy.contains("Public");
     });
   });
 
   it("selects combined GNFR", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select-container").click();
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-container-gnfr").click();
       cy.contains("li", "Kokonaisp").click();
-      cy.get("#gnfr-select-list").should("have.class", "hidden-all");
-      cy.get("#gnfr-select-input").should("have.value", "Kokonaispäästöt");
+      cy.get("#select-list-gnfr").should("have.class", "hidden-all");
+      cy.get("#select-input-gnfr").should("have.value", "Kokonaispäästöt");
     });
   });
 
   it("finds & selects option by input value (road & transport)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get("#gnfr-select-input").click().clear().type("roadTranspor");
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-input-gnfr").click().clear().type("roadTranspor");
       cy.get("li").click();
-      cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
+      cy.get("#select-input-gnfr").should("have.value", "F_RoadTransport_fi");
     });
   });
 
   it("shows previously selected GNFR after exiting selector", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get("#gnfr-select-input").click().clear().type("kokonais{esc}");
-      cy.get("#gnfr-select-input").should("have.value", "F_RoadTransport_fi");
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-input-gnfr").click().clear().type("kokonais{esc}");
+      cy.get("#select-input-gnfr").should("have.value", "F_RoadTransport_fi");
     });
   });
 
   it("selects option with keyboard actions (combined GNFR)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get("#gnfr-select-input").click().clear().type("kokonais{downarrow}{enter}");
-      cy.get("#gnfr-select-input").should("have.value", "Kokonaispäästöt");
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-input-gnfr").click().clear().type("kokonais{downarrow}{enter}");
+      cy.get("#select-input-gnfr").should("have.value", "Kokonaispäästöt");
     });
   });
 });
 
 describe("Pollutant selector", () => {
   it("toggles pollutant options visible", () => {
-    cy.get(".pollutant-selector-div").within(() =>
-      cy.get(".pollutant-select-container").click()
+    cy.get("#pollutant-selector-div").within(() =>
+      cy.get("#select-container-pollutant").click()
     );
-    cy.get("#pollutant-select-list").within(() => cy.contains("Rikkidioksidi"));
+    cy.get("#select-list-pollutant").within(() => cy.contains("Rikkidioksidi"));
   });
 
   it("toggles pollutant options hidden by clicking the input", () => {
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select-container").click();
-      cy.get("#pollutant-select-list").should("have.class", "hidden-all");
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-container-pollutant").click();
+      cy.get("#select-list-pollutant").should("have.class", "hidden-all");
     });
   });
 
   it("toggles pollutant options hidden by clicking outside the input", () => {
-    cy.get(".pollutant-selector-div").within(() =>
-      cy.get(".pollutant-select-container").click()
+    cy.get("#pollutant-selector-div").within(() =>
+      cy.get("#select-container-pollutant").click()
     );
     cy.contains("Rikkidioksidi");
     cy.get("#map-container").click(325, 520);
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get("#pollutant-select-list").should("have.class", "hidden-all");
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-list-pollutant").should("have.class", "hidden-all");
     });
   });
 
   it("selects pollutant by clicking an option (rikkidioksidi)", () => {
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select-container").click();
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
-      cy.get("#pollutant-select-list").should("have.class", "hidden-all");
-      cy.get("#pollutant-select-input").should("have.value", "Rikkidioksidi");
+      cy.get("#select-list-pollutant").should("have.class", "hidden-all");
+      cy.get("#select-input-pollutant").should("have.value", "Rikkidioksidi");
     });
   });
 
   it("finds & selects option by input value (road & transport)", () => {
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get("#pollutant-select-input").click().clear().type("hiilimono");
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-input-pollutant").click().clear().type("hiilimono");
       cy.get("li").click();
-      cy.get("#pollutant-select-input").should("have.value", "Hiilimonoksidi");
+      cy.get("#select-input-pollutant").should("have.value", "Hiilimonoksidi");
     });
   });
 
   it("shows previously selected pollutant after exiting selector", () => {
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get("#pollutant-select-input").click().clear().type("rikkidio{esc}");
-      cy.get("#pollutant-select-input").should("have.value", "Hiilimonoksidi");
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-input-pollutant").click().clear().type("rikkidio{esc}");
+      cy.get("#select-input-pollutant").should("have.value", "Hiilimonoksidi");
     });
   });
 
   it("selects option with keyboard actions (combined GNFR)", () => {
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get("#pollutant-select-input").click().clear().type("rikkidioksi{downarrow}{enter}");
-      cy.get("#pollutant-select-input").should("have.value", "Rikkidioksidi");
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-input-pollutant").click().clear().type("rikkidioksi{downarrow}{enter}");
+      cy.get("#select-input-pollutant").should("have.value", "Rikkidioksidi");
     });
   });
 });
@@ -189,8 +189,8 @@ describe("Grid data layer", () => {
   it("opens rikkidioksidi layer", () => {
     cy.visit("http://localhost:8080/");
     cy.contains("Typen oksidit");
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select-container").click();
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
     });
     // wait for the layer and legend to appear
@@ -218,8 +218,8 @@ describe("Grid data layer", () => {
   });
 
   it("shows expected class ranges in legend (2018 combined: typen oksidit)", () => {
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select-container").click();
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-container-pollutant").click();
       cy.contains("Typen oksidit").click();
     });
     cy.get(".legend-box").within(() => {
@@ -244,8 +244,8 @@ describe("Grid data layer", () => {
   });
 
   it("shows expected class ranges in legend (2010 aviation: typen oksidit)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select-container").click();
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-container-gnfr").click();
       cy.contains("li", "Aviation").click();
     });
     cy.get(".legend-box").within(() => {
@@ -257,8 +257,8 @@ describe("Grid data layer", () => {
   });
 
   it("shows expected class ranges in legend (2018 road/transport: typen oksidit)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
-      cy.get(".gnfr-select-container").click();
+    cy.get("#gnfr-selector-div").within(() => {
+      cy.get("#select-container-gnfr").click();
       cy.contains("li", "Road").click();
     });
     cy.get("#year-selector-div").within(() => {
@@ -277,12 +277,12 @@ describe("Grid data layer", () => {
 describe("Municipality layer", () => {
   it("toggles municipality layer visible", () => {
     // switch back to typen oksidit
-    cy.get(".pollutant-selector-div").within(() => {
+    cy.get("#pollutant-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("Typen oksidit").click();
     });
     // switch back to combined data
-    cy.get(".gnfr-selector-div").within(() => {
+    cy.get("#gnfr-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "Kokonaisp").click();
     });
@@ -312,11 +312,11 @@ describe("Municipality layer", () => {
   });
 
   it("shows expected class ranges in legend (2018 road/transport: rikkidioksidi)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
+    cy.get("#gnfr-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "Road").click();
     });
-    cy.get(".pollutant-selector-div").within(() => {
+    cy.get("#pollutant-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("Rikkidioksidi").click();
     });
@@ -329,7 +329,7 @@ describe("Municipality layer", () => {
   });
 
   it("shows expected class ranges in legend (2010 aviation: typen oksidit)", () => {
-    cy.get(".pollutant-selector-div").within(() => {
+    cy.get("#pollutant-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("Typen oksidit").click();
     });
@@ -337,7 +337,7 @@ describe("Municipality layer", () => {
       cy.get("input").click();
       cy.contains("li", "2010").click();
     });
-    cy.get(".gnfr-selector-div").within(() => {
+    cy.get("#gnfr-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "Aviation").click();
     });
@@ -350,7 +350,7 @@ describe("Municipality layer", () => {
   });
 
   it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
-    cy.get(".gnfr-selector-div").within(() => {
+    cy.get("#gnfr-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "Kokonaisp").click();
     });
@@ -368,8 +368,8 @@ describe("Municipality layer", () => {
       cy.get("input").click();
       cy.contains("li", "2018").click();
     });
-    cy.get(".pollutant-selector-div").within(() => {
-      cy.get(".pollutant-select-container").click();
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
     });
     cy.get(".legend-box").within(() => {
