@@ -75,7 +75,7 @@
           role="option"
           :ref="'options-' + uniqueSelectorId + option.id"
         >
-          {{ option.label }} <span> {{ option.id }}</span>
+          {{ option.label[lang] }} <span> {{ option.id }}</span>
         </li>
       </ul>
     </div>
@@ -85,19 +85,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Option } from "@/types";
+import { mapState } from "vuex";
 
 const findFocus = (): HTMLElement => {
   const focusPoint = document.activeElement;
   return focusPoint as HTMLElement;
-};
-
-const optionsSort = (a: Option, b: Option) => {
-  if (a.showFirst) {
-    return -1;
-  } else if (b.showFirst) {
-    return 1;
-  }
-  return a.label.localeCompare(b.label);
 };
 
 export default Vue.extend({
@@ -117,9 +109,10 @@ export default Vue.extend({
       initialized: false as boolean
     };
   },
+  computed: mapState(["lang"]),
   watch: {
     options: function (newOptions: Option[], oldOptions: Option[]) {
-      this.filteredOptions = [...newOptions].sort(optionsSort);
+      this.filteredOptions = [...newOptions].sort(this.optionsSort);
       // update label of the selected option by new options
       if (oldOptions && this.selectedOption) {
         const updatedSelectedOption = newOptions.find(
@@ -127,25 +120,33 @@ export default Vue.extend({
         );
         if (updatedSelectedOption) {
           this.selectedOption = updatedSelectedOption;
-          this.inputValue = updatedSelectedOption.label;
+          this.inputValue = updatedSelectedOption.label[this.lang];
         }
       }
     }
   },
   methods: {
     async initializeOptions() {
-      this.inputValue = this.initialOption.label;
+      this.inputValue = this.initialOption.label[this.lang];
       this.selectedOption = this.initialOption;
       this.$emit("selected-option", this.selectedOption);
-      this.filteredOptions = [...this.options].sort(optionsSort);
+      this.filteredOptions = [...this.options].sort(this.optionsSort);
       this.initialized = true;
+    },
+    optionsSort(a: Option, b: Option) {
+      if (a.showFirst) {
+        return -1;
+      } else if (b.showFirst) {
+        return 1;
+      }
+      return a.label[this.lang].localeCompare(b.label[this.lang]);
     },
     filterOptions(): void {
       this.filteredOptions = this.options
         .filter((o) => {
-          return o.label.toLowerCase().includes(this.inputValue.toLowerCase());
+          return o.label[this.lang].toLowerCase().includes(this.inputValue.toLowerCase());
         })
-        .sort(optionsSort);
+        .sort(this.optionsSort);
     },
     getOptionByid(id: string): Option | undefined {
       return this.options.find((o) => o.id === id);
@@ -155,8 +156,8 @@ export default Vue.extend({
         this.showOptions = open;
         if (!open && this.selectedOption) {
           // set previosly selected value to input if exiting selector
-          this.inputValue = this.selectedOption.label;
-          this.filteredOptions = [...this.options].sort(optionsSort);
+          this.inputValue = this.selectedOption.label[this.lang];
+          this.filteredOptions = [...this.options].sort(this.optionsSort);
         }
       } else {
         this.showOptions = !this.showOptions;
@@ -220,7 +221,7 @@ export default Vue.extend({
     },
     setSelectedOption: function (option: Option, focusInput: boolean) {
       this.selectedOption = option;
-      this.inputValue = option.label;
+      this.inputValue = option.label[this.lang];
       this.$emit("selected-option", option);
       if (focusInput) {
         this.moveFocus(findFocus(), "input");

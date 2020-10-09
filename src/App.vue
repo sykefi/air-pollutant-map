@@ -2,9 +2,12 @@
   <div id="app-wrapper">
     <div id="app-container">
       <div id="settings-panel">
-        <SelectorYear @selected-year="setSelectedYear" />
-        <SelectorGnfr :mapDataType="mapDataType" @set-selected-gnfr="setSelectedGnfr" />
-        <SelectorPollutant @set-selected-pollutant="setSelectedPollutant" />
+        <SelectorYear @selected-year="(year) => (this.year = year)" />
+        <SelectorGnfr
+          :mapDataType="mapDataType"
+          @selected-gnfr="(gnfr) => (this.gnfr = gnfr)"
+        />
+        <SelectorPollutant @selected-pollutant="(p) => (this.pollutant = p)" />
       </div>
       <div v-if="gnfr" id="gnfr-desc">
         <GnfrDescription
@@ -20,12 +23,12 @@
           :gnfrId="gnfr ? gnfr.id : undefined"
           :pollutant="pollutant"
           :mapDataType="mapDataType"
-          @update-total-pollution-stats="(tps) => (totalPollutionStats = tps)"
+          @update-total-pollution-stats="(tps) => (this.totalPollutionStats = tps)"
         />
         <div id="map-controls-container">
           <SelectorDataType
             :mapDataType="mapDataType"
-            @select-map-data-type="selectMapDataType"
+            @select-map-data-type="(type) => (this.mapDataType = type)"
           />
           <ToggleLanguageButtons />
         </div>
@@ -66,20 +69,6 @@ export default Vue.extend({
       mapDataType: MapDataType.GRID as MapDataType,
       totalPollutionStats: undefined as TotalPollutionStats | undefined
     };
-  },
-  methods: {
-    setSelectedYear(year: number) {
-      this.year = year;
-    },
-    setSelectedGnfr(gnfr: Gnfr) {
-      this.gnfr = gnfr;
-    },
-    setSelectedPollutant(pollutant: Pollutant) {
-      this.pollutant = pollutant;
-    },
-    selectMapDataType(mapDataType: MapDataType) {
-      this.mapDataType = mapDataType;
-    }
   },
   beforeCreate() {
     if (process.env.VUE_APP_DETECT_LANGUAGE === "false") {

@@ -1,11 +1,11 @@
 <template>
   <div class="select-wrapper">
     <CustomDropdownSelector
-      v-if="yearOptions"
+      v-if="options && initialOption"
       uniqueSelectorId="year"
       :selectorLabel="'selector.vuosi.label' | translate"
-      :options="yearOptions"
-      :initialOption="yearOptions[yearOptions.length - 1]"
+      :options="options"
+      :initialOption="initialOption"
       @selected-option="(year) => $emit('selected-year', year.value)"
     />
   </div>
@@ -15,7 +15,7 @@
 import Vue from "vue";
 import { Option } from "@/types";
 import CustomDropdownSelector from "./CustomDropdownSelector.vue";
-import { initialYear } from "@/constants";
+import { yearOptions, initialYear } from "@/constants";
 
 export default Vue.extend({
   components: {
@@ -23,20 +23,23 @@ export default Vue.extend({
   },
   data() {
     return {
-      years: [1990, 1995, 2000, 2005, 2010, 2015, 2018] as number[],
-      yearOptions: null as Option[] | null
+      years: yearOptions as number[],
+      options: null as Option[] | null,
+      initialOption: undefined as Option | undefined
     };
   },
   methods: {
     loadOptions() {
-      this.yearOptions = this.years.map((year) => {
+      this.options = this.years.map((year) => {
+        const sYear = year.toString();
         return {
-          id: year.toString(),
-          label: year.toString(),
+          id: sYear,
+          label: { fi: sYear, sv: sYear, en: sYear },
           value: year,
           showFirst: false
         } as Option;
       });
+      this.initialOption = this.options.find((o) => o.value === initialYear);
     }
   },
   mounted() {
@@ -50,6 +53,6 @@ export default Vue.extend({
 
 <style scoped>
 .select-wrapper {
-  width: 180px;
+  width: 110px;
 }
 </style>
