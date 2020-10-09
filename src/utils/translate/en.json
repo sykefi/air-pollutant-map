@@ -14,5 +14,7 @@
   "aria.mapdatatype.selector.label": "Select map data type from two options (grid & municipalities)",
   "aria.language.selector.label": "Select language language of the air pollution map (FI -> Finnish, SV -> Swedish, EN -> English)",
   "gnfr.description.share.of.reported": "Share of reported emissions",
-  "gnfr.description.share.of.calculated": "calculated"
+  "gnfr.description.share.of.calculated": "calculated",
+  "gnfr.description.gnfr-share-of-total": "Share of the selected class of total emissions",
+  "gnfr.description.gnfr-total-emissions": "Total emissions of the selected class"
 }

@@ -14,5 +14,7 @@
   "aria.mapdatatype.selector.label": "Valitse kartalla näytettävä data kahdesta vaihtoehdosta (ruudukko & kunnat)",
   "aria.language.selector.label": "Valitse päästökartan kieli (FI -> suomi, SV -> ruotsi, EN -> englanti)",
   "gnfr.description.share.of.reported": "Raportoitujen päästömäärien osuus",
-  "gnfr.description.share.of.calculated": "laskennallisten"
+  "gnfr.description.share.of.calculated": "laskennallisten",
+  "gnfr.description.gnfr-share-of-total": "Valitun luokan osuus kokonaispäästöistä",
+  "gnfr.description.gnfr-total-emissions": "Valitun luokan päästöt yhteensä"
 }
