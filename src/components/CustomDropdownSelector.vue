@@ -1,0 +1,499 @@
+<template>
+  <div class="selector-div" :id="`${uniqueSelectorId}-selector-div`">
+    <div class="label-div">
+      <label class="selector-label" for="select-input">
+        {{ selectorLabel }}
+      </label>
+      <div
+        :id="'select-status-' + uniqueSelectorId"
+        class="hidden-visually"
+        aria-live="polite"
+      >
+        {{ filteredOptions.length }}
+        {{ `aria.${uniqueSelectorId}.selector.status.text` | translate }}
+      </div>
+    </div>
+    <div
+      class="select-container"
+      :id="'select-container-' + uniqueSelectorId"
+      v-on:click="handleSelectorClick"
+      v-on:keyup="doKeyAction"
+      v-on:keydown="preventKeyDownScroll"
+      role="combobox"
+      aria-haspopup="listbox"
+      aria-autocomplete="list"
+      :aria-owns="'select-list-' + uniqueSelectorId"
+      :aria-expanded="showOptions ? 'true' : 'false'"
+    >
+      <input
+        type="text"
+        :id="'select-input-' + uniqueSelectorId"
+        :ref="'selectInput-' + uniqueSelectorId"
+        v-model="inputValue"
+        class="select-css"
+        aria-describedby="select-info"
+        :aria-controls="'select-list-' + uniqueSelectorId"
+      />
+      <span :id="'select-info-' + uniqueSelectorId" class="hidden-visually">
+        {{ `aria.${uniqueSelectorId}.selector.describe` | translate }}
+      </span>
+      <span class="select-icons">
+        <svg
+          width="21"
+          height="21"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          focusable="false"
+          aria-hidden="true"
+          :id="'icon-circle-down-' + uniqueSelectorId"
+          v-bind:class="[
+            !showOptions ? '' : 'rotate',
+            !initialized ? 'hidden-all' : '',
+            'icon'
+          ]"
+          role="img"
+        >
+          <path
+            d="M23.245 4l-11.245 14.374-11.219-14.374-.781.619 12 15.381 12-15.391-.755-.609z"
+          />
+        </svg>
+      </span>
+      <ul
+        v-bind:class="[
+          showOptions && filteredOptions.length > 0 ? '' : 'hidden-all',
+          'select-options'
+        ]"
+        :id="'select-list-' + uniqueSelectorId"
+        role="listbox"
+      >
+        <li
+          v-for="option in filteredOptions"
+          :key="option.id"
+          tabindex="-1"
+          role="option"
+          :ref="'options-' + uniqueSelectorId + option.id"
+        >
+          {{ option.label }} <span> {{ option.id }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from "vue";
+import { Option } from "@/types";
+
+const findFocus = (): HTMLElement => {
+  const focusPoint = document.activeElement;
+  return focusPoint as HTMLElement;
+};
+
+const optionsSort = (a: Option, b: Option) => {
+  if (a.showFirst) {
+    return -1;
+  } else if (b.showFirst) {
+    return 1;
+  }
+  return a.label.localeCompare(b.label);
+};
+
+export default Vue.extend({
+  props: {
+    uniqueSelectorId: String,
+    selectorLabel: String,
+    options: { type: Array as PropType<Option[]> },
+    initialOption: { type: Object as PropType<Option> }
+  },
+  data() {
+    return {
+      filteredOptions: [] as Option[],
+      showOptions: false as boolean,
+      selectedOption: undefined as Option | undefined,
+      selectorState: "initial" as string,
+      inputValue: "" as string,
+      initialized: false as boolean
+    };
+  },
+  watch: {
+    options: function (newOptions: Option[], oldOptions: Option[]) {
+      this.filteredOptions = [...newOptions].sort(optionsSort);
+      // update label of the selected option by new options
+      if (oldOptions && this.selectedOption) {
+        const updatedSelectedOption = newOptions.find(
+          (option) => option.id === this.selectedOption!.id
+        );
+        if (updatedSelectedOption) {
+          this.selectedOption = updatedSelectedOption;
+          this.inputValue = updatedSelectedOption.label;
+        }
+      }
+    }
+  },
+  methods: {
+    async initializeOptions() {
+      this.inputValue = this.initialOption.label;
+      this.selectedOption = this.initialOption;
+      this.$emit("selected-option", this.selectedOption);
+      this.filteredOptions = [...this.options].sort(optionsSort);
+      this.initialized = true;
+    },
+    filterOptions(): void {
+      this.filteredOptions = this.options
+        .filter((o) => {
+          return o.label.toLowerCase().includes(this.inputValue.toLowerCase());
+        })
+        .sort(optionsSort);
+    },
+    getOptionByid(id: string): Option | undefined {
+      return this.options.find((o) => o.id === id);
+    },
+    toggleSelectorOpen: function (open: boolean | undefined = undefined) {
+      if (open !== undefined) {
+        this.showOptions = open;
+        if (!open && this.selectedOption) {
+          // set previosly selected value to input if exiting selector
+          this.inputValue = this.selectedOption.label;
+          this.filteredOptions = [...this.options].sort(optionsSort);
+        }
+      } else {
+        this.showOptions = !this.showOptions;
+      }
+    },
+    setState: function (state: string) {
+      this.selectorState = state;
+    },
+    getInputElement: function (): HTMLElement {
+      return this.$refs["selectInput-" + this.uniqueSelectorId] as HTMLElement;
+    },
+    handleSelectorClick: function () {
+      if (!this.initialized) {
+        return;
+      }
+      const currentFocus = findFocus();
+      switch (this.selectorState) {
+        case "initial":
+          this.toggleSelectorOpen(true);
+          this.setState("opened");
+          break;
+        case "opened":
+          if (currentFocus === this.getInputElement()) {
+            this.toggleSelectorOpen(false);
+            this.setState("initial");
+          } else if (currentFocus && currentFocus.tagName === "LI") {
+            this.makeChoice(currentFocus);
+            this.toggleSelectorOpen(false);
+            this.setState("closed");
+          }
+          break;
+        case "filtered": // i.e. option was selected
+          if (currentFocus && currentFocus.tagName === "LI") {
+            this.makeChoice(currentFocus);
+            this.toggleSelectorOpen(false);
+            this.setState("closed");
+          } else {
+            this.toggleSelectorOpen();
+            this.setState(this.showOptions ? "opened" : "closed");
+          }
+          break;
+        case "closed":
+          this.toggleSelectorOpen(true);
+          this.setState("filtered");
+          break;
+      }
+    },
+    getOptionIdFromElement: function (element: HTMLElement): string {
+      return element!.querySelector("span")!.textContent!.trim();
+    },
+    makeChoice: function (whichOption: HTMLElement) {
+      // read option identifier from hidden span element
+      const optionId = this.getOptionIdFromElement(whichOption);
+      const option = this.getOptionByid(optionId);
+
+      if (option) {
+        this.setSelectedOption(option, true);
+      } else {
+        console.log("Could not select:", optionId);
+      }
+    },
+    setSelectedOption: function (option: Option, focusInput: boolean) {
+      this.selectedOption = option;
+      this.inputValue = option.label;
+      this.$emit("selected-option", option);
+      if (focusInput) {
+        this.moveFocus(findFocus(), "input");
+      }
+    },
+    getOptionAtIndex: function (index: number): HTMLLIElement {
+      const option = this.filteredOptions[index];
+      // @ts-ignore
+      return this.$refs["options-" + this.uniqueSelectorId + option.id][0] as HTMLLIElement;
+    },
+    moveFocus: function (fromHere: HTMLElement, toThere: string) {
+      if (toThere === "input" || this.filteredOptions.length == 0) {
+        this.getInputElement().focus();
+        return;
+      }
+      switch (fromHere) {
+        case this.getInputElement():
+          if (toThere === "forward") {
+            this.getOptionAtIndex(0).focus();
+          } else if (toThere === "back") {
+            this.getOptionAtIndex(this.filteredOptions.length - 1).focus();
+          }
+          break;
+        case this.getOptionAtIndex(0):
+          if (toThere === "forward" && this.filteredOptions[1]) {
+            this.getOptionAtIndex(1).focus();
+          } else if (toThere === "back") {
+            this.getInputElement().focus();
+          }
+          break;
+        case this.getOptionAtIndex(this.filteredOptions.length - 1):
+          if (toThere === "forward") {
+            this.getOptionAtIndex(0).focus();
+          } else if (toThere === "back") {
+            this.getOptionAtIndex(this.filteredOptions.length - 2).focus();
+          }
+          break;
+        default: {
+          const currentItem = findFocus();
+          const selectedValue = currentItem ? this.getOptionIdFromElement(currentItem) : "";
+          const indexOfSelectedValue = this.filteredOptions
+            .map((o) => o.id)
+            .indexOf(selectedValue);
+          if (toThere === "forward") {
+            this.getOptionAtIndex(indexOfSelectedValue + 1).focus();
+          } else if (toThere === "back" && indexOfSelectedValue > 0) {
+            this.getOptionAtIndex(indexOfSelectedValue - 1).focus();
+          } else {
+            this.getInputElement().focus();
+          }
+          break;
+        }
+      }
+    },
+    preventKeyDownScroll: function (e: KeyboardEvent) {
+      const code = e.keyCode ? e.keyCode : e.code;
+      switch (code) {
+        case 38:
+        case 40:
+        case 32: // Arrow keys
+          e.preventDefault();
+          break; // Space
+        default:
+          break; // do not block other keys
+      }
+    },
+    doKeyAction: function (whichKey: KeyboardEvent) {
+      const currentFocus = findFocus();
+      switch (whichKey.code) {
+        case "Enter":
+          if (this.selectorState === "initial") {
+            this.toggleSelectorOpen(true);
+            this.setState("opened");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.toggleSelectorOpen(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "opened" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.toggleSelectorOpen(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus &&
+            currentFocus.tagName === "LI"
+          ) {
+            this.makeChoice(currentFocus);
+            this.toggleSelectorOpen(false);
+            this.setState("closed");
+          } else if (
+            this.selectorState === "filtered" &&
+            currentFocus === this.getInputElement()
+          ) {
+            this.toggleSelectorOpen(true);
+            this.setState("opened");
+          } else {
+            this.toggleSelectorOpen(true);
+            this.setState("filtered");
+          }
+          break;
+
+        case "Escape":
+          if (this.selectorState === "opened" || this.selectorState === "filtered") {
+            this.toggleSelectorOpen(false);
+            this.setState("initial");
+          }
+          break;
+
+        case "ArrowDown":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleSelectorOpen(true);
+            this.moveFocus(this.getInputElement(), "forward");
+            this.setState("opened");
+          } else {
+            this.toggleSelectorOpen(true);
+            this.moveFocus(currentFocus, "forward");
+          }
+          break;
+        case "ArrowUp":
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleSelectorOpen(true);
+            this.moveFocus(this.getInputElement(), "back");
+            this.setState("opened");
+          } else {
+            this.moveFocus(currentFocus, "back");
+          }
+          break;
+        default:
+          this.filterOptions();
+          if (this.selectorState === "initial" || this.selectorState === "closed") {
+            this.toggleSelectorOpen(true);
+            this.setState("filtered");
+          } else if (this.selectorState === "opened") {
+            this.setState("filtered");
+          }
+          break;
+      }
+    }
+  },
+  mounted() {
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (target && !target.closest("#select-container-" + this.uniqueSelectorId)) {
+        this.toggleSelectorOpen(false);
+        this.setState("initial");
+      }
+    });
+    this.initializeOptions();
+  }
+});
+</script>
+
+<style scoped>
+.selector-div {
+  background: #ffffff;
+  max-width: 100%;
+  margin: 12px;
+}
+.label-div {
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 2px;
+}
+.selector-label {
+  font-weight: 500;
+  margin: 0 1px 1px 2px;
+}
+.select-container {
+  position: relative;
+}
+.select-css {
+  display: block;
+  font-size: 1em;
+  font-family: sans-serif;
+  /* font-weight: 700; */
+  color: #444;
+  line-height: 1;
+  padding: 0.6em 1.4em 0.5em 0.8em;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: 1px solid black;
+  box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+  border-radius: 0.25em;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  position: relative;
+  z-index: 10;
+}
+.select-css::-ms-expand {
+  display: none;
+}
+.select-css:focus {
+  border: 1px solid blue;
+  color: #222;
+  outline: none;
+}
+.select-icons {
+  pointer-events: none;
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  z-index: 20;
+  border: 1px solid white;
+  background: transparent;
+}
+.select-options {
+  border: 1px solid #aaa;
+  border-radius: 0 0 0.25em 0.25em;
+  line-height: 1.5;
+  padding: 0;
+  padding-top: 7px;
+  margin: 0;
+  margin-top: -0.2em;
+  list-style-type: none;
+  font-weight: normal;
+  cursor: pointer;
+  z-index: 9;
+  position: absolute;
+  width: calc(100% - 2px);
+  background-color: #ffffff;
+  max-height: 400px;
+  overflow: auto;
+}
+.select-options li {
+  display: flex;
+  font-size: 0.9em;
+  padding: 0.5em 0.8em 0.5em 0.8em;
+  font-size: 0.9em;
+  text-align: left;
+}
+.select-options li:hover {
+  background: #d1d1d1;
+}
+.select-options li:focus {
+  background: #d1d1d1;
+  border: none;
+  outline: none;
+}
+.select-options li span {
+  display: none;
+}
+.icon {
+  fill: ButtonText;
+  pointer-events: none;
+  transition-duration: 0.2s;
+  -webkit-transition-duration: 0.2s; /* Safari */
+}
+.rotate {
+  transform: rotate(180deg);
+}
+.hidden-all {
+  display: none;
+}
+.hidden-visually {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  border: 0;
+}
+</style>

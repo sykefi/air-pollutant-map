@@ -29,7 +29,7 @@ describe("Page load and initial UI", () => {
 
 describe("Year selector", () => {
   it("toggles year options visible", () => {
-    cy.get(".year-selector-div").within(() => cy.get(".year-select-container").click());
+    cy.get("#year-selector-div").within(() => cy.get("#select-container-year").click());
     cy.contains("2018");
     cy.contains("2015");
     cy.contains("2010");
@@ -39,26 +39,26 @@ describe("Year selector", () => {
   });
 
   it("toggles year options hidden by clicking the input", () => {
-    cy.get(".year-selector-div").within(() => {
-      cy.get(".year-select-container").click();
-      cy.get("#year-select-list").should("have.class", "hidden-all");
+    cy.get("#year-selector-div").within(() => {
+      cy.get("#select-container-year").click();
+      cy.get("#select-list-year").should("have.class", "hidden-all");
     });
   });
 
   it("toggles year options hidden by clicking outside the input", () => {
-    cy.get(".year-selector-div").within(() => cy.get(".year-select-container").click());
+    cy.get("#year-selector-div").within(() => cy.get("#select-container-year").click());
     cy.contains("2015");
     cy.get("#map-container").click(325, 520);
-    cy.get(".year-selector-div").within(() => {
-      cy.get("#year-select-list").should("have.class", "hidden-all");
+    cy.get("#year-selector-div").within(() => {
+      cy.get("#select-list-year").should("have.class", "hidden-all");
     });
   });
 
   it("selects year by clicking an option (2010)", () => {
-    cy.get(".year-selector-div").within(() => {
-      cy.get(".year-select-container").click();
-      cy.contains("2010").click();
-      cy.get("#year-select-list").should("have.class", "hidden-all");
+    cy.get("#year-selector-div").within(() => {
+      cy.get("#select-container-year").click();
+      cy.contains("li", "2010").click();
+      cy.get("#select-list-year").should("have.class", "hidden-all");
       cy.contains("2010");
     });
   });
@@ -231,7 +231,7 @@ describe("Grid data layer", () => {
   });
 
   it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
-    cy.get(".year-selector-div").within(() => {
+    cy.get("#year-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "2010").click();
     });
@@ -261,7 +261,7 @@ describe("Grid data layer", () => {
       cy.get(".gnfr-select-container").click();
       cy.contains("li", "Road").click();
     });
-    cy.get(".year-selector-div").within(() => {
+    cy.get("#year-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "2018").click();
     });
@@ -333,7 +333,7 @@ describe("Municipality layer", () => {
       cy.get("input").click();
       cy.contains("Typen oksidit").click();
     });
-    cy.get(".year-selector-div").within(() => {
+    cy.get("#year-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "2010").click();
     });
@@ -364,7 +364,7 @@ describe("Municipality layer", () => {
 
   it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
     // switch back to year 2018
-    cy.get(".year-selector-div").within(() => {
+    cy.get("#year-selector-div").within(() => {
       cy.get("input").click();
       cy.contains("li", "2018").click();
     });
