@@ -177,3 +177,10 @@ export interface TotalPollutionStats {
   gnfrPollution: number;
   totalPollution: number;
 }
+
+export interface Option {
+  label: string;
+  id: string;
+  showFirst: boolean;
+  value: string | number | null;
+}
