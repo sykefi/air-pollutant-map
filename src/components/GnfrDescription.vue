@@ -6,12 +6,12 @@
       <div class="stats">
         <div v-if="gnfr && gnfr.id !== 'COMBINED'">
           {{ "gnfr.description.share.of.reported" | translate }}:
-          <span class="formatted-number"> {{ getRepRatio() }} %</span> ({{
-            "gnfr.description.share.of.calculated" | translate
-          }}: <span class="formatted-number">{{ getCalcRatio() }} %</span>)
+          <span class="formatted-number"> {{ getRepRatio() }} %</span>
+          ({{ "gnfr.description.share.of.calculated" | translate }}:
+          <span class="formatted-number">{{ getCalcRatio() }} %</span>)
         </div>
         <div v-if="totalPollutionStats && totalPollutionStats.gnfrId !== 'COMBINED'">
-          Luokan päästöjen osuus kokonaispäästöistä:
+          {{ "gnfr.description.gnfr-share-of-total" | translate }}:
           <span class="formatted-number">
             {{ getShareOfGnfrPollution(totalPollutionStats) }} %
           </span>
@@ -21,7 +21,7 @@
           >)
         </div>
         <div v-if="totalPollutionStats && totalPollutionStats.gnfrId === 'COMBINED'">
-          Valitun luokan päästöt yhteensä:
+          {{ "gnfr.description.gnfr-total-emissions" | translate }}:
           <span class="formatted-number">
             {{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
             {{ totalPollutionStats.unit }}
