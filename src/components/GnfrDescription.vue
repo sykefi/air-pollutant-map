@@ -24,6 +24,9 @@
           </span>
         </div>
       </div>
+      <div v-else class="load-animation-container">
+        <LoadingAnimation color="black" :size="17" />
+      </div>
     </div>
   </div>
 </template>
@@ -33,6 +36,7 @@ import { Gnfr, GnfrPollutantMeta, Pollutant, TotalPollutionStats } from "@/types
 import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
 import { fetchGnfrPollutantMetas } from "../services/meta";
+import LoadingAnimation from "./LoadingAnimation.vue";
 
 export default Vue.extend({
   props: {
@@ -42,6 +46,9 @@ export default Vue.extend({
     totalPollutionStats: { type: Object as PropType<TotalPollutionStats | undefined> }
   },
   computed: mapState(["lang"]),
+  components: {
+    LoadingAnimation
+  },
   data() {
     return {
       gnfrPollutantMetas: undefined as GnfrPollutantMeta[] | undefined
@@ -117,5 +124,8 @@ export default Vue.extend({
 }
 .formatted-number {
   color: #007ac9;
+}
+.load-animation-container {
+  margin: 5px 0px -2px 2px;
 }
 </style>
