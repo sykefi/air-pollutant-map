@@ -16,31 +16,51 @@
     <div
       class="select-container"
       :id="'select-container-' + uniqueSelectorId"
-      v-on:click="handleSelectorClick"
-      v-on:keyup="doKeyAction"
-      v-on:keydown="preventKeyDownScroll"
+      @click="handleSelectorClick"
+      @keydown="handleKeyDown"
+      @keyup="handleKeyUp"
       role="combobox"
       aria-haspopup="listbox"
       aria-autocomplete="list"
       :aria-owns="'select-list-' + uniqueSelectorId"
       :aria-expanded="showOptions ? 'true' : 'false'"
     >
-      <input
-        type="text"
-        :id="'select-input-' + uniqueSelectorId"
-        :ref="'selectInput-' + uniqueSelectorId"
-        v-model="inputValue"
-        class="select-css"
-        aria-describedby="select-info"
-        :aria-controls="'select-list-' + uniqueSelectorId"
-      />
+      <div class="input-container">
+        <input
+          type="text"
+          class="base-input filter-input"
+          :id="'select-input-' + uniqueSelectorId"
+          :ref="'selectInput-' + uniqueSelectorId"
+          v-model="filterInputValue"
+          aria-describedby="select-info"
+          :aria-controls="'select-list-' + uniqueSelectorId"
+        />
+        <input
+          :id="'selection-input-' + uniqueSelectorId"
+          :class="[
+            'base-input',
+            'selection-input',
+            filterInputValue.length > 0 ? 'hidden-text' : ''
+          ]"
+          readonly
+          disabled
+          v-model="selectInputValue"
+        />
+        <input
+          class="base-input pseudo-input"
+          style="position: static;"
+          readonly
+          disabled
+          value=""
+        />
+      </div>
       <span :id="'select-info-' + uniqueSelectorId" class="hidden-visually">
         {{ `aria.${uniqueSelectorId}.selector.describe` | translate }}
       </span>
       <span class="select-icons">
         <svg
-          width="21"
-          height="21"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
           fill-rule="evenodd"
@@ -71,6 +91,7 @@
         <li
           v-for="option in filteredOptions"
           :key="option.id"
+          :class="[option.id === selectedOption.id ? 'selected-option' : '']"
           tabindex="-1"
           role="option"
           :ref="'options-' + uniqueSelectorId + option.id"
@@ -105,13 +126,14 @@ export default Vue.extend({
       showOptions: false as boolean,
       selectedOption: undefined as Option | undefined,
       selectorState: "initial" as string,
-      inputValue: "" as string,
+      filterInputValue: "" as string,
+      selectInputValue: "" as string,
       initialized: false as boolean
     };
   },
   computed: mapState(["lang"]),
   watch: {
-    options: function (newOptions: Option[], oldOptions: Option[]) {
+    options(newOptions: Option[], oldOptions: Option[]) {
       this.filteredOptions = [...newOptions].sort(this.optionsSort);
       // update label of the selected option by new options
       if (oldOptions && this.selectedOption) {
@@ -120,14 +142,14 @@ export default Vue.extend({
         );
         if (updatedSelectedOption) {
           this.selectedOption = updatedSelectedOption;
-          this.inputValue = updatedSelectedOption.label[this.lang];
+          this.selectInputValue = updatedSelectedOption.label[this.lang];
         }
       }
     }
   },
   methods: {
     async initializeOptions() {
-      this.inputValue = this.initialOption.label[this.lang];
+      this.selectInputValue = this.initialOption.label[this.lang];
       this.selectedOption = this.initialOption;
       this.$emit("selected-option", this.selectedOption);
       this.filteredOptions = [...this.options].sort(this.optionsSort);
@@ -144,32 +166,39 @@ export default Vue.extend({
     filterOptions(): void {
       this.filteredOptions = this.options
         .filter((o) => {
-          return o.label[this.lang].toLowerCase().includes(this.inputValue.toLowerCase());
+          return o.label[this.lang]
+            .toLowerCase()
+            .includes(this.filterInputValue.toLowerCase());
         })
         .sort(this.optionsSort);
     },
     getOptionByid(id: string): Option | undefined {
       return this.options.find((o) => o.id === id);
     },
-    toggleSelectorOpen: function (open: boolean | undefined = undefined) {
+    toggleSelectorOpen(open: boolean | undefined = undefined) {
       if (open !== undefined) {
         this.showOptions = open;
+        // this.selectedOption is defined always after initialization
         if (!open && this.selectedOption) {
+          this.filterInputValue = "";
           // set previosly selected value to input if exiting selector
-          this.inputValue = this.selectedOption.label[this.lang];
+          this.selectInputValue = this.selectedOption.label[this.lang];
           this.filteredOptions = [...this.options].sort(this.optionsSort);
         }
       } else {
         this.showOptions = !this.showOptions;
+        if (!this.showOptions) {
+          this.filterInputValue = "";
+        }
       }
     },
-    setState: function (state: string) {
+    setState(state: string) {
       this.selectorState = state;
     },
-    getInputElement: function (): HTMLElement {
+    getInputElement(): HTMLElement {
       return this.$refs["selectInput-" + this.uniqueSelectorId] as HTMLElement;
     },
-    handleSelectorClick: function () {
+    handleSelectorClick() {
       if (!this.initialized) {
         return;
       }
@@ -205,10 +234,10 @@ export default Vue.extend({
           break;
       }
     },
-    getOptionIdFromElement: function (element: HTMLElement): string {
+    getOptionIdFromElement(element: HTMLElement): string {
       return element!.querySelector("span")!.textContent!.trim();
     },
-    makeChoice: function (whichOption: HTMLElement) {
+    makeChoice(whichOption: HTMLElement) {
       // read option identifier from hidden span element
       const optionId = this.getOptionIdFromElement(whichOption);
       const option = this.getOptionByid(optionId);
@@ -219,20 +248,20 @@ export default Vue.extend({
         console.log("Could not select:", optionId);
       }
     },
-    setSelectedOption: function (option: Option, focusInput: boolean) {
+    setSelectedOption(option: Option, focusInput: boolean) {
       this.selectedOption = option;
-      this.inputValue = option.label[this.lang];
+      this.selectInputValue = option.label[this.lang];
       this.$emit("selected-option", option);
       if (focusInput) {
         this.moveFocus(findFocus(), "input");
       }
     },
-    getOptionAtIndex: function (index: number): HTMLLIElement {
+    getOptionAtIndex(index: number): HTMLLIElement {
       const option = this.filteredOptions[index];
       // @ts-ignore
       return this.$refs["options-" + this.uniqueSelectorId + option.id][0] as HTMLLIElement;
     },
-    moveFocus: function (fromHere: HTMLElement, toThere: string) {
+    moveFocus(fromHere: HTMLElement, toThere: string) {
       if (toThere === "input" || this.filteredOptions.length == 0) {
         this.getInputElement().focus();
         return;
@@ -276,19 +305,25 @@ export default Vue.extend({
         }
       }
     },
-    preventKeyDownScroll: function (e: KeyboardEvent) {
+    preventKeyDownScroll(e: KeyboardEvent) {
       const code = e.keyCode ? e.keyCode : e.code;
       switch (code) {
         case 38:
         case 40:
         case 32: // Arrow keys
           e.preventDefault();
-          break; // Space
+          break;
         default:
           break; // do not block other keys
       }
     },
-    doKeyAction: function (whichKey: KeyboardEvent) {
+    handleKeyDown(whichKey: KeyboardEvent) {
+      this.preventKeyDownScroll(whichKey);
+      if (whichKey.code === "Tab") {
+        this.toggleSelectorOpen(false);
+        this.setState("closed");
+        return;
+      }
       const currentFocus = findFocus();
       switch (whichKey.code) {
         case "Enter":
@@ -355,6 +390,15 @@ export default Vue.extend({
             this.moveFocus(currentFocus, "back");
           }
           break;
+      }
+    },
+    handleKeyUp(whichKey: KeyboardEvent) {
+      switch (whichKey.code) {
+        case "Enter":
+        case "Escape":
+        case "ArrowDown":
+        case "ArrowUp":
+          break;
         default:
           this.filterOptions();
           if (this.selectorState === "initial" || this.selectorState === "closed") {
@@ -393,82 +437,108 @@ export default Vue.extend({
 }
 .selector-label {
   font-weight: 500;
-  margin: 0 1px 1px 2px;
+  margin: 0 1px 0px 2px;
 }
 .select-container {
   position: relative;
 }
-.select-css {
+.input-container {
+  position: relative;
+}
+.base-input {
+  position: absolute;
   display: block;
-  font-size: 1em;
+  font-size: 15px;
   font-family: sans-serif;
-  /* font-weight: 700; */
-  color: #444;
   line-height: 1;
-  padding: 0.6em 1.4em 0.5em 0.8em;
+  padding: 10px 13px 8px 13px;
+  border: 1px solid transparent;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   margin: 0;
-  border: 1px solid black;
+  border-radius: 4px;
+}
+.filter-input {
+  background: none;
+  color: black;
+  padding: 10px 15px 8px 11px;
+  border: 1px solid #7f7f7f;
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
-  border-radius: 0.25em;
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
-  background-color: #fff;
-  position: relative;
-  z-index: 10;
+  z-index: 11;
+  transition: all 100ms ease 0s;
 }
-.select-css::-ms-expand {
-  display: none;
-}
-.select-css:focus {
-  border: 1px solid blue;
+.filter-input:focus {
+  border: 1px solid rgb(38, 132, 255);
+  box-shadow: rgb(38, 132, 255) 0px 0px 0px 1px;
   color: #222;
   outline: none;
+  outline: 0px !important;
+}
+.input-container input::-ms-expand {
+  display: none;
+}
+.selection-input {
+  color: black;
+  z-index: 10;
+  pointer-events: none;
+  background-color: #fff;
+}
+.hidden-text {
+  color: white;
+}
+.pseudo-input {
+  color: white;
+  border: none;
+  z-index: 9;
+  pointer-events: none;
+  background: none;
 }
 .select-icons {
   pointer-events: none;
   position: absolute;
-  top: 0.5em;
-  right: 0.5em;
+  top: 10px;
+  right: 9px;
   z-index: 20;
-  border: 1px solid white;
   background: transparent;
 }
 .select-options {
   border: 1px solid #aaa;
-  border-radius: 0 0 0.25em 0.25em;
+  border-radius: 4px;
   line-height: 1.5;
-  padding: 0;
-  padding-top: 7px;
+  padding: 3px 0px;
   margin: 0;
-  margin-top: -0.2em;
+  margin-top: 7px;
   list-style-type: none;
   font-weight: normal;
-  cursor: pointer;
+  cursor: default;
   z-index: 9;
   position: absolute;
   width: calc(100% - 2px);
   background-color: #ffffff;
   max-height: 400px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 4px 11px;
   overflow: auto;
 }
 .select-options li {
   display: flex;
-  font-size: 0.9em;
-  padding: 0.5em 0.8em 0.5em 0.8em;
-  font-size: 0.9em;
+  font-size: 15px;
+  padding: 7px 13px;
   text-align: left;
 }
 .select-options li:hover {
-  background: #d1d1d1;
+  background: rgb(222, 235, 255);
 }
 .select-options li:focus {
-  background: #d1d1d1;
+  background: rgb(222, 235, 255);
   border: none;
   outline: none;
+}
+.selected-option {
+  color: white !important;
+  background: rgb(38, 132, 255) !important;
 }
 .select-options li span {
   display: none;

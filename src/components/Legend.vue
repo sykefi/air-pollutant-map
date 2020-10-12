@@ -50,7 +50,7 @@ export default {
   border-radius: 5px;
   background-color: rgb(0 0 0 / 70%);
   color: white;
-  font-size: 0.9em;
+  font-size: 13px;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
 .legend-container {

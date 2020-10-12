@@ -100,7 +100,7 @@ describe("GNFR selector", () => {
       cy.get("#select-container-gnfr").click();
       cy.contains("li", "Kokonaisp").click();
       cy.get("#select-list-gnfr").should("have.class", "hidden-all");
-      cy.get("#select-input-gnfr").should("have.value", "Kokonaispäästöt");
+      cy.get("#selection-input-gnfr").should("have.value", "Kokonaispäästöt");
     });
   });
 
@@ -108,21 +108,21 @@ describe("GNFR selector", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-input-gnfr").click().clear().type("roadTranspor");
       cy.get("li").click();
-      cy.get("#select-input-gnfr").should("have.value", "F_RoadTransport_fi");
+      cy.get("#selection-input-gnfr").should("have.value", "F_RoadTransport_fi");
     });
   });
 
   it("shows previously selected GNFR after exiting selector", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-input-gnfr").click().clear().type("kokonais{esc}");
-      cy.get("#select-input-gnfr").should("have.value", "F_RoadTransport_fi");
+      cy.get("#selection-input-gnfr").should("have.value", "F_RoadTransport_fi");
     });
   });
 
   it("selects option with keyboard actions (combined GNFR)", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-input-gnfr").click().clear().type("kokonais{downarrow}{enter}");
-      cy.get("#select-input-gnfr").should("have.value", "Kokonaispäästöt");
+      cy.get("#selection-input-gnfr").should("have.value", "Kokonaispäästöt");
     });
   });
 });
@@ -158,7 +158,7 @@ describe("Pollutant selector", () => {
       cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
       cy.get("#select-list-pollutant").should("have.class", "hidden-all");
-      cy.get("#select-input-pollutant").should("have.value", "Rikkidioksidi");
+      cy.get("#selection-input-pollutant").should("have.value", "Rikkidioksidi");
     });
   });
 
@@ -166,21 +166,21 @@ describe("Pollutant selector", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click().clear().type("hiilimono");
       cy.get("li").click();
-      cy.get("#select-input-pollutant").should("have.value", "Hiilimonoksidi");
+      cy.get("#selection-input-pollutant").should("have.value", "Hiilimonoksidi");
     });
   });
 
   it("shows previously selected pollutant after exiting selector", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click().clear().type("rikkidio{esc}");
-      cy.get("#select-input-pollutant").should("have.value", "Hiilimonoksidi");
+      cy.get("#selection-input-pollutant").should("have.value", "Hiilimonoksidi");
     });
   });
 
   it("selects option with keyboard actions (combined GNFR)", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click().clear().type("rikkidioksi{downarrow}{enter}");
-      cy.get("#select-input-pollutant").should("have.value", "Rikkidioksidi");
+      cy.get("#selection-input-pollutant").should("have.value", "Rikkidioksidi");
     });
   });
 });
@@ -232,7 +232,7 @@ describe("Grid data layer", () => {
 
   it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
     cy.get("#year-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-year").click();
       cy.contains("li", "2010").click();
     });
     cy.get(".legend-box").within(() => {
@@ -262,7 +262,7 @@ describe("Grid data layer", () => {
       cy.contains("li", "Road").click();
     });
     cy.get("#year-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-year").click();
       cy.contains("li", "2018").click();
     });
     cy.get(".legend-box").within(() => {
@@ -278,12 +278,12 @@ describe("Municipality layer", () => {
   it("toggles municipality layer visible", () => {
     // switch back to typen oksidit
     cy.get("#pollutant-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-pollutant").click();
       cy.contains("Typen oksidit").click();
     });
     // switch back to combined data
     cy.get("#gnfr-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-gnfr").click();
       cy.contains("li", "Kokonaisp").click();
     });
     cy.contains("Kunnat").click();
@@ -313,11 +313,11 @@ describe("Municipality layer", () => {
 
   it("shows expected class ranges in legend (2018 road/transport: rikkidioksidi)", () => {
     cy.get("#gnfr-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-gnfr").click();
       cy.contains("li", "Road").click();
     });
     cy.get("#pollutant-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-pollutant").click();
       cy.contains("Rikkidioksidi").click();
     });
     cy.get(".legend-box").within(() => {
@@ -330,15 +330,15 @@ describe("Municipality layer", () => {
 
   it("shows expected class ranges in legend (2010 aviation: typen oksidit)", () => {
     cy.get("#pollutant-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-pollutant").click();
       cy.contains("Typen oksidit").click();
     });
     cy.get("#year-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-year").click();
       cy.contains("li", "2010").click();
     });
     cy.get("#gnfr-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-gnfr").click();
       cy.contains("li", "Aviation").click();
     });
     cy.get(".legend-box").within(() => {
@@ -351,7 +351,7 @@ describe("Municipality layer", () => {
 
   it("shows expected class ranges in legend (2010 combined: typen oksidit)", () => {
     cy.get("#gnfr-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-gnfr").click();
       cy.contains("li", "Kokonaisp").click();
     });
     cy.get(".legend-box").within(() => {
@@ -365,7 +365,7 @@ describe("Municipality layer", () => {
   it("shows expected class ranges in legend (2018 combined: rikkidioksidi)", () => {
     // switch back to year 2018
     cy.get("#year-selector-div").within(() => {
-      cy.get("input").click();
+      cy.get("#select-input-year").click();
       cy.contains("li", "2018").click();
     });
     cy.get("#pollutant-selector-div").within(() => {

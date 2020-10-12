@@ -53,6 +53,6 @@ export default Vue.extend({
 
 <style scoped>
 .select-wrapper {
-  width: 110px;
+  width: 120px;
 }
 </style>
