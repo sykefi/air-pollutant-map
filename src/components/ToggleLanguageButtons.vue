@@ -74,7 +74,7 @@ export default Vue.extend({
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.57);
   padding: 5px;
-  font-size: 0.8em;
+  font-size: 12px;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
   height: min-content;
   margin: 0px 10px 0px 10px;
@@ -98,14 +98,14 @@ export default Vue.extend({
 }
 #selector-left {
   padding: 3px 8px 3px 7px;
-  margin-right: -3px;
+  margin-right: -1px;
   border-radius: 5px 0 0 5px;
 }
 #selector-right {
   border-radius: 0 5px 5px 0;
 }
 #selector-middle {
-  margin-right: -3px;
+  margin-right: -1px;
 }
 .selected-lang {
   z-index: 3;

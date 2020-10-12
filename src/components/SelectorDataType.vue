@@ -64,7 +64,7 @@ export default Vue.extend({
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.57);
   padding: 5px;
-  font-size: 0.9em;
+  font-size: 15px;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
 .map-data-type-selector-container {
@@ -91,7 +91,7 @@ export default Vue.extend({
   border-radius: 0 5px 5px 0;
 }
 #selector-grid {
-  margin-right: -3px;
+  margin-right: -1px;
   border-radius: 5px 0 0 5px;
 }
 .selected-data-type {

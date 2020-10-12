@@ -35,7 +35,7 @@ export default Vue.extend({
           id: p.id,
           label: p.name,
           value: p,
-          showFirst: p.id === "s16"
+          showFirst: false
         } as Option;
       });
       this.initialOption = this.options.find((o) => o.id === "s16");
@@ -52,6 +52,6 @@ export default Vue.extend({
 
 <style scoped>
 .select-wrapper {
-  max-width: 240px;
+  width: 280px;
 }
 </style>
