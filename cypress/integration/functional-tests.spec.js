@@ -8,7 +8,7 @@ describe("Page load and initial UI", () => {
     cy.contains("Vuosi");
   });
 
-  it("shows gnfr selector", () => {
+  it("shows GNFR selector", () => {
     cy.contains("Luokka");
   });
 
@@ -24,6 +24,18 @@ describe("Page load and initial UI", () => {
 
   it("shows legend", () => {
     cy.contains("Päästömäärä (t)");
+  });
+
+  it("shows GNFR description", () => {
+    cy.contains("esittää kaikkien inventoitujen");
+  });
+
+  it("shows total pollution statistics", () => {
+    cy.contains("Valitun luokan päästöt yhteensä:");
+  });
+
+  it("shows correct total pollution (2018 combined: typen oksidit)", () => {
+    cy.contains("126595.3 t");
   });
 });
 
@@ -65,19 +77,19 @@ describe("Year selector", () => {
 });
 
 describe("GNFR selector", () => {
-  it("toggles gnfr options visible", () => {
+  it("toggles GNFR options visible", () => {
     cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
     cy.get("#select-list-gnfr").within(() => cy.contains("li", "Shipping"));
   });
 
-  it("toggles gnfr options hidden by clicking the input", () => {
+  it("toggles GNFR options hidden by clicking the input", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-container-gnfr").click();
       cy.get("#select-list-gnfr").should("have.class", "hidden-all");
     });
   });
 
-  it("toggles gnfr options hidden by clicking outside the input", () => {
+  it("toggles GNFR options hidden by clicking outside the input", () => {
     cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
     cy.contains("Shipping");
     cy.get("#map-container").click(325, 520);
@@ -271,6 +283,11 @@ describe("Grid data layer", () => {
       cy.contains("137 - 381");
       cy.contains("381 - 842");
     });
+  });
+
+  it("shows correct total pollution statistics (2018 road/transport: typen oksidit)", () => {
+    cy.contains("Valitun luokan osuus kokonaispäästöistä");
+    cy.contains("24 % (30429.7 t)");
   });
 });
 
