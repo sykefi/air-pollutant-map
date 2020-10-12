@@ -93,7 +93,7 @@ export default Vue.extend({
   flex-direction: column;
   align-content: center;
   justify-content: center;
-  width: calc(100% - 20px);
+  width: 100%;
   max-width: 600px;
 }
 #settings-panel {

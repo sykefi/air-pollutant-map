@@ -32,7 +32,7 @@
           :id="'select-input-' + uniqueSelectorId"
           :ref="'selectInput-' + uniqueSelectorId"
           v-model="filterInputValue"
-          aria-describedby="select-info"
+          :aria-describedby="'select-info-' + uniqueSelectorId"
           :aria-controls="'select-list-' + uniqueSelectorId"
         />
         <input
@@ -309,8 +309,7 @@ export default Vue.extend({
       const code = e.keyCode ? e.keyCode : e.code;
       switch (code) {
         case 38:
-        case 40:
-        case 32: // Arrow keys
+        case 40: // Arrow keys
           e.preventDefault();
           break;
         default:
@@ -390,6 +389,12 @@ export default Vue.extend({
             this.moveFocus(currentFocus, "back");
           }
           break;
+        default:
+          // let's move focus back to input if it's somewhere else at normal (letter) key down
+          // shift key should not cause this
+          if (findFocus() !== this.getInputElement() && whichKey.keyCode !== 16) {
+            this.moveFocus(findFocus(), "input");
+          }
       }
     },
     handleKeyUp(whichKey: KeyboardEvent) {
@@ -407,7 +412,6 @@ export default Vue.extend({
           } else if (this.selectorState === "opened") {
             this.setState("filtered");
           }
-          break;
       }
     }
   },
@@ -428,7 +432,7 @@ export default Vue.extend({
 .selector-div {
   background: #ffffff;
   max-width: 100%;
-  margin: 12px;
+  margin: 12px 8px;
 }
 .label-div {
   display: flex;
