@@ -55,7 +55,14 @@ export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
   &outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
-  return fc.features.map((feat) => getPollutantObject(feat.properties));
+  return fc.features
+    .map((feat) => getPollutantObject(feat.properties as DbPollutant))
+    .filter((pollutant: Pollutant) => {
+      if (process.env.NODE_ENV === NodeEnv.PRODUCTION) {
+        return pollutant.useProd;
+      }
+      return pollutant.useDev;
+    });
 };
 
 const getGnfrPollutantMetaObject = (props: DbGnfrPollutantMeta): GnfrPollutantMeta => {
