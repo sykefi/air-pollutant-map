@@ -110,9 +110,9 @@ export default Vue.extend({
 
 <style scoped>
 .desc-box {
-  margin: 0.4em 0 0.7em 0;
+  margin: 0.4em 0 1.2em 0;
   padding: 0em;
-  height: 9em;
+  min-height: 9em;
   background-color: #fff;
 }
 .gnfr-name {
