@@ -9,6 +9,7 @@ import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style, Stroke } from "ol/style";
+import { StyleFunction } from "ol/style/Style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
@@ -52,7 +53,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    getOlStyle() {
+    getOlStyle(): StyleFunction {
       return (feature: FeatureLike) =>
         new Style({
           fill: new Fill({
@@ -64,71 +65,79 @@ export default Vue.extend({
           })
         });
     },
-    async updateStyle() {
-      const maxValue = Math.ceil(
+    getMaxPollutionValue(): number {
+      return Math.ceil(
         Math.max(...this.layerSource.getFeatures().map((feat) => feat.get(this.densityProp)))
       );
-
-      if (!styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.densityProp)) {
-        if (this.year === constants.latestYear && this.gnfrId === "COMBINED") {
-          // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
-          const latestValues = this.layerSource
-            .getFeatures()
-            .map((feat) => feat.get(this.densityProp));
-          styleUtils.setPollutantBreakPoints(
-            MapDataType.MUNICIPALITY,
-            this.densityProp,
-            latestValues,
-            classCount
-          );
-          this.colorFunction = styleUtils.getColorFunction(
-            MapDataType.MUNICIPALITY,
-            this.densityProp,
-            maxValue
-          );
-        } else {
-          // combined pollutants from latest year need to be fetched for calculating breakpoints
-          console.log(
-            `Fetching features of ${constants.latestYear} and calculating breakpoints`
-          );
-          const fc = await pollutantService.fetchMuniFeatures(
-            constants.latestYear,
-            "COMBINED",
-            this.pollutant
-          );
-          if (!fc) return;
-          const latestValues = fc.features.map((feat) => feat.properties[this.densityProp]);
-          styleUtils.setPollutantBreakPoints(
-            MapDataType.MUNICIPALITY,
-            this.densityProp,
-            latestValues,
-            classCount
-          );
-          this.colorFunction = styleUtils.getColorFunction(
-            MapDataType.MUNICIPALITY,
-            this.densityProp,
-            maxValue
-          );
-          // for some reason this async style update needs to be triggered manually
-          this.vectorLayer.setStyle(this.getOlStyle());
-        }
-      } else {
-        this.colorFunction = styleUtils.getColorFunction(
+    },
+    async updateStyle(maxPollutionValue: number): Promise<number[] | undefined> {
+      if (styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.densityProp)) {
+        const breakPoints = styleUtils.getBreakPoints(
           MapDataType.MUNICIPALITY,
-          this.densityProp,
-          maxValue
+          this.pollutant.id
         );
+        this.colorFunction = styleUtils.getColorFunction(
+          this.densityProp,
+          breakPoints!,
+          maxPollutionValue
+        );
+        return breakPoints;
+      } else if (this.year === constants.latestYear && this.gnfrId === "COMBINED") {
+        // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
+        const latestValues = this.layerSource
+          .getFeatures()
+          .map((feat) => feat.get(this.densityProp));
+
+        const breakPoints = styleUtils.getPollutantBreakPoints(
+          MapDataType.MUNICIPALITY,
+          this.pollutant.id,
+          latestValues,
+          classCount
+        );
+        this.colorFunction = styleUtils.getColorFunction(
+          this.densityProp,
+          breakPoints,
+          maxPollutionValue
+        );
+        return breakPoints;
+      } else {
+        // combined pollutants from latest year need to be fetched for calculating breakpoints
+        console.log(
+          `Fetching features of ${constants.latestYear} and calculating breakpoints`
+        );
+        const fc = await pollutantService.fetchMuniFeatures(
+          constants.latestYear,
+          "COMBINED",
+          this.pollutant
+        );
+        if (!fc) return;
+        const latestValues = fc.features.map((feat) => feat.properties[this.densityProp]);
+        const breakPoints = styleUtils.getPollutantBreakPoints(
+          MapDataType.MUNICIPALITY,
+          this.pollutant.id,
+          latestValues,
+          classCount
+        );
+        this.colorFunction = styleUtils.getColorFunction(
+          this.densityProp,
+          breakPoints,
+          maxPollutionValue
+        );
+        // for some reason this async style update needs to be triggered manually
+        this.vectorLayer.setStyle(this.getOlStyle());
+        return breakPoints;
       }
+    },
+    updateLegend(breakPoints: number[], maxPollutionValue: number): void {
       // finally update legend to match the new style
-      this.legend = styleUtils.getPollutantLegendObject(
-        MapDataType.MUNICIPALITY,
+      this.legend = styleUtils.getPollutantLegend(
         this.pollutant,
-        this.densityProp,
-        maxValue
+        breakPoints,
+        maxPollutionValue
       );
       this.$emit("update-legend", this.legend);
     },
-    async updateTotalPollutionStats() {
+    async updateTotalPollutionStats(): Promise<void> {
       const totalPollutionStats = await pollutantService.getTotalPollutionStats(
         this.year,
         this.gnfrId,
@@ -136,7 +145,7 @@ export default Vue.extend({
       );
       this.$emit("update-total-pollution-stats", totalPollutionStats);
     },
-    async setFeaturePopup(event) {
+    async setFeaturePopup(event): Promise<void> {
       const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
       if (feats.length > 0) {
         this.$emit("set-muni-feature-popup", event.coordinate, feats[0].getProperties());
@@ -144,10 +153,10 @@ export default Vue.extend({
         console.log("no features found on click -> cannot set popup");
       }
     },
-    enableShowFeaturePopupOnClick() {
+    enableShowFeaturePopupOnClick(): void {
       this.map.on("singleclick", this.setFeaturePopup);
     },
-    disableShowFeaturePopupOnClick() {
+    disableShowFeaturePopupOnClick(): void {
       this.map.un("singleclick", this.setFeaturePopup);
       this.$emit("set-muni-feature-popup", undefined, null);
     }
@@ -170,8 +179,14 @@ export default Vue.extend({
           // @ts-ignore
           this.layerSource.getFormat().readFeatures(fc)
         );
-        await this.updateStyle();
-        this.$store.dispatch(Dispatch.setLoaded);
+        const maxPollutionValue = this.getMaxPollutionValue();
+        const breakPoints = await this.updateStyle(maxPollutionValue);
+        if (breakPoints) {
+          this.updateLegend(breakPoints, maxPollutionValue);
+          this.$store.dispatch(Dispatch.setLoaded);
+        } else {
+          console.error("Could not update style for the current layer");
+        }
         this.updateTotalPollutionStats();
       },
       strategy: allStrategy

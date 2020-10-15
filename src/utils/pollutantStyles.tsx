@@ -69,7 +69,7 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
   return combinedBreakPoints.filter((value, index, self) => self.indexOf(value) === index);
 };
 
-const getBreakPoints = (
+export const getBreakPoints = (
   dataType: MapDataType,
   valuePropName: string
 ): number[] | undefined => {
@@ -84,12 +84,12 @@ export const hasBreakPoints = (dataType: MapDataType, valuePropName: string): bo
   return breakPointCache.has(getStyleId(dataType, valuePropName));
 };
 
-export const setPollutantBreakPoints = (
+export const getPollutantBreakPoints = (
   dataType: MapDataType,
   valuePropName: string,
   valueList: number[],
   classCount: number
-): void => {
+): number[] => {
   const validSortedValues = valueList
     .filter((number) => number !== undefined && number !== null)
     .sort((a, b) => a - b);
@@ -98,32 +98,9 @@ export const setPollutantBreakPoints = (
     console.log(validSortedValues);
   }
 
-  breakPointCache.set(
-    getStyleId(dataType, valuePropName),
-    calculateAdjustedBreakPoints(validSortedValues, classCount)
-  );
-};
-
-/**
- * Returns default color scale if number of breakpoints (classes) and color match.
- * Otherwise it picks appropriate colors from the color scale (for smaller number of classes).
- */
-const getColorArray = (colorScale: string[], breakPoints: number[]): string[] => {
-  if (breakPoints.length === colorScale.length) {
-    return colorScale;
-  } else if (breakPoints.length < colorScale.length) {
-    // else create subset of the color scale by the number of breakpoints (classes)
-    const colors: string[] = [];
-    for (let i = 1; i <= breakPoints.length; i++) {
-      const relativeColorPosition =
-        i === 1 ? 1 : Math.round((i / breakPoints.length) * colorScale.length);
-      colors[i - 1] = colorScale[relativeColorPosition - 1];
-    }
-    return colors;
-  } else {
-    console.error("Could not get color array (got more breakpoints than colours)");
-    return [];
-  }
+  const breakPoints = calculateAdjustedBreakPoints(validSortedValues, classCount);
+  breakPointCache.set(getStyleId(dataType, valuePropName), breakPoints);
+  return breakPoints;
 };
 
 const getFeatureColor = (
@@ -147,45 +124,27 @@ const getFeatureColor = (
 };
 
 export const getColorFunction = (
-  dataType: MapDataType,
   valuePropName: string,
+  breakPoints: number[],
   maxValue: number
 ): Function | undefined => {
-  const breakPoints = getBreakPoints(dataType, valuePropName);
-  if (!breakPoints) {
-    console.log(
-      "Failed to load style function for pollutant (no breakpoints found)",
-      valuePropName
-    );
-    return undefined;
-  }
   // replace last breakpoint with given maxValue if it is higher
   const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
   if (maxValue > secondLastBreakPoint) {
     breakPoints[breakPoints.length - 1] = maxValue;
   }
   // get color scale by number of breakpoints
-  const colors = getColorArray(colorScale, breakPoints);
+  const colors = colorScale.slice(0, breakPoints.length);
   return (feature: FeatureLike) =>
     getFeatureColor(breakPoints, colors, valuePropName, feature);
 };
 
-export const getPollutantLegendObject = (
-  dataType: MapDataType,
+export const getPollutantLegend = (
   pollutant: Pollutant,
-  valuePropName: string,
+  breakPoints: number[],
   maxValue: number
 ): PollutantLegend | undefined => {
-  const breakPoints = getBreakPoints(dataType, valuePropName);
-  if (!breakPoints) {
-    console.log(
-      "Failed to load legend for pollutant (no breakpoints found)",
-      pollutant.id,
-      pollutant.name["fi"]
-    );
-    return undefined;
-  }
-  const colors = getColorArray(colorScale, breakPoints);
+  const colors = colorScale.slice(0, breakPoints.length);
   // replace last breakpoint with given maxValue if it is higher
   const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
   if (maxValue > secondLastBreakPoint) {

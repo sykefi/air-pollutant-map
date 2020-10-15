@@ -9,6 +9,7 @@ import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
+import { StyleFunction } from "ol/style/Style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
@@ -51,7 +52,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    getOlStyle() {
+    getOlStyle(): StyleFunction {
       return (feature: FeatureLike) =>
         new Style({
           fill: new Fill({
@@ -59,71 +60,84 @@ export default Vue.extend({
           })
         });
     },
-    async updateStyle() {
-      const maxValue = Math.ceil(
+    getMaxPollutionValue(): number {
+      return Math.ceil(
         Math.max(...this.layerSource.getFeatures().map((feat) => feat.get(this.pollutant.id)))
       );
-
-      if (!styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.id)) {
-        if (this.gnfrId === "COMBINED" && this.year === constants.latestYear) {
-          // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
-          const latestValues = this.layerSource
-            .getFeatures()
-            .map((feat) => feat.get(this.pollutant.id));
-          styleUtils.setPollutantBreakPoints(
-            MapDataType.GRID,
-            this.pollutant.id,
-            latestValues,
-            classCount
-          );
-          this.colorFunction = styleUtils.getColorFunction(
-            MapDataType.GRID,
-            this.pollutant.id,
-            maxValue
-          );
-        } else {
-          // combined pollutants from latest year need to be fetched for calculating breakpoints
-          console.log(
-            `Fetching features of ${constants.latestYear} and calculating breakpoints`
-          );
-          const fc = await pollutantService.fetchGridFeatures(
-            constants.latestYear,
-            "COMBINED",
-            this.pollutant
-          );
-          if (!fc) return;
-          const latestValues = fc.features.map((feat) => feat.properties[this.pollutant.id]);
-          styleUtils.setPollutantBreakPoints(
-            MapDataType.GRID,
-            this.pollutant.id,
-            latestValues,
-            classCount
-          );
-          this.colorFunction = styleUtils.getColorFunction(
-            MapDataType.GRID,
-            this.pollutant.id,
-            maxValue
-          );
-          // for some reason this async style update needs to be triggered manually
-          this.vectorLayer.setStyle(this.getOlStyle());
-        }
-      } else {
+    },
+    /**
+     * Either loads or calculates breakpoints for the layer, creates style function by them and finally returns the breakpoints.
+     * Returns undefined if breakpoints were not found in the end (this should not happen).
+     *
+     * This function is to be part of the loader function of the layer, which is called every time the layer source is refreshed (this.layerSource.refresh()).
+     * The dynamic styling of the layer is based on the combined emission values of the selected pollutant (combined GNFR class of that pollutant). The style
+     * function is based on breakpoints, that define minimum and maximum values for each color class. New breakpoints are calculated only if they were not
+     * calculated before. If the breakponts are to be calculatd for the first time, they can be calculated from the current layer if it is the combined GNFR and
+     * latest year, otherwise that layer is fetched for calculating the breakpoints. Finally, the style function of the layer is updated by the breakpoints.
+     */
+    async updateStyle(maxPollutionValue: number): Promise<number[] | undefined> {
+      if (styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.id)) {
+        const breakPoints = styleUtils.getBreakPoints(MapDataType.GRID, this.pollutant.id);
         this.colorFunction = styleUtils.getColorFunction(
+          this.pollutant.id,
+          breakPoints!,
+          maxPollutionValue
+        );
+        return breakPoints;
+      } else if (this.gnfrId === "COMBINED" && this.year === constants.latestYear) {
+        // current layer is combined emissions and latest year, thus breakpoints can be calculated by it
+        const latestValues = this.layerSource
+          .getFeatures()
+          .map((feat) => feat.get(this.pollutant.id));
+        const breakPoints = styleUtils.getPollutantBreakPoints(
           MapDataType.GRID,
           this.pollutant.id,
-          maxValue
+          latestValues,
+          classCount
         );
+        this.colorFunction = styleUtils.getColorFunction(
+          this.pollutant.id,
+          breakPoints,
+          maxPollutionValue
+        );
+        return breakPoints;
+      } else {
+        // combined pollutants from latest year need to be fetched for calculating breakpoints
+        console.log(
+          `Fetching features of ${constants.latestYear} and calculating breakpoints`
+        );
+        const fc = await pollutantService.fetchGridFeatures(
+          constants.latestYear,
+          "COMBINED",
+          this.pollutant
+        );
+        if (!fc) return;
+        const latestValues = fc.features.map((feat) => feat.properties[this.pollutant.id]);
+        const breakPoints = styleUtils.getPollutantBreakPoints(
+          MapDataType.GRID,
+          this.pollutant.id,
+          latestValues,
+          classCount
+        );
+        this.colorFunction = styleUtils.getColorFunction(
+          this.pollutant.id,
+          breakPoints,
+          maxPollutionValue
+        );
+        // for some reason this async style update needs to be triggered manually
+        this.vectorLayer.setStyle(this.getOlStyle());
+        return breakPoints;
       }
-      // finally update legend to match the new style
-      this.legend = styleUtils.getPollutantLegendObject(
-        MapDataType.GRID,
+    },
+    updateLegend(breakPoints: number[], maxPollutionValue: number): void {
+      this.legend = styleUtils.getPollutantLegend(
         this.pollutant,
-        this.pollutant.id,
-        maxValue
+        breakPoints,
+        maxPollutionValue
       );
       this.$emit("update-legend", this.legend);
     },
-    async updateTotalPollutionStats() {
+    async updateTotalPollutionStats(): Promise<void> {
       const totalPollutionStats = await pollutantService.getTotalPollutionStats(
         this.year,
         this.gnfrId,
@@ -131,7 +145,7 @@ export default Vue.extend({
       );
       this.$emit("update-total-pollution-stats", totalPollutionStats);
     },
-    async setFeaturePopup(event) {
+    async setFeaturePopup(event): Promise<void> {
       const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
       if (feats.length > 0 && feats[0].getProperties()[this.pollutant.id]) {
         this.$emit(
@@ -143,10 +157,10 @@ export default Vue.extend({
         console.log("no features found on click -> cannot set popup");
       }
     },
-    enableShowFeaturePopupOnClick() {
+    enableShowFeaturePopupOnClick(): void {
       this.map.on("singleclick", this.setFeaturePopup);
     },
-    disableShowFeaturePopupOnClick() {
+    disableShowFeaturePopupOnClick(): void {
       this.map.un("singleclick", this.setFeaturePopup);
       this.$emit("set-grid-feature-popup", undefined, null);
     }
@@ -168,8 +182,14 @@ export default Vue.extend({
           // @ts-ignore
           this.layerSource.getFormat().readFeatures(fc)
         );
-        await this.updateStyle();
-        this.$store.dispatch(Dispatch.setLoaded);
+        const maxPollutionValue = this.getMaxPollutionValue();
+        const breakPoints = await this.updateStyle(maxPollutionValue);
+        if (breakPoints) {
+          this.updateLegend(breakPoints, maxPollutionValue);
+          this.$store.dispatch(Dispatch.setLoaded);
+        } else {
+          console.error("Could not update style for the current layer");
+        }
         this.updateTotalPollutionStats();
       },
       strategy: allStrategy
