@@ -117,6 +117,8 @@ dist
 .DS_Store
 db/temp
 cypress/integration/examples
+build-test-prod.sh
+dist_test/
 
 # grid/muni data files
 db/create_grid_data_tables/griddata3.csv

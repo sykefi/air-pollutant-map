@@ -1,8 +1,6 @@
 import { FeatureLike } from "ol/Feature";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 
-const breakPointCache: Map<string, number[]> = new Map();
-
 const colorScale: string[] = [
   "#edf8fb",
   "#bfd3e6",
@@ -13,14 +11,25 @@ const colorScale: string[] = [
   "#6e016b"
 ];
 
+/**
+ * Simple in-memory cache for storing breakpoints in order to avoid calculating them again for
+ * previously viewed pollutant layers.
+ */
+const breakPointCache: Map<string, number[]> = new Map();
+
+/**
+ * Returns style identifier for the breakPointCache.
+ */
 const getStyleId = (dataType: MapDataType, valuePropName: string) => dataType + valuePropName;
 
 const getStandardDeviation = (array: number[], mean: number, n: number): number => {
   return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 };
 
+/**
+ * Rounds the given value to have no more than two significant figures
+ */
 const roundBreakPoint = (n: number): number => {
-  // round breakpoint values to at least two significant figures
   for (let i = 1; i < Math.pow(10, 10); i = i * 10) {
     const divider = 10 / i;
     if (n > divider) {
@@ -30,6 +39,13 @@ const roundBreakPoint = (n: number): number => {
   return n;
 };
 
+/**
+ * Calculates breakpoints by a given value array (valueList) and number of classes (classCount).
+ * Breakpoints are calculated as quantiles when no outliers are detected in the value array. However,
+ * if one or more outliers are present in the value array, the final set of breakpoints is combined
+ * from both quantiles and outlier-adjusted breakpoints. Outliers are detected by z-scores 1 & 3 and
+ * respective values (if found) are used as adjusted breakpoints for the last 1-2 classes.
+ */
 const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): number[] => {
   const n = valueList.length;
   const mean = valueList.reduce((a, b) => a + b) / n;
@@ -63,9 +79,10 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
     breakPoints[i] = roundBreakPoint(bp);
   }
 
-  // combine final breakpoints from normal breakpoints, outlier-adjusted breakpoints and highest value
+  // combine final breakpoints array from normal breakpoints, outlier-adjusted breakpoints (if any)
+  // and highest value
   const combinedBreakPoints = breakPoints.concat(outlierBreakPoints, [valueList[n - 1]]);
-  // filter out duplicate breakpoints
+  // filter out duplicate breakpoints (if present)
   return combinedBreakPoints.filter((value, index, self) => self.indexOf(value) === index);
 };
 
@@ -80,10 +97,18 @@ export const getBreakPoints = (
   return undefined;
 };
 
+/**
+ * Returns true if breakpoints for the given datatype and feature property were calculated previously and can
+ * hence be found from the cache.
+ */
 export const hasBreakPoints = (dataType: MapDataType, valuePropName: string): boolean => {
   return breakPointCache.has(getStyleId(dataType, valuePropName));
 };
 
+/**
+ * Calculates outlier-adjusted breakpoints by the given value array and stores the result in the in-memory cache
+ * for easy reuse. Filters out null and undefined values from the value array.
+ */
 export const getPollutantBreakPoints = (
   dataType: MapDataType,
   valuePropName: string,
@@ -103,13 +128,19 @@ export const getPollutantBreakPoints = (
   return breakPoints;
 };
 
+/**
+ * Returns color code for the given feature by the given property name (pollutant id) and breakpoints.
+ * If the feature does not have the property, returns "transparent" as the colour. If the property value
+ * of the feature is higher than any of the breakpoints, it means that wrong breakpoints are being used
+ * and thus error message is written (in this case "grey" is returned as the colour).
+ */
 const getFeatureColor = (
   breakPoints: number[],
   colors: string[],
-  pollutant: string,
+  propName: string,
   feature: FeatureLike
 ): string => {
-  const value = feature.get(pollutant);
+  const value = feature.get(propName);
   if (!value) {
     return "transparent"; // if value is null or undefined
   } else {
@@ -123,8 +154,16 @@ const getFeatureColor = (
   }
 };
 
+/**
+ * Returns function for assigning feature colors by selected feature property. The returned
+ * function can be used inside OpenLayers StyleFunction. The returned function already has
+ * parameters for breakPoints and respective colors assigned, and takes only property name
+ * and feature (as expected by OpenLayers StyleFunction). The last breakpoint is replaced with
+ * the given maximum property value (if it is higher). This allows the same style function
+ * to be used with different map layers.
+ */
 export const getColorFunction = (
-  valuePropName: string,
+  featurePropName: string,
   breakPoints: number[],
   maxValue: number
 ): Function | undefined => {
@@ -136,9 +175,12 @@ export const getColorFunction = (
   // get color scale by number of breakpoints
   const colors = colorScale.slice(0, breakPoints.length);
   return (feature: FeatureLike) =>
-    getFeatureColor(breakPoints, colors, valuePropName, feature);
+    getFeatureColor(breakPoints, colors, featurePropName, feature);
 };
 
+/**
+ * Returns Legend object from the given breakPoints array.
+ */
 export const getPollutantLegend = (
   pollutant: Pollutant,
   breakPoints: number[],
