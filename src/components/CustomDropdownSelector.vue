@@ -528,7 +528,7 @@ export default Vue.extend({
   list-style-type: none;
   font-weight: normal;
   cursor: default;
-  z-index: 9;
+  z-index: 12;
   position: absolute;
   width: calc(100% - 2px);
   background-color: #ffffff;
@@ -538,13 +538,7 @@ export default Vue.extend({
 }
 @media (max-width: 508px) {
   .select-options {
-    position: fixed;
-    left: 30px;
-    top: 173px;
-    width: calc(100% - 60px);
-    overflow: auto;
-    z-index: 13;
-    max-height: calc(100vh - 242px);
+    max-height: calc(100vh - 340px);
   }
 }
 .select-options li {

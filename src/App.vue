@@ -85,9 +85,10 @@ export default Vue.extend({
   display: flex;
   align-content: center;
   justify-content: center;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
   font-size: 15px;
   width: 100%;
+  line-height: initial;
 }
 #app-container {
   display: flex;
