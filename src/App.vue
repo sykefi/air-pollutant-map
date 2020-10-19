@@ -26,7 +26,7 @@
           @update-total-pollution-stats="(tps) => (this.totalPollutionStats = tps)"
         />
         <div id="map-controls-container">
-          <SelectorDataType
+          <ToggleDataType
             :mapDataType="mapDataType"
             @select-map-data-type="(type) => (this.mapDataType = type)"
           />
@@ -41,7 +41,7 @@
 import Vue from "vue";
 import OlMap from "./components/OlMap.vue";
 import SelectorYear from "./components/SelectorYear.vue";
-import SelectorDataType from "./components/SelectorDataType.vue";
+import ToggleDataType from "./components/ToggleDataType.vue";
 import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
@@ -56,7 +56,7 @@ export default Vue.extend({
     SelectorYear,
     SelectorGnfr,
     SelectorPollutant,
-    SelectorDataType,
+    ToggleDataType,
     ToggleLanguageButtons,
     GnfrDescription
   },
@@ -87,6 +87,7 @@ export default Vue.extend({
   justify-content: center;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   font-size: 15px;
+  width: 100%;
 }
 #app-container {
   display: flex;
@@ -94,12 +95,17 @@ export default Vue.extend({
   align-content: center;
   justify-content: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 556px;
 }
 #settings-panel {
   width: 100%;
   display: flex;
   z-index: 5;
+}
+@media (max-width: 508px) {
+  #settings-panel {
+    flex-wrap: wrap;
+  }
 }
 #gnfr-desc {
   width: 100%;
@@ -120,6 +126,7 @@ export default Vue.extend({
 #map-controls-container {
   position: absolute;
   display: flex;
+  flex-wrap: wrap;
   top: 9px;
   left: 50px;
 }

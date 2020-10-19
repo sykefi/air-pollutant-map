@@ -212,7 +212,7 @@ describe("Grid data layer", () => {
   it("shows grid layer popup on click", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Rikkidioksidi (t):");
-    cy.contains("0.36");
+    cy.contains("0.14");
   });
 
   it("closes popup", () => {
@@ -310,9 +310,9 @@ describe("Municipality layer", () => {
 
   it("shows municipality layer popup (2018 combined: typen oksidit)", () => {
     cy.get("#map-container").click(325, 520);
-    cy.contains("Typen oksidit (Kiuruvesi):");
-    cy.contains("232.6 t");
-    cy.contains("0.16 t / km2");
+    cy.contains("Typen oksidit (Lapinlahti):");
+    cy.contains("352.7 t");
+    cy.contains("0.28 t / km2");
   });
 
   it("closes popup", () => {
@@ -407,7 +407,7 @@ describe("Toggle back to grid data layer", () => {
   it("popups keep working", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Rikkidioksidi (t):");
-    cy.contains("0.36");
+    cy.contains("0.14");
     cy.get(".olpopup-closer").click();
   });
 

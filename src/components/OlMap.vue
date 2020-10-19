@@ -173,6 +173,11 @@ export default Vue.extend({
   width: 100%;
   z-index: 0;
 }
+@media (max-height: 900px) {
+  #ol-map {
+    height: 70vh;
+  }
+}
 #map-legend-container {
   position: absolute;
   top: 10px;

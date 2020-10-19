@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="legend-wrapper">
     <div v-if="!loading && legend" class="legend-box legend-container">
       <div id="legend-title">
         {{ "map.legend.title-without-unit" | translate }}
@@ -46,11 +46,21 @@ export default {
 </script>
 
 <style scoped>
+.legend-wrapper {
+  font-size: 13px;
+}
+@media (max-width: 508px) {
+  .legend-wrapper {
+    font-size: 12px;
+    margin-top: 20px;
+    margin-top: 41px;
+    margin-right: -4px;
+  }
+}
 .legend-box {
   border-radius: 5px;
   background-color: rgb(0 0 0 / 70%);
   color: white;
-  font-size: 13px;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
 .legend-container {
