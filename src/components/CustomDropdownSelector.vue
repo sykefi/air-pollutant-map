@@ -434,6 +434,11 @@ export default Vue.extend({
   max-width: 100%;
   margin: 12px 8px;
 }
+@media (max-width: 508px) {
+  .selector-div {
+    margin: 5px 5px 8px 5px;
+  }
+}
 .label-div {
   display: flex;
   align-items: flex-start;
@@ -508,6 +513,11 @@ export default Vue.extend({
   z-index: 20;
   background: transparent;
 }
+@media (max-width: 508px) {
+  .select-icons {
+    display: none;
+  }
+}
 .select-options {
   border: 1px solid #aaa;
   border-radius: 4px;
@@ -525,6 +535,17 @@ export default Vue.extend({
   max-height: 400px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 4px 11px;
   overflow: auto;
+}
+@media (max-width: 508px) {
+  .select-options {
+    position: fixed;
+    left: 30px;
+    top: 173px;
+    width: calc(100% - 60px);
+    overflow: auto;
+    z-index: 13;
+    max-height: calc(100vh - 242px);
+  }
 }
 .select-options li {
   display: flex;
