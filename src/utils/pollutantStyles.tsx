@@ -111,7 +111,7 @@ export const hasBreakPoints = (dataType: MapDataType, valuePropName: string): bo
  */
 export const getPollutantBreakPoints = (
   dataType: MapDataType,
-  valuePropName: string,
+  pollutantId: string,
   valueList: number[],
   classCount: number
 ): number[] => {
@@ -124,7 +124,7 @@ export const getPollutantBreakPoints = (
   }
 
   const breakPoints = calculateAdjustedBreakPoints(validSortedValues, classCount);
-  breakPointCache.set(getStyleId(dataType, valuePropName), breakPoints);
+  breakPointCache.set(getStyleId(dataType, pollutantId), breakPoints);
   return breakPoints;
 };
 
