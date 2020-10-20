@@ -5,7 +5,7 @@
 3. Run the psql command below (update the location of psql.exe to the command):
 
 ```
-C:\"Program Files\pgAdmin 4\v4\runtime\psql.exe" -h kkxpgdbt1 -d PaastotKartalla -U paastotkartalla -c "\copy public.grid_data_master (vuosi,rivi,long,lat,gnfr,s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40) FROM 'griddata3.csv' with (format csv, header true, delimiter ';', encoding 'utf-8');"
+C:\"Program Files\pgAdmin 4\v4\runtime\psql.exe" -h kkxpgdbt1 -d PaastotKartalla -U paastotkartalla -c "\copy public.grid_data_master (vuosi,grid_id,long,lat,gnfr,s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40) FROM 'griddata3.csv' with (format csv, header true, delimiter ';', encoding 'utf-8');"
 ```
 
 ### 2. Update imported grid data to tables: grid_data_gnfr_dev, grid_data_gnfr_prod & grid_data_totals
