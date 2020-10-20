@@ -5,7 +5,7 @@ CREATE TABLE public.grid_data_master
 (
   id SERIAL PRIMARY KEY,
   vuosi integer,
-  rivi integer,
+  grid_id integer,
   long double precision,
   lat double precision,
   gnfr varchar(25),
