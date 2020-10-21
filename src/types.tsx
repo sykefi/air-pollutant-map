@@ -60,9 +60,13 @@ interface FeatureCollection {
   type: "FeatureCollection";
 }
 
+interface GridFeatureProperties extends PollutantValues {
+  grid_id: number;
+}
+
 export interface GridFeature {
   geometry: Polygon;
-  properties: PollutantValues;
+  properties: GridFeatureProperties;
 }
 
 export interface GridFeatureCollection extends FeatureCollection {

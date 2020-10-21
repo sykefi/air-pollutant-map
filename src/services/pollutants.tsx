@@ -29,13 +29,13 @@ const outputFormat = "&outputFormat=application/json";
 
 const getWfsGridDataUri = (year: number, gnfrId: string, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataGnfrTable}&propertyName=geom,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataGnfrTable}&propertyName=grid_id,${pollutant.id}
     ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
 const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=geom,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=grid_id,${pollutant.id}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
@@ -43,25 +43,32 @@ const getGridDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant)
   return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutant.id}`;
 };
 
-export const fetchGridFeatures = async (
+export const fetchGridData = async (
   year: number,
   gnfrId: string,
   pollutant: Pollutant
-): Promise<GridFeatureCollection | undefined> => {
+): Promise<Map<number, number> | undefined> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsTotalGridDataUri(year, pollutant)
       : getWfsGridDataUri(year, gnfrId, pollutant);
+
   const cacheKey = getGridDataCacheKey(year, gnfrId, pollutant);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
     return cached;
   }
+  const pollutionMap: Map<number, number> = new Map();
   try {
     const response = await fetch(encodeURI(uri));
-    const fc = await response.json();
-    cache.setToCache(cacheKey, fc);
-    return fc;
+    const fc = (await response.json()) as GridFeatureCollection;
+    fc.features
+      .map((feat) => feat.properties)
+      .forEach((props) => {
+        pollutionMap.set(props.grid_id, props[pollutant.id]);
+      });
+    cache.setToCache(cacheKey, pollutionMap);
+    return pollutionMap;
   } catch (error) {
     console.error(error);
   }
