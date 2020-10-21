@@ -13,10 +13,11 @@ const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";
 const pollutantGnfrMetaTable = "p_gnfr_pollutant_meta";
 
-const getGnfrObject = (props: DbGnfr): Gnfr => {
+const getGnfrObject = (featureId: string, props: DbGnfr): Gnfr => {
+  const id = featureId.split(".", 2)[1];
   const name = { fi: props.nimi, sv: props.namn, en: props.name };
   const desc = { fi: props.desc_fi, sv: props.desc_sv, en: props.desc_en };
-  return { id: props.id, name, desc, useDev: props.use_dev, useProd: props.use_prod };
+  return { id, name, desc, useDev: props.use_dev, useProd: props.use_prod };
 };
 
 export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
@@ -25,7 +26,7 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   return fc.features
-    .map((feat) => getGnfrObject(feat.properties))
+    .map((feat) => getGnfrObject(feat.id as string, feat.properties as DbGnfr))
     .filter((gnfr: Gnfr) => {
       if (process.env.NODE_ENV === NodeEnv.PRODUCTION) {
         return gnfr.useProd;
@@ -34,9 +35,10 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
     });
 };
 
-const getPollutantObject = (props: DbPollutant): Pollutant => {
+const getPollutantObject = (featureId: string, props: DbPollutant): Pollutant => {
+  const id = featureId.split(".", 2)[1];
   return {
-    id: props.id,
+    id,
     parlocGroupId: props.parloc_ryhma_tunnus,
     parlocGroupName: props.parloc_ryhma_nimi,
     name: { fi: props.nimi, sv: props.namn, en: props.name },
@@ -56,7 +58,7 @@ export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   return fc.features
-    .map((feat) => getPollutantObject(feat.properties as DbPollutant))
+    .map((feat) => getPollutantObject(feat.id as string, feat.properties as DbPollutant))
     .filter((pollutant: Pollutant) => {
       if (process.env.NODE_ENV === NodeEnv.PRODUCTION) {
         return pollutant.useProd;
