@@ -1,7 +1,7 @@
 ### 1. Import (raw) grid data to table: grid_data (replace with new data from CSV)
 
-1. Run the SQL script: [create_grid_data_master_table.sql](./create_grid_data_master_table.sql) to drop the old table and create a new one (public.grid_data_master).
-2. Ensure that the column order, delimiter (`;`) and encoding (`utf-8`) in the CSV file match the ones in the copy clause (below). Column names don't need to match.
+1. Run the SQL script: [create_grid_data_master_table.sql](./create_grid_data_master_table.sql) to drop the old table and create a new one (empty public.grid_data_master).
+2. Ensure that the column order, delimiter (`;`) and encoding (`utf-8`) in the CSV file match the ones in the copy clause (below). Column names do not need to match.
 3. Run the psql command below (update the location of psql.exe to the command):
 
 ```
@@ -10,6 +10,6 @@ C:\"Program Files\pgAdmin 4\v4\runtime\psql.exe" -h kkxpgdbt1 -d PaastotKartalla
 
 ### 2. Update imported grid data to tables: grid_data_gnfr_dev, grid_data_gnfr_prod & grid_data_totals
 
-1. Run the SQL script: [create_grid_data_gnfr_dev_table.sql](./create_grid_data_gnfr_dev_table.sql) (drops & creates the table with geometry column and index).
-2. Run the SQL script: [create_grid_data_gnfr_prod_table.sql](./create_grid_data_gnfr_prod_table.sql) (drops & creates the table with geometry column and index).
-3. Run the SQL script: [create_grid_data_totals_table.sql](./create_grid_data_totals_table.sql) (drops & creates the table with geometry column).
+1. Run the SQL script: [create_grid_data_gnfr_dev_table.sql](./create_grid_data_gnfr_dev_table.sql) (drops & creates the table and index).
+2. Run the SQL script: [create_grid_data_gnfr_prod_table.sql](./create_grid_data_gnfr_prod_table.sql) (drops & creates the table and index).
+3. Run the SQL script: [create_grid_data_totals_table.sql](./create_grid_data_totals_table.sql) (drops & creates the table and index).
