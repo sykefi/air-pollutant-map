@@ -13,6 +13,7 @@ import { StyleFunction } from "ol/style/Style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
 import * as pollutantService from "./../services/pollutants";
+import * as gridService from "./../services/grid";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import { Dispatch } from "@/store";
@@ -39,16 +40,16 @@ export default Vue.extend({
   watch: {
     year: function (newVal) {
       console.log(`Year changed to ${newVal}, refreshing grid data...`);
-      this.layerSource.refresh();
+      this.handleLayerUpdate();
     },
     gnfrId: function (newVal: string) {
       console.log(`Gnfr changed to ${newVal}, refreshing grid data...`);
-      this.layerSource.refresh();
+      this.handleLayerUpdate();
     },
     pollutant: function (newVal: Pollutant) {
       console.log(`Pollutant changed to ${newVal.name["fi"]}, refreshing grid data...`);
-      this.colorFunction = undefined;
-      this.layerSource.refresh();
+      // this.colorFunction = undefined;
+      this.handleLayerUpdate();
     }
   },
   methods: {
@@ -60,11 +61,52 @@ export default Vue.extend({
           })
         });
     },
+
     getMaxPollutionValue(): number {
       return Math.ceil(
-        Math.max(...this.layerSource.getFeatures().map((feat) => feat.get(this.pollutant.id)))
+        Math.max(
+          ...this.layerSource
+            .getFeatures()
+            .map((feat) => feat.get("pollution"))
+            .filter((p) => p)
+        )
       );
     },
+
+    async handleLayerUpdate() {
+      this.$store.dispatch(Dispatch.setLoading);
+      this.$emit("update-total-pollution-stats", undefined);
+      await this.loadSourceFeatures();
+      await this.handleStyleUpdate();
+      await this.updateTotalPollutionStats();
+    },
+
+    async loadSourceFeatures() {
+      const gridData = await pollutantService.fetchGridData(
+        this.year,
+        this.gnfrId,
+        this.pollutant
+      );
+      if (!gridData) return;
+
+      this.layerSource.forEachFeature((feat) => {
+        const pollution = gridData.get(feat.get("id") as number);
+        feat.setProperties({ pollution });
+      });
+    },
+
+    async handleStyleUpdate() {
+      const maxPollutionValue = this.getMaxPollutionValue();
+
+      const breakPoints = await this.updateStyle(maxPollutionValue);
+      if (breakPoints) {
+        this.updateLegend(breakPoints, maxPollutionValue);
+        this.$store.dispatch(Dispatch.setLoaded);
+      } else {
+        console.error("Could not update style for the current layer");
+      }
+    },
+
     /**
      * Either loads or calculates breakpoints for the layer, creates style function by them and finally returns the breakpoints.
      * Returns undefined if breakpoints were not found in the end (this should not happen).
@@ -79,7 +121,7 @@ export default Vue.extend({
       if (styleUtils.hasBreakPoints(MapDataType.GRID, this.pollutant.id)) {
         const breakPoints = styleUtils.getBreakPoints(MapDataType.GRID, this.pollutant.id);
         this.colorFunction = styleUtils.getColorFunction(
-          this.pollutant.id,
+          "pollution",
           breakPoints!,
           maxPollutionValue
         );
@@ -88,7 +130,7 @@ export default Vue.extend({
         // current layer is combined emissions and latest year, thus breakpoints can be calculated by it
         const latestValues = this.layerSource
           .getFeatures()
-          .map((feat) => feat.get(this.pollutant.id));
+          .map((feat) => feat.get("pollution"));
         const breakPoints = styleUtils.getPollutantBreakPoints(
           MapDataType.GRID,
           this.pollutant.id,
@@ -96,7 +138,7 @@ export default Vue.extend({
           classCount
         );
         this.colorFunction = styleUtils.getColorFunction(
-          this.pollutant.id,
+          "pollution",
           breakPoints,
           maxPollutionValue
         );
@@ -106,13 +148,13 @@ export default Vue.extend({
         console.log(
           `Fetching features of ${constants.latestYear} and calculating breakpoints`
         );
-        const fc = await pollutantService.fetchGridFeatures(
+        const gd = await pollutantService.fetchGridData(
           constants.latestYear,
           "COMBINED",
           this.pollutant
         );
-        if (!fc) return;
-        const latestValues = fc.features.map((feat) => feat.properties[this.pollutant.id]);
+        if (!gd) return;
+        const latestValues = [...gd.values()];
         const breakPoints = styleUtils.getPollutantBreakPoints(
           MapDataType.GRID,
           this.pollutant.id,
@@ -120,7 +162,7 @@ export default Vue.extend({
           classCount
         );
         this.colorFunction = styleUtils.getColorFunction(
-          this.pollutant.id,
+          "pollution",
           breakPoints,
           maxPollutionValue
         );
@@ -129,6 +171,7 @@ export default Vue.extend({
         return breakPoints;
       }
     },
+
     updateLegend(breakPoints: number[], maxPollutionValue: number): void {
       this.legend = styleUtils.getPollutantLegend(
         this.pollutant,
@@ -137,6 +180,7 @@ export default Vue.extend({
       );
       this.$emit("update-legend", this.legend);
     },
+
     async updateTotalPollutionStats(): Promise<void> {
       const totalPollutionStats = await pollutantService.getTotalPollutionStats(
         this.year,
@@ -145,60 +189,48 @@ export default Vue.extend({
       );
       this.$emit("update-total-pollution-stats", totalPollutionStats);
     },
+
     async setFeaturePopup(event): Promise<void> {
       const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
-      if (feats.length > 0 && feats[0].getProperties()[this.pollutant.id]) {
+      if (feats.length > 0 && feats[0].getProperties()["pollution"]) {
         this.$emit(
           "set-grid-feature-popup",
           event.coordinate,
-          feats[0].getProperties()[this.pollutant.id]
+          feats[0].getProperties()["pollution"]
         );
       } else {
         console.log("no features found on click -> cannot set popup");
       }
     },
+
     enableShowFeaturePopupOnClick(): void {
       this.map.on("singleclick", this.setFeaturePopup);
     },
+
     disableShowFeaturePopupOnClick(): void {
       this.map.un("singleclick", this.setFeaturePopup);
       this.$emit("set-grid-feature-popup", undefined, null);
     }
   },
-  mounted() {
+  async mounted() {
+    // fetch grid geometry
+    const gridFc = await gridService.fetchGridFeatures();
+
     this.layerSource = new VectorSource({
-      format: new GeoJSON(),
-      loader: async () => {
-        this.$emit("update-total-pollution-stats", undefined);
-        this.$store.dispatch(Dispatch.setLoading);
-        const fc = await pollutantService.fetchGridFeatures(
-          this.year,
-          this.gnfrId,
-          this.pollutant
-        );
-        if (!fc) return;
-        this.layerSource.clear();
-        this.layerSource.addFeatures(
-          // @ts-ignore
-          this.layerSource.getFormat().readFeatures(fc)
-        );
-        const maxPollutionValue = this.getMaxPollutionValue();
-        const breakPoints = await this.updateStyle(maxPollutionValue);
-        if (breakPoints) {
-          this.updateLegend(breakPoints, maxPollutionValue);
-          this.$store.dispatch(Dispatch.setLoaded);
-        } else {
-          console.error("Could not update style for the current layer");
-        }
-        this.updateTotalPollutionStats();
-      },
-      strategy: allStrategy
+      format: new GeoJSON()
     });
+    this.layerSource.addFeatures(
+      // @ts-ignore
+      this.layerSource.getFormat().readFeatures(gridFc)
+    );
+
+    this.handleLayerUpdate();
 
     this.vectorLayer = new VectorLayer({
       source: this.layerSource,
       style: this.getOlStyle()
     });
+
     this.map.addLayer(this.vectorLayer);
     this.enableShowFeaturePopupOnClick();
   },
