@@ -31,7 +31,7 @@ describe("Page load and initial UI", () => {
   });
 
   it("shows total pollution statistics", () => {
-    cy.contains("Valitun luokan päästöt yhteensä:");
+    cy.contains("Päästöt yhteensä:");
   });
 
   it("shows correct total pollution (2018 combined: typen oksidit)", () => {
