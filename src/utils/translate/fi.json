@@ -13,8 +13,9 @@
   "aria.pollutant.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (saastukkeet)",
   "aria.mapdatatype.selector.label": "Valitse kartalla näytettävä data kahdesta vaihtoehdosta (ruudukko & kunnat)",
   "aria.language.selector.label": "Valitse päästökartan kieli (FI -> suomi, SV -> ruotsi, EN -> englanti)",
-  "gnfr.description.share.of.reported": "Raportoitujen päästömäärien osuus",
-  "gnfr.description.share.of.calculated": "laskennallisten",
-  "gnfr.description.gnfr-share-of-total": "Valitun luokan osuus kokonaispäästöistä",
-  "gnfr.description.gnfr-total-emissions": "Valitun luokan päästöt yhteensä"
+  "gnfr.description.combined-emissions": "Päästöt yhteensä:",
+  "gnfr.description.gnfr-share-of-total": "Valitun luokan osuus kokonaispäästöistä on",
+  "gnfr.description.share.of.reported_pre": " ja esitettävistä päästöistä",
+  "gnfr.description.share.of.reported_after": "on toiminnanharjoittajien raportoimia.",
+  "gnfr.description.no_reported_emissions": ". Luokkaan ei kuulu toiminnanharjoittajien raportoimia päästöjä."
 }
