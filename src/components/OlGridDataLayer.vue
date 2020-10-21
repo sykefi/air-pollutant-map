@@ -148,13 +148,13 @@ export default Vue.extend({
         console.log(
           `Fetching features of ${constants.latestYear} and calculating breakpoints`
         );
-        const fc = await pollutantService.fetchGridFeatures(
+        const gd = await pollutantService.fetchGridData(
           constants.latestYear,
           "COMBINED",
           this.pollutant
         );
-        if (!fc) return;
-        const latestValues = fc.features.map((feat) => feat.properties[this.pollutant.id]);
+        if (!gd) return;
+        const latestValues = [...gd.values()];
         const breakPoints = styleUtils.getPollutantBreakPoints(
           MapDataType.GRID,
           this.pollutant.id,
