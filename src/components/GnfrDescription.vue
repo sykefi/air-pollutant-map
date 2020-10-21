@@ -4,33 +4,34 @@
       <span class="gnfr-name">{{ gnfr && gnfr.name[lang] }}</span>
       {{ gnfr && gnfr.desc[lang] }}
       <div class="stats">
-        <div v-if="gnfr && gnfr.id !== 'COMBINED'">
-          {{ "gnfr.description.share.of.reported" | translate }}:
-          <span class="formatted-number"> {{ getRepRatio() }} %</span>
-          ({{ "gnfr.description.share.of.calculated" | translate }}:
-          <span class="formatted-number">{{ getCalcRatio() }} %</span>)
-        </div>
-        <div v-if="totalPollutionStats && totalPollutionStats.gnfrId !== 'COMBINED'">
-          {{ "gnfr.description.gnfr-share-of-total" | translate }}:
-          <span class="formatted-number">
-            {{ getShareOfGnfrPollution(totalPollutionStats) }} %
-          </span>
-          (<span class="formatted-number"
-            >{{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
-            {{ totalPollutionStats.unit }}</span
-          >)
-        </div>
-        <div v-if="totalPollutionStats && totalPollutionStats.gnfrId === 'COMBINED'">
-          {{ "gnfr.description.gnfr-total-emissions" | translate }}:
-          <span class="formatted-number">
-            {{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
-            {{ totalPollutionStats.unit }}
-          </span>
-        </div>
+        <span v-if="totalPollutionStats">
+          <span v-if="totalPollutionStats.gnfrId === 'COMBINED'">
+            {{ "gnfr.description.combined-emissions" | translate }}
+            <span class="formatted-number">
+              {{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
+              {{ totalPollutionStats.unit }}
+            </span></span
+          ><span v-else>
+            {{ "gnfr.description.gnfr-share-of-total" | translate }}
+            <span class="formatted-number">
+              {{ getShareOfGnfrPollution(totalPollutionStats) }} %
+            </span>
+            (<span class="formatted-number"
+              >{{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
+              {{ totalPollutionStats.unit }}</span
+            >)</span
+          ></span
+        ><span v-if="gnfr && gnfr.id !== 'COMBINED' && getCalcRepShareObject()">
+          <span v-if="getRepRatio() > 0">
+            {{ "gnfr.description.share.of.reported_pre" | translate }}
+            <span class="formatted-number"> {{ getRepRatio() }} %</span>
+            {{ "gnfr.description.share.of.reported_after" | translate }} </span
+          ><span v-else>{{ "gnfr.description.no_reported_emissions" | translate }}</span>
+        </span>
       </div>
-      <div v-if="!gnfrPollutantMetas || !totalPollutionStats" class="load-animation-container">
-        <LoadingAnimation color="black" :size="17" />
-      </div>
+    </div>
+    <div v-if="!gnfrPollutantMetas || !totalPollutionStats" class="load-animation-container">
+      <LoadingAnimation color="black" :size="17" />
     </div>
   </div>
 </template>
