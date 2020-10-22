@@ -108,7 +108,7 @@ export default Vue.extend({
         const fc = await pollutantService.fetchMuniFeatures(
           constants.latestYear,
           "COMBINED",
-          this.pollutant
+          this.pollutant.id
         );
         if (!fc) return;
         const latestValues = fc.features.map((feat) => feat.properties[this.densityProp]);
@@ -171,7 +171,7 @@ export default Vue.extend({
         const fc = await pollutantService.fetchMuniFeatures(
           this.year,
           this.gnfrId,
-          this.pollutant
+          this.pollutant.id
         );
         if (!fc) return;
         this.layerSource.clear();
