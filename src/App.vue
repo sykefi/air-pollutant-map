@@ -17,7 +17,7 @@
           :totalPollutionStats="totalPollutionStats"
         />
       </div>
-      <div id="map-container" :class="[nodeEnv === 'production' ? 'map-border' : '']">
+      <div id="map-container">
         <OlMap
           :year="year"
           :gnfrId="gnfr ? gnfr.id : undefined"
@@ -46,7 +46,7 @@ import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import GnfrDescription from "./components/GnfrDescription.vue";
-import { Pollutant, MapDataType, Gnfr, NodeEnv, TotalPollutionStats } from "./types";
+import { Pollutant, MapDataType, Gnfr, TotalPollutionStats } from "./types";
 import { Dispatch } from "./store";
 import * as constants from "./constants";
 
@@ -62,7 +62,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      nodeEnv: process.env.NODE_ENV as NodeEnv,
       year: constants.initialYear as number,
       gnfr: undefined as Gnfr | undefined,
       pollutant: undefined as Pollutant | undefined,
@@ -119,8 +118,6 @@ export default Vue.extend({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-.map-border {
   border: 1px solid #707070;
   border-radius: 4px;
 }

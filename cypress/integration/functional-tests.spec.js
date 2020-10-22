@@ -205,6 +205,8 @@ describe("Grid data layer", () => {
       cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
     });
+    // wait until total emissions are shown
+    cy.contains("33127.4 t");
     // wait for the layer and legend to appear
     cy.contains("Päästömäärä (t)");
   });
@@ -388,7 +390,10 @@ describe("Municipality layer", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
+      cy.get("#selection-input-pollutant").should("have.value", "Rikkidioksidi");
     });
+    // wait until total emissions are shown
+    cy.contains("33127.4 t");
     cy.get(".legend-box").within(() => {
       cy.contains("0 - 0.0058");
       cy.contains("0.0058 - 0.012");

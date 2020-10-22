@@ -1,28 +1,31 @@
 <template>
   <div>
     <div id="ol-map">
-      <div v-if="gnfrId && pollutant && isReady && mapDataType === mapDataTypes.GRID">
-        <OlGridDataLayer
-          :year="year"
-          :gnfrId="gnfrId"
-          :pollutant="pollutant"
-          :map="map"
-          @update-legend="updateLegend"
-          @set-grid-feature-popup="setGridFeaturePopup"
-          @update-total-pollution-stats="(tps) => $emit('update-total-pollution-stats', tps)"
-        />
-      </div>
-      <div v-if="pollutant && isReady && mapDataType === mapDataTypes.MUNICIPALITY">
-        <OlMuniDataLayer
-          :year="year"
-          :gnfrId="gnfrId"
-          :pollutant="pollutant"
-          :map="map"
-          @update-legend="updateLegend"
-          @set-muni-feature-popup="setMuniFeaturePopup"
-          @update-total-pollution-stats="(tps) => $emit('update-total-pollution-stats', tps)"
-        />
-      </div>
+      <OlMuniBasemapLayer
+        v-if="isReady"
+        :visible="mapDataType === mapDataTypes.GRID"
+        :map="map"
+      />
+      <OlGridDataLayer
+        v-if="gnfrId && pollutant && isReady && mapDataType === mapDataTypes.GRID"
+        :year="year"
+        :gnfrId="gnfrId"
+        :pollutant="pollutant"
+        :map="map"
+        @update-legend="updateLegend"
+        @set-grid-feature-popup="setGridFeaturePopup"
+        @update-total-pollution-stats="(tps) => $emit('update-total-pollution-stats', tps)"
+      />
+      <OlMuniDataLayer
+        v-if="pollutant && isReady && mapDataType === mapDataTypes.MUNICIPALITY"
+        :year="year"
+        :gnfrId="gnfrId"
+        :pollutant="pollutant"
+        :map="map"
+        @update-legend="updateLegend"
+        @set-muni-feature-popup="setMuniFeaturePopup"
+        @update-total-pollution-stats="(tps) => $emit('update-total-pollution-stats', tps)"
+      />
     </div>
     <Legend id="map-legend-container" :legend="legend" :mapDataType="mapDataType" />
     <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupFeat">
@@ -46,27 +49,22 @@
 import Vue, { PropType } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
-import OSM from "ol/source/OSM";
 import Overlay from "ol/Overlay";
-import { Tile as TileLayer } from "ol/layer";
-import { Attribution, defaults as defaultControls } from "ol/control";
 import { Coordinate } from "ol/coordinate";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import OlMuniDataLayer from "./OlMuniDataLayer.vue";
+import OlMuniBasemapLayer from "./OlMuniBasemapLayer.vue";
 import GridFeaturePopup from "./GridFeaturePopup.vue";
 import MuniFeaturePopup from "./MuniFeaturePopup.vue";
 import Legend from "./Legend.vue";
-import { NodeEnv, Pollutant, MapDataType, MuniFeatureProperties } from "@/types";
+import { Pollutant, MapDataType, MuniFeatureProperties } from "@/types";
 import { PollutantLegend } from "../types";
-
-const attribution = new Attribution({
-  collapsible: true
-});
 
 export default Vue.extend({
   components: {
     OlGridDataLayer,
     OlMuniDataLayer,
+    OlMuniBasemapLayer,
     GridFeaturePopup,
     MuniFeaturePopup,
     Legend
@@ -146,11 +144,7 @@ export default Vue.extend({
   mounted() {
     this.map = new Map({
       target: "ol-map",
-      layers:
-        process.env.NODE_ENV === NodeEnv.PRODUCTION
-          ? []
-          : [new TileLayer({ source: new OSM() })],
-      controls: defaultControls({ attribution: false }).extend([attribution]),
+      layers: [],
       view: new View({
         projection: "EPSG:3857",
         center: [2871896, 9794576],
