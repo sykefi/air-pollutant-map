@@ -174,7 +174,7 @@ describe("Pollutant selector", () => {
     });
   });
 
-  it("finds & selects option by input value (road & transport)", () => {
+  it("finds & selects option by input value (hiilimonoksidi)", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click().clear().type("hiilimono");
       cy.get("li").click();
@@ -182,14 +182,14 @@ describe("Pollutant selector", () => {
     });
   });
 
-  it("shows previously selected pollutant after exiting selector", () => {
+  it("shows previously selected pollutant after exiting selector (hiilimonoksidi)", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click().clear().type("rikkidio{esc}");
       cy.get("#selection-input-pollutant").should("have.value", "Hiilimonoksidi");
     });
   });
 
-  it("selects option with keyboard actions (combined GNFR)", () => {
+  it("selects option with keyboard actions (rikkidioksidi", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click().clear().type("rikkidioksi{downarrow}{enter}");
       cy.get("#selection-input-pollutant").should("have.value", "Rikkidioksidi");
@@ -200,7 +200,10 @@ describe("Pollutant selector", () => {
 describe("Grid data layer", () => {
   it("opens rikkidioksidi layer", () => {
     cy.visit("http://localhost:8080/");
+    // wait until the initial layer is loaded
     cy.contains("Typen oksidit");
+    cy.contains("126595.3 t");
+    // select rikkidioksidi
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-container-pollutant").click();
       cy.contains("Rikkidioksidi").click();
