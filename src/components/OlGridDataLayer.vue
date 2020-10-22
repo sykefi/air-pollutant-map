@@ -6,7 +6,6 @@
 import Vue, { PropType } from "vue";
 import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
-import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style } from "ol/style";
 import { StyleFunction } from "ol/style/Style";
