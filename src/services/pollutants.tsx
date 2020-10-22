@@ -27,33 +27,33 @@ const gridDataTotalsTable = "p_grid_data_totals";
 const muniDataTotalsTable = "p_muni_data_totals";
 const outputFormat = "&outputFormat=application/json";
 
-const getWfsGridDataUri = (year: number, gnfrId: string, pollutant: Pollutant): string => {
+const getWfsGridDataUri = (year: number, gnfrId: string, pollutantId: string): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataGnfrTable}&propertyName=grid_id,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataGnfrTable}&propertyName=grid_id,${pollutantId}
     ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
-const getWfsTotalGridDataUri = (year: number, pollutant: Pollutant): string => {
+const getWfsTotalGridDataUri = (year: number, pollutantId: string): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=grid_id,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=grid_id,${pollutantId}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
-const getGridDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant): string => {
-  return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutant.id}`;
+const getGridDataCacheKey = (year: number, gnfrId: string, pollutantId: string): string => {
+  return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutantId}`;
 };
 
 export const fetchGridData = async (
   year: number,
   gnfrId: string,
-  pollutant: Pollutant
+  pollutantId: string
 ): Promise<Map<number, number> | undefined> => {
   const uri =
     gnfrId === "COMBINED"
-      ? getWfsTotalGridDataUri(year, pollutant)
-      : getWfsGridDataUri(year, gnfrId, pollutant);
+      ? getWfsTotalGridDataUri(year, pollutantId)
+      : getWfsGridDataUri(year, gnfrId, pollutantId);
 
-  const cacheKey = getGridDataCacheKey(year, gnfrId, pollutant);
+  const cacheKey = getGridDataCacheKey(year, gnfrId, pollutantId);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
     return cached;
@@ -65,7 +65,7 @@ export const fetchGridData = async (
     fc.features
       .map((feat) => feat.properties)
       .forEach((props) => {
-        pollutionMap.set(props.grid_id, props[pollutant.id]);
+        pollutionMap.set(props.grid_id, props[pollutantId]);
       });
     cache.setToCache(cacheKey, pollutionMap);
     return pollutionMap;
@@ -74,32 +74,32 @@ export const fetchGridData = async (
   }
 };
 
-const getMuniDataCacheKey = (year: number, gnfrId: string, pollutant: Pollutant): string => {
-  return `pollutant_map_muni_data_${year}_${gnfrId}_${pollutant.id}`;
+const getMuniDataCacheKey = (year: number, gnfrId: string, pollutantId: string): string => {
+  return `pollutant_map_muni_data_${year}_${gnfrId}_${pollutantId}`;
 };
 
-const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutant: Pollutant): string => {
+const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutantId: string): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,namn,area,${pollutant.id}
+  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,namn,area,${pollutantId}
   ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
-const getWfsMuniDataTotalsUri = (year: number, pollutant: Pollutant): string => {
+const getWfsMuniDataTotalsUri = (year: number, pollutantId: string): string => {
   return `${gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,namn,area,${pollutant.id}
+    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,namn,area,${pollutantId}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
 export const fetchMuniFeatures = async (
   year: number,
   gnfrId: string,
-  pollutant: Pollutant
+  pollutantId: string
 ): Promise<MuniFeatureCollection | undefined> => {
   const uri =
     gnfrId === "COMBINED"
-      ? getWfsMuniDataTotalsUri(year, pollutant)
-      : getWfsMuniDataGnfrUri(year, gnfrId, pollutant);
-  const cacheKey = getMuniDataCacheKey(year, gnfrId, pollutant);
+      ? getWfsMuniDataTotalsUri(year, pollutantId)
+      : getWfsMuniDataGnfrUri(year, gnfrId, pollutantId);
+  const cacheKey = getMuniDataCacheKey(year, gnfrId, pollutantId);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
     return cached;
@@ -115,9 +115,9 @@ export const fetchMuniFeatures = async (
         en: feat.properties.nimi
       };
       const props = { id: feat.properties.id, name, area: feat.properties.area };
-      props[pollutant.id] = feat.properties[pollutant.id];
-      props[pollutant.id + "-density"] =
-        feat.properties[pollutant.id] / (feat.properties.area * m2tokm2);
+      props[pollutantId] = feat.properties[pollutantId];
+      props[pollutantId + "-density"] =
+        feat.properties[pollutantId] / (feat.properties.area * m2tokm2);
       const feature = { geometry: feat.geometry, type: feat.type, properties: props };
       return feature;
     });
@@ -132,27 +132,27 @@ export const fetchMuniFeatures = async (
   }
 };
 
-const calculateTotalPollution = (fc: MuniFeatureCollection, pollutant: Pollutant): number => {
+const calculateTotalPollution = (fc: MuniFeatureCollection, pollutantId: string): number => {
   return fc.features
     .map((feat) => feat.properties)
     .reduce((sum: number, props: PollutantValues) => {
-      return props[pollutant.id] ? sum + props[pollutant.id] : sum;
+      return props[pollutantId] ? sum + props[pollutantId] : sum;
     }, 0);
 };
 
 const getTotalPollution = async (
   year: number,
   gnfrId: string,
-  pollutant: Pollutant
+  pollutantId: string
 ): Promise<number | undefined> => {
-  const totalPollutionId = `${year}_${gnfrId}_${pollutant.id}_total`;
+  const totalPollutionId = `${year}_${gnfrId}_${pollutantId}_total`;
 
   if (cache.hasKey(totalPollutionId)) {
     return cache.getFromCache(totalPollutionId);
   }
-  const fc = await fetchMuniFeatures(year, gnfrId, pollutant);
+  const fc = await fetchMuniFeatures(year, gnfrId, pollutantId);
   if (fc) {
-    const totalPollution = calculateTotalPollution(fc, pollutant);
+    const totalPollution = calculateTotalPollution(fc, pollutantId);
     cache.setToCache(totalPollutionId, totalPollution);
     return totalPollution;
   }
@@ -163,8 +163,8 @@ export const getTotalPollutionStats = async (
   gnfrId: string,
   pollutant: Pollutant
 ): Promise<TotalPollutionStats | undefined> => {
-  const gnfrPollution = await getTotalPollution(year, gnfrId, pollutant);
-  const totalPollution = await getTotalPollution(year, "COMBINED", pollutant);
+  const gnfrPollution = await getTotalPollution(year, gnfrId, pollutant.id);
+  const totalPollution = await getTotalPollution(year, "COMBINED", pollutant.id);
   if ((gnfrPollution || gnfrPollution === 0) && totalPollution) {
     return { gnfrId, gnfrPollution, totalPollution, unit: pollutant.unit };
   }

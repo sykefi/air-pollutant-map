@@ -10,7 +10,6 @@ import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style, Stroke } from "ol/style";
 import Map from "ol/Map.js";
 import * as pollutantService from "./../services/pollutants";
-import { Pollutant } from "@/types";
 
 export default Vue.extend({
   props: {
@@ -42,8 +41,8 @@ export default Vue.extend({
       });
     },
     async loadSourceData() {
-      const pollutant = { id: "s16" } as Pollutant;
-      const fc = await pollutantService.fetchMuniFeatures(2018, "COMBINED", pollutant);
+      // let's just fetch any municipality pollution layer as the basemap featureset
+      const fc = await pollutantService.fetchMuniFeatures(2018, "COMBINED", "s16");
       this.layerSource.addFeatures(
         // @ts-ignore
         this.layerSource.getFormat().readFeatures(fc)

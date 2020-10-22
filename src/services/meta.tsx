@@ -14,6 +14,7 @@ const pollutantMetaTable = "p_pollutant_meta";
 const pollutantGnfrMetaTable = "p_gnfr_pollutant_meta";
 
 const getGnfrObject = (featureId: string, props: DbGnfr): Gnfr => {
+  // parse original id from the one created by GeoServer
   const id = featureId.split(".", 2)[1];
   const name = { fi: props.nimi, sv: props.namn, en: props.name };
   const desc = { fi: props.desc_fi, sv: props.desc_sv, en: props.desc_en };
@@ -36,6 +37,7 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
 };
 
 const getPollutantObject = (featureId: string, props: DbPollutant): Pollutant => {
+  // parse original id from the one created by GeoServer
   const id = featureId.split(".", 2)[1];
   return {
     id,
