@@ -59,6 +59,14 @@ import MuniFeaturePopup from "./MuniFeaturePopup.vue";
 import Legend from "./Legend.vue";
 import { Pollutant, MapDataType, MuniFeatureProperties } from "@/types";
 import { PollutantLegend } from "../types";
+import Projection from "ol/proj/Projection";
+
+const projection = new Projection({
+  code: "EPSG:3067",
+  extent: [50199.4814, 6582464.0358, 761274.6247, 7799839.8902],
+  global: false,
+  metersPerUnit: 1
+});
 
 export default Vue.extend({
   components: {
@@ -146,9 +154,9 @@ export default Vue.extend({
       target: "ol-map",
       layers: [],
       view: new View({
-        projection: "EPSG:3857",
-        center: [2871896, 9794576],
-        zoom: 5.3
+        projection,
+        center: [435385.0836878328, 7247696.528687431],
+        zoom: 1.54
       })
     });
     this.map.once("postrender", () => {
@@ -156,6 +164,7 @@ export default Vue.extend({
       this.isReady = true;
     });
     this.initializePopup();
+    console.log("map", this.map);
   }
 });
 </script>
