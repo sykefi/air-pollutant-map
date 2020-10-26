@@ -12,7 +12,7 @@ describe("Visual regression tests", () => {
   it("opens popup", () => {
     cy.get("#map-container").click(325, 520);
     cy.contains("Typen oksidit (t):");
-    cy.contains("2.7");
+    cy.contains("9.5");
     cy.matchImageSnapshot({
       failureThreshold: 0.03, // threshold for entire image
       failureThresholdType: "percent"
