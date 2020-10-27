@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "serve-dev": "vue-cli-service serve --mode development",
-    "serve-test": "vue-cli-service serve --mode test",
+    "serve-syke": "vue-cli-service serve --mode test",
     "serve-prod": "vue-cli-service serve --mode production",
-    "build-test": "vue-cli-service build --mode test",
+    "build-syke": "vue-cli-service build --mode test",
     "build-prod": "vue-cli-service build --mode production",
     "lint": "vue-cli-service lint",
     "cypress": "npx cypress open"
