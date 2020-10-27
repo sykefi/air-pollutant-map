@@ -125,7 +125,7 @@ export const getPollutantBreakPoints = (
 
   const breakPoints = calculateAdjustedBreakPoints(validSortedValues, classCount);
   breakPointCache.set(getStyleId(dataType, pollutantId), breakPoints);
-  return breakPoints;
+  return [...breakPoints];
 };
 
 /**
@@ -167,15 +167,16 @@ export const getColorFunction = (
   breakPoints: number[],
   maxValue: number
 ): Function | undefined => {
+  const adjustedBreakPoints = [...breakPoints];
   // replace last breakpoint with given maxValue if it is higher
-  const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
+  const secondLastBreakPoint = adjustedBreakPoints[adjustedBreakPoints.length - 2];
   if (maxValue > secondLastBreakPoint) {
-    breakPoints[breakPoints.length - 1] = maxValue;
+    adjustedBreakPoints[adjustedBreakPoints.length - 1] = maxValue;
   }
-  // get color scale by number of breakpoints
-  const colors = colorScale.slice(0, breakPoints.length);
+  // get color scale by number of adjustedBreakPoints
+  const colors = colorScale.slice(0, adjustedBreakPoints.length);
   return (feature: FeatureLike) =>
-    getFeatureColor(breakPoints, colors, featurePropName, feature);
+    getFeatureColor(adjustedBreakPoints, colors, featurePropName, feature);
 };
 
 /**
