@@ -13,7 +13,7 @@
   "aria.pollutant.selector.describe": "Arrow down for options (pollutants)",
   "aria.mapdatatype.selector.label": "Select map data type from two options (grid & municipalities)",
   "aria.language.selector.label": "Select language language of the air pollution map (FI -> Finnish, SV -> Swedish, EN -> English)",
-  "gnfr.description.combined-emissions": "Combined emissions:",
+  "gnfr.description.combined-emissions": "Total emissions:",
   "gnfr.description.gnfr-share-of-total": "Share of the selected class is",
   "gnfr.description.share.of.reported_pre": " and of the visible emissions",
   "gnfr.description.share.of.reported_after": "are reported by the facilities.",
