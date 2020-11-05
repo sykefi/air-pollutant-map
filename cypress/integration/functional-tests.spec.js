@@ -13,7 +13,7 @@ describe("Page load and initial UI", () => {
   });
 
   it("shows pollutant selector", () => {
-    cy.contains("Saastuke");
+    cy.contains("Päästö");
     cy.contains("Typen oksidit");
   });
 
