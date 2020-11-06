@@ -23,7 +23,7 @@ describe("Page load and initial UI", () => {
   });
 
   it("shows legend", () => {
-    cy.contains("Päästömäärä (t)");
+    cy.contains("Päästömäärä");
   });
 
   it("shows GNFR description", () => {
@@ -211,7 +211,7 @@ describe("Grid data layer", () => {
     // wait until total emissions are shown
     cy.contains("33127.4 t");
     // wait for the layer and legend to appear
-    cy.contains("Päästömäärä (t)");
+    cy.contains("Päästömäärä");
   });
 
   it("shows grid layer popup on click", () => {
@@ -409,7 +409,7 @@ describe("Municipality layer", () => {
 describe("Toggle back to grid data layer", () => {
   it("toggles grid data layer active again", () => {
     cy.contains("Ruudukko").click();
-    cy.contains("Päästömäärä (t)");
+    cy.contains("Päästömäärä");
   });
 
   it("popups keep working", () => {
