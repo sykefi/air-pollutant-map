@@ -4,7 +4,10 @@
   "selector.pollutant.label": "Förorening",
   "selector.map.datatype.grid": "Rutnät",
   "selector.map.datatype.muni": "Kommuner",
+
   "map.legend.title-without-unit": "Utsläppsmängd",
+  "map.legend.per-grid-cell": "in grid cell",
+
   "aria.year.selector.status.text": "Tillgängliga alternativ (år)",
   "aria.year.selector.describe": "Tryck pil ned till alternativ (år)",
   "aria.gnfr.selector.status.text": "tillgängliga alternativ (utsläppsklasser)",
@@ -13,6 +16,7 @@
   "aria.pollutant.selector.describe": "Tryck pil ned till alternativ (föroreningar)",
   "aria.mapdatatype.selector.label": "Välj data som visas på kartan från två alternativ (rutnät & kommuner)",
   "aria.language.selector.label": "Välj språket på luftföroreningskartan (FI -> Finnish, SV -> Swedish, EN -> English)",
+
   "gnfr.description.combined-emissions": "Sammanlagda utsläpp:",
   "gnfr.description.gnfr-share-of-total": "Andel av vald kategori är",
   "gnfr.description.share.of.reported_pre": " och av utsläpp som visas",

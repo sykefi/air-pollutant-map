@@ -4,7 +4,10 @@
   "selector.pollutant.label": "Päästö",
   "selector.map.datatype.grid": "Ruudukko",
   "selector.map.datatype.muni": "Kunnat",
+
   "map.legend.title-without-unit": "Päästömäärä",
+  "map.legend.per-grid-cell": "ruudulla",
+
   "aria.year.selector.status.text": "vaihtoehtoa (vuotta) valittavana",
   "aria.year.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (vuodet)",
   "aria.gnfr.selector.status.text": "vaihtoehtoa (päästöluokkaa) valittavana",
@@ -13,6 +16,7 @@
   "aria.pollutant.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (saastukkeet)",
   "aria.mapdatatype.selector.label": "Valitse kartalla näytettävä data kahdesta vaihtoehdosta (ruudukko & kunnat)",
   "aria.language.selector.label": "Valitse päästökartan kieli (FI -> suomi, SV -> ruotsi, EN -> englanti)",
+
   "gnfr.description.combined-emissions": "Päästöt yhteensä:",
   "gnfr.description.gnfr-share-of-total": "Valitun luokan osuus kokonaispäästöistä on",
   "gnfr.description.share.of.reported_pre": " ja esitettävistä päästöistä",

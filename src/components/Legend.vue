@@ -2,7 +2,12 @@
   <div class="legend-wrapper">
     <div v-if="!loading && legend" class="legend-box legend-container">
       <div id="legend-title">
-        {{ "map.legend.title-without-unit" | translate }}
+        <span>
+          {{ "map.legend.title-without-unit" | translate }}
+        </span>
+        <span v-if="mapDataType === mapDataTypes.GRID">
+          <br />{{ "map.legend.per-grid-cell" | translate }}</span
+        >
         <span v-if="mapDataType === mapDataTypes.MUNICIPALITY">
           ({{ legend.unit }} / km<sup>2</sup>)
         </span>
@@ -72,6 +77,7 @@ export default {
 #legend-title {
   margin: 0 0 8px 0;
   font-weight: 550;
+  text-align: left;
 }
 .legend-class-row {
   margin: 5px 0 0 0;
