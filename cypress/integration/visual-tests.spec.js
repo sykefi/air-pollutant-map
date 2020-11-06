@@ -1,7 +1,7 @@
 describe("Visual regression tests", () => {
   it("renders initial map", () => {
     cy.visit("http://localhost:8080/");
-    cy.contains("Päästömäärä (t)");
+    cy.contains("Päästömäärä");
     cy.wait(1000);
     cy.matchImageSnapshot({
       failureThreshold: 0.03, // threshold for entire image
@@ -120,7 +120,7 @@ describe("Visual regression tests", () => {
 
   it("toggles back to grid data layer (typen oksidit)", () => {
     cy.contains("Ruudukko").click();
-    cy.contains("Päästömäärä (t)");
+    cy.contains("Päästömäärä");
     cy.wait(1500);
     cy.matchImageSnapshot({
       failureThreshold: 0.03, // threshold for entire image
