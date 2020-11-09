@@ -8,7 +8,7 @@
           <span class="olpopup-value">
             {{ featProps[pollutant.id] ? roundPollutantValue(featProps[pollutant.id]) : 0 }}
           </span>
-          <span>{{ pollutant.unit }} </span>
+          <span>{{ pollutant.unitLegend }} </span>
         </div>
         <div class="olpopup-value-row">
           <span class="olpopup-value"
@@ -18,7 +18,7 @@
                 : 0
             }}
           </span>
-          <span>{{ pollutant.unit }} / km<sup>2</sup> </span>
+          <span>{{ pollutant.unitLegend }} / km<sup>2</sup> </span>
         </div>
       </div>
     </div>

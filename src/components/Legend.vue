@@ -9,7 +9,7 @@
           <br />{{ "map.legend.per-grid-cell" | translate }}</span
         >
         <span v-if="mapDataType === mapDataTypes.MUNICIPALITY">
-          ({{ legend.unit }} / km<sup>2</sup>)
+          <br />({{ legend.unit }} / km<sup>2</sup>)
         </span>
         <span v-else> ({{ legend.unit }})</span>
       </div>

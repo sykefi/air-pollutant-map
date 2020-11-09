@@ -45,8 +45,8 @@ const getPollutantObject = (featureId: string, props: DbPollutant): Pollutant =>
     parlocGroupName: props.parloc_ryhma_nimi,
     name: { fi: props.nimi, sv: props.namn, en: props.name },
     unit: props.yksikko,
-    repUnit: props.rap_yksikko,
-    repMultiplier: props.rap_kerroin,
+    unitLegend: props.yksikko_legenda,
+    coeffLegend: props.kerroin_legenda,
     group: props.ryhma,
     useDev: props.use_dev,
     useProd: props.use_prod
