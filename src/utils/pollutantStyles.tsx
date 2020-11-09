@@ -204,7 +204,7 @@ export const getPollutantLegend = (
     },
     {
       classNames: [...Array(breakPoints.length).keys()].map((i) => i + 1),
-      unit: pollutant.unit
+      unit: pollutant.unitLegend
     }
   );
 };

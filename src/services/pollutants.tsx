@@ -39,21 +39,27 @@ const getWfsTotalGridDataUri = (year: number, pollutantId: string): string => {
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
-const getGridDataCacheKey = (year: number, gnfrId: string, pollutantId: string): string => {
-  return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutantId}`;
+const getGridDataCacheKey = (
+  year: number,
+  gnfrId: string,
+  pollutantId: string,
+  unitCoefficient: number
+): string => {
+  return `pollutant_map_grid_data_${year}_${gnfrId}_${pollutantId}_${unitCoefficient}`;
 };
 
 export const fetchGridData = async (
   year: number,
   gnfrId: string,
-  pollutantId: string
+  pollutantId: string,
+  unitCoefficient: number = 1
 ): Promise<Map<number, number> | undefined> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsTotalGridDataUri(year, pollutantId)
       : getWfsGridDataUri(year, gnfrId, pollutantId);
 
-  const cacheKey = getGridDataCacheKey(year, gnfrId, pollutantId);
+  const cacheKey = getGridDataCacheKey(year, gnfrId, pollutantId, unitCoefficient);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
     return cached;
@@ -65,7 +71,8 @@ export const fetchGridData = async (
     fc.features
       .map((feat) => feat.properties)
       .forEach((props) => {
-        pollutionMap.set(props.grid_id, props[pollutantId]);
+        const pollution = props[pollutantId] * unitCoefficient;
+        pollutionMap.set(props.grid_id, pollution);
       });
     cache.setToCache(cacheKey, pollutionMap);
     return pollutionMap;
@@ -74,8 +81,13 @@ export const fetchGridData = async (
   }
 };
 
-const getMuniDataCacheKey = (year: number, gnfrId: string, pollutantId: string): string => {
-  return `pollutant_map_muni_data_${year}_${gnfrId}_${pollutantId}`;
+const getMuniDataCacheKey = (
+  year: number,
+  gnfrId: string,
+  pollutantId: string,
+  unitCoefficient: number
+): string => {
+  return `pollutant_map_muni_data_${year}_${gnfrId}_${pollutantId}_${unitCoefficient}`;
 };
 
 const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutantId: string): string => {
@@ -93,13 +105,14 @@ const getWfsMuniDataTotalsUri = (year: number, pollutantId: string): string => {
 export const fetchMuniFeatures = async (
   year: number,
   gnfrId: string,
-  pollutantId: string
+  pollutantId: string,
+  unitCoefficient: number = 1
 ): Promise<MuniFeatureCollection | undefined> => {
   const uri =
     gnfrId === "COMBINED"
       ? getWfsMuniDataTotalsUri(year, pollutantId)
       : getWfsMuniDataGnfrUri(year, gnfrId, pollutantId);
-  const cacheKey = getMuniDataCacheKey(year, gnfrId, pollutantId);
+  const cacheKey = getMuniDataCacheKey(year, gnfrId, pollutantId, unitCoefficient);
   const cached = cache.getFromCache(cacheKey);
   if (cached) {
     return cached;
@@ -114,11 +127,11 @@ export const fetchMuniFeatures = async (
         sv: feat.properties.namn,
         en: feat.properties.nimi
       };
-      const props = { id: feat.properties.id, name, area: feat.properties.area };
-      props[pollutantId] = feat.properties[pollutantId];
-      props[pollutantId + "-density"] =
-        feat.properties[pollutantId] / (feat.properties.area * m2tokm2);
-      const feature = { geometry: feat.geometry, type: feat.type, properties: props };
+      const properties = { id: feat.properties.id, name, area: feat.properties.area };
+      const pollution = feat.properties[pollutantId] * unitCoefficient;
+      properties[pollutantId] = pollution;
+      properties[pollutantId + "-density"] = pollution / (feat.properties.area * m2tokm2);
+      const feature = { geometry: feat.geometry, type: feat.type, properties };
       return feature;
     });
     const fc = {

@@ -139,8 +139,8 @@ export interface DbPollutant {
   namn: string;
   name: string;
   yksikko: string;
-  rap_yksikko: string;
-  rap_kerroin: number;
+  yksikko_legenda: string;
+  kerroin_legenda: number;
   ryhma: string | null;
   use_dev: boolean;
   use_prod: boolean;
@@ -152,8 +152,8 @@ export interface Pollutant {
   parlocGroupName: string;
   name: LangStringMap;
   unit: string;
-  repUnit: string;
-  repMultiplier: number;
+  unitLegend: string;
+  coeffLegend: number;
   group: string | null;
   useDev: boolean;
   useProd: boolean;

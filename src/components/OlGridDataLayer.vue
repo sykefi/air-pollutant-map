@@ -84,7 +84,8 @@ export default Vue.extend({
       const gridData = await pollutantService.fetchGridData(
         this.year,
         this.gnfrId,
-        this.pollutant.id
+        this.pollutant.id,
+        this.pollutant.coeffLegend
       );
       if (!gridData) return;
 
@@ -150,7 +151,8 @@ export default Vue.extend({
         const gd = await pollutantService.fetchGridData(
           constants.latestYear,
           "COMBINED",
-          this.pollutant.id
+          this.pollutant.id,
+          this.pollutant.coeffLegend
         );
         if (!gd) return;
         const latestValues = [...gd.values()];

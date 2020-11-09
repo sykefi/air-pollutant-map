@@ -2,7 +2,7 @@
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
     <div class="olpopup-content">
-      <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ pollutant.unit }}):</div>
+      <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ pollutant.unitLegend }}):</div>
       <div class="olpopup-value">
         <span class="olpopup-value">{{
           popupValue ? roundPollutantValue(popupValue) : 0
