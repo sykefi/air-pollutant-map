@@ -28,7 +28,11 @@ export default Vue.extend({
       this.$emit("close-popup");
     },
     roundPollutantValue(n: number) {
-      return parseFloat(n.toPrecision(2));
+      const rounded = parseFloat(n.toPrecision(2));
+      if (rounded >= 1000) {
+        return rounded.toLocaleString("fullwide", { useGrouping: true });
+      }
+      return rounded;
     }
   }
 });

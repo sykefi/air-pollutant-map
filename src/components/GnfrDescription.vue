@@ -87,7 +87,11 @@ export default Vue.extend({
       return "?";
     },
     roundTotalPollution(n: number) {
-      return parseFloat(n.toPrecision(3));
+      const rounded = parseFloat(n.toPrecision(3));
+      if (rounded >= 1000) {
+        return rounded.toLocaleString("fullwide", { useGrouping: true });
+      }
+      return rounded;
     },
     roundPercentage(n: number) {
       // round breakpoint values to at least two significant figures
