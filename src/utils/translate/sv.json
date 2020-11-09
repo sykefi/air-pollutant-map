@@ -6,7 +6,7 @@
   "selector.map.datatype.muni": "Kommuner",
 
   "map.legend.title-without-unit": "Utsläppsmängd",
-  "map.legend.per-grid-cell": "in grid cell",
+  "map.legend.per-grid-cell": "i rutan",
 
   "aria.year.selector.status.text": "Tillgängliga alternativ (år)",
   "aria.year.selector.describe": "Tryck pil ned till alternativ (år)",

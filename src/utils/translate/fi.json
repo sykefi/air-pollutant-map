@@ -6,7 +6,7 @@
   "selector.map.datatype.muni": "Kunnat",
 
   "map.legend.title-without-unit": "Päästömäärä",
-  "map.legend.per-grid-cell": "ruudulla",
+  "map.legend.per-grid-cell": "ruudussa",
 
   "aria.year.selector.status.text": "vaihtoehtoa (vuotta) valittavana",
   "aria.year.selector.describe": "Napsauta nuolinäppäintä alas nähdäksesi vaihtoehdot (vuodet)",
