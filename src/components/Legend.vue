@@ -18,7 +18,7 @@
           class="legend-color-box"
           v-bind:style="{ backgroundColor: legend[className].color }"
         />
-        <div v-if="className === 1">< {{ legend[className].max }}</div>
+        <div v-if="className === 1">&lt; {{ legend[className].max }}</div>
         <div v-else>{{ legend[className].min }} - {{ legend[className].max }}</div>
       </div>
     </div>
