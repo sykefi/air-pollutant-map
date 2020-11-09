@@ -86,8 +86,8 @@ export default Vue.extend({
       }
       return "?";
     },
-    roundTotalPollution(pollution: number) {
-      return Math.round(pollution * 10) / 10;
+    roundTotalPollution(n: number) {
+      return parseFloat(n.toPrecision(3));
     },
     roundPercentage(n: number) {
       // round breakpoint values to at least two significant figures

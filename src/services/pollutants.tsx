@@ -52,7 +52,7 @@ export const fetchGridData = async (
   year: number,
   gnfrId: string,
   pollutantId: string,
-  unitCoefficient: number = 1
+  unitCoefficient = 1
 ): Promise<Map<number, number> | undefined> => {
   const uri =
     gnfrId === "COMBINED"
@@ -106,7 +106,7 @@ export const fetchMuniFeatures = async (
   year: number,
   gnfrId: string,
   pollutantId: string,
-  unitCoefficient: number = 1
+  unitCoefficient = 1
 ): Promise<MuniFeatureCollection | undefined> => {
   const uri =
     gnfrId === "COMBINED"
