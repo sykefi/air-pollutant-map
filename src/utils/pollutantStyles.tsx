@@ -30,13 +30,7 @@ const getStandardDeviation = (array: number[], mean: number, n: number): number 
  * Rounds the given value to have no more than two significant figures
  */
 const roundBreakPoint = (n: number): number => {
-  for (let i = 1; i < Math.pow(10, 10); i = i * 10) {
-    const divider = 10 / i;
-    if (n > divider) {
-      return Math.round(n * i) / i;
-    }
-  }
-  return n;
+  return parseFloat(n.toPrecision(1));
 };
 
 /**
@@ -83,7 +77,9 @@ const calculateAdjustedBreakPoints = (valueList: number[], classCount: number): 
   // and highest value
   const combinedBreakPoints = breakPoints.concat(outlierBreakPoints, [valueList[n - 1]]);
   // filter out duplicate breakpoints (if present)
-  return combinedBreakPoints.filter((value, index, self) => self.indexOf(value) === index);
+  return combinedBreakPoints.filter(
+    (value, index, self) => self.indexOf(value) === index && value > 0
+  );
 };
 
 export const getBreakPoints = (
