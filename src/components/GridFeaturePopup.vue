@@ -28,14 +28,7 @@ export default Vue.extend({
       this.$emit("close-popup");
     },
     roundPollutantValue(n: number) {
-      // rounds value to at least two significant figures
-      for (let i = 10; i < Math.pow(10, 10); i = i * 10) {
-        const divider = 10 / i;
-        if (n > divider) {
-          return Math.round(n * i) / i;
-        }
-      }
-      return n;
+      return parseFloat(n.toPrecision(2));
     }
   }
 });
