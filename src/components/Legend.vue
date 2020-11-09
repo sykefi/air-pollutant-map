@@ -18,8 +18,11 @@
           class="legend-color-box"
           v-bind:style="{ backgroundColor: legend[className].color }"
         />
-        <div v-if="className === 1">&lt; {{ legend[className].max }}</div>
-        <div v-else>{{ legend[className].min }} - {{ legend[className].max }}</div>
+        <div v-if="className === 1">&lt; {{ toLocaleNumber(legend[className].max) }}</div>
+        <div v-else>
+          {{ toLocaleNumber(legend[className].min) }} -
+          {{ toLocaleNumber(legend[className].max) }}
+        </div>
       </div>
     </div>
     <div v-else class="legend-box loading-wrapper">
@@ -47,6 +50,14 @@ export default {
     return {
       mapDataTypes: Object(MapDataType)
     };
+  },
+  methods: {
+    toLocaleNumber(n: number) {
+      if (n >= 1000) {
+        return n.toLocaleString("fullwide", { useGrouping: true });
+      }
+      return n;
+    }
   }
 };
 </script>
