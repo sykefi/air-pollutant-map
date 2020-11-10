@@ -4,37 +4,33 @@ import {
   WfsMuniFeatureCollection,
   MuniFeature,
   GridFeatureCollection,
-  NodeEnv,
   PollutantValues,
   TotalPollutionStats
 } from "@/types";
 import * as cache from "./cache";
 import { m2tokm2 } from "./../constants";
+import * as env from "./../env";
 
-const gsUri = process.env.VUE_APP_GEOSERVER_URI;
+const gridDataGnfrTable = env.useAggregatedGnfrs
+  ? "p_grid_data_gnfr_prod"
+  : "p_grid_data_gnfr_dev";
 
-const gridDataGnfrTable =
-  process.env.NODE_ENV === NodeEnv.PRODUCTION
-    ? "p_grid_data_gnfr_prod"
-    : "p_grid_data_gnfr_dev";
-
-const muniDataGnfrTable =
-  process.env.NODE_ENV === NodeEnv.PRODUCTION
-    ? "p_muni_data_gnfr_prod"
-    : "p_muni_data_gnfr_dev";
+const muniDataGnfrTable = env.useAggregatedGnfrs
+  ? "p_muni_data_gnfr_prod"
+  : "p_muni_data_gnfr_dev";
 
 const gridDataTotalsTable = "p_grid_data_totals";
 const muniDataTotalsTable = "p_muni_data_totals";
 const outputFormat = "&outputFormat=application/json";
 
 const getWfsGridDataUri = (year: number, gnfrId: string, pollutantId: string): string => {
-  return `${gsUri}ows?service=WFS&version=1.0.0
+  return `${env.gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${gridDataGnfrTable}&propertyName=grid_id,${pollutantId}
     ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
 const getWfsTotalGridDataUri = (year: number, pollutantId: string): string => {
-  return `${gsUri}ows?service=WFS&version=1.0.0
+  return `${env.gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${gridDataTotalsTable}&propertyName=grid_id,${pollutantId}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
@@ -91,13 +87,13 @@ const getMuniDataCacheKey = (
 };
 
 const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutantId: string): string => {
-  return `${gsUri}ows?service=WFS&version=1.0.0
+  return `${env.gsUri}ows?service=WFS&version=1.0.0
   &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,namn,area,${pollutantId}
   ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
 const getWfsMuniDataTotalsUri = (year: number, pollutantId: string): string => {
-  return `${gsUri}ows?service=WFS&version=1.0.0
+  return `${env.gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,namn,area,${pollutantId}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };

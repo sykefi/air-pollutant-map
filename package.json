@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve-dev": "vue-cli-service serve --mode development",
-    "serve-syke": "vue-cli-service serve --mode test",
-    "serve-prod": "vue-cli-service serve --mode production",
-    "build-syke": "vue-cli-service build --mode test",
-    "build-prod": "vue-cli-service build --mode production",
+    "serve-dev-syke": "vue-cli-service serve --mode dev-syke",
+    "serve-dev-public": "vue-cli-service serve --mode dev-public",
+    "serve-prod-syke": "vue-cli-service serve --mode prod-syke",
+    "serve-prod-public": "vue-cli-service serve --mode prod-public",
+    "build-prod-syke": "vue-cli-service build --mode prod-syke",
+    "build-prod-public": "vue-cli-service build --mode prod-public",
     "lint": "vue-cli-service lint",
     "cypress": "npx cypress open"
   },

@@ -48,7 +48,7 @@ import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import GnfrDescription from "./components/GnfrDescription.vue";
 import { Pollutant, MapDataType, Gnfr, TotalPollutionStats } from "./types";
 import { Dispatch } from "./store";
-import * as constants from "./constants";
+import * as env from "./env";
 
 export default Vue.extend({
   components: {
@@ -62,7 +62,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      year: constants.initialYear as number,
+      year: env.latestYear as number,
       gnfr: undefined as Gnfr | undefined,
       pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType,
@@ -70,11 +70,7 @@ export default Vue.extend({
     };
   },
   beforeCreate() {
-    if (process.env.VUE_APP_DETECT_LANGUAGE === "false") {
-      return;
-    } else {
-      this.$store.dispatch(Dispatch.setDetectedLang);
-    }
+    this.$store.dispatch(Dispatch.setDetectedLang);
   }
 });
 </script>
