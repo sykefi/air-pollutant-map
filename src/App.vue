@@ -114,8 +114,7 @@ export default Vue.extend({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  border: 1px solid #707070;
-  border-radius: 4px;
+  box-shadow: 0px 3px 4px 2px rgba(0, 0, 0, 0.04);
 }
 #map-controls-container {
   position: absolute;
