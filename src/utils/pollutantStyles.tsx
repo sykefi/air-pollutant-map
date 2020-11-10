@@ -27,10 +27,10 @@ const getStandardDeviation = (array: number[], mean: number, n: number): number 
 };
 
 /**
- * Rounds the given value to have no more than two significant figures
+ * Rounds the given value one or more significant figures.
  */
-const roundBreakPoint = (n: number): number => {
-  return parseFloat(n.toPrecision(1));
+const roundBreakPoint = (n: number, sigNumbers = 1): number => {
+  return parseFloat(n.toPrecision(sigNumbers));
 };
 
 /**
@@ -176,6 +176,24 @@ export const getColorFunction = (
 };
 
 /**
+ * Returns rounded maximum value for the highest value class in legend. Number of significant figures in the
+ * rounded value is one or more depending on how many are needed to make it distinct from the second last
+ * breakpoint.
+ */
+const getRoundedMaxValueForLegend = (
+  maxValue: number,
+  secondLastBreakPoint: number
+): number => {
+  for (let i = 1; i < 10; i++) {
+    const roundedMax = roundBreakPoint(maxValue, i);
+    if (roundedMax !== secondLastBreakPoint) {
+      return roundedMax;
+    }
+  }
+  return maxValue;
+};
+
+/**
  * Returns Legend object from the given breakPoints array.
  */
 export const getPollutantLegend = (
@@ -187,20 +205,21 @@ export const getPollutantLegend = (
   // replace last breakpoint with given maxValue if it is higher
   const secondLastBreakPoint = breakPoints[breakPoints.length - 2];
   if (maxValue > secondLastBreakPoint) {
-    breakPoints[breakPoints.length - 1] = maxValue;
+    const roundedMax = getRoundedMaxValueForLegend(maxValue, secondLastBreakPoint);
+    breakPoints[breakPoints.length - 1] = roundedMax;
   } else {
     // no values belong to the last class -> remove it from legend
     breakPoints.splice(-1, 1);
   }
   // create and return legend object
   return breakPoints.reduce(
-    (legend, breakPoint, index) => {
+    (legendObject, breakPoint, index) => {
       // set 0 as the min value of the first range
       const min = index > 0 ? breakPoints[index - 1] : 0;
       // set given max value as the max value of the last range
       const max = breakPoint;
-      legend[index + 1] = { min, max, color: colors[index] };
-      return legend;
+      legendObject[index + 1] = { min, max, color: colors[index] };
+      return legendObject;
     },
     {
       classNames: [...Array(breakPoints.length).keys()].map((i) => i + 1),
