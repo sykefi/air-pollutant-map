@@ -4,11 +4,10 @@ import {
   Gnfr,
   GnfrPollutantMeta,
   DbGnfrPollutantMeta,
-  NodeEnv,
   Pollutant
 } from "@/types";
+import * as env from "./../env";
 
-const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 const gnfrMetaTable = "p_gnfr_meta";
 const pollutantMetaTable = "p_pollutant_meta";
 const pollutantGnfrMetaTable = "p_gnfr_pollutant_meta";
@@ -22,14 +21,14 @@ const getGnfrObject = (featureId: string, props: DbGnfr): Gnfr => {
 };
 
 export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
-  const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
+  const uri = `${env.gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${gnfrMetaTable}&outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   return fc.features
     .map((feat) => getGnfrObject(feat.id as string, feat.properties as DbGnfr))
     .filter((gnfr: Gnfr) => {
-      if (process.env.NODE_ENV === NodeEnv.PRODUCTION) {
+      if (env.useAggregatedGnfrs) {
         return gnfr.useProd;
       }
       return gnfr.useDev;
@@ -54,7 +53,7 @@ const getPollutantObject = (featureId: string, props: DbPollutant): Pollutant =>
 };
 
 export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
-  const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
+  const uri = `${env.gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${pollutantMetaTable}
   &outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
@@ -62,7 +61,7 @@ export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
   return fc.features
     .map((feat) => getPollutantObject(feat.id as string, feat.properties as DbPollutant))
     .filter((pollutant: Pollutant) => {
-      if (process.env.NODE_ENV === NodeEnv.PRODUCTION) {
+      if (env.useProdPollutants) {
         return pollutant.useProd;
       }
       return pollutant.useDev;
@@ -80,7 +79,7 @@ const getGnfrPollutantMetaObject = (props: DbGnfrPollutantMeta): GnfrPollutantMe
 };
 
 export const fetchGnfrPollutantMetas = async (): Promise<GnfrPollutantMeta[]> => {
-  const uri = `${gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
+  const uri = `${env.gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${pollutantGnfrMetaTable}
   &outputFormat=application/json`.replace(/ /g, "");
   const response = await fetch(encodeURI(uri));
