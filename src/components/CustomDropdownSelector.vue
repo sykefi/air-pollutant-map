@@ -432,7 +432,7 @@ export default Vue.extend({
 .selector-div {
   background: #ffffff;
   max-width: 100%;
-  margin: 12px 8px;
+  margin: 0em 1em 1em 0em;
 }
 @media (max-width: 508px) {
   .selector-div {

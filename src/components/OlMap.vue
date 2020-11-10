@@ -160,7 +160,6 @@ export default Vue.extend({
       })
     });
     this.map.once("postrender", () => {
-      console.log("map is ready");
       this.isReady = true;
     });
     this.initializePopup();
@@ -172,7 +171,7 @@ export default Vue.extend({
 <style scoped>
 @import "~ol/ol.css";
 #ol-map {
-  height: calc(100vh - 250px);
+  height: calc(100vh - 260px);
   width: 100%;
   z-index: 0;
 }
