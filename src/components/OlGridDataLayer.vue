@@ -16,7 +16,7 @@ import * as gridService from "./../services/grid";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import { Dispatch } from "@/store";
-import * as constants from "./../constants";
+import * as env from "./../env";
 
 const classCount = 7;
 
@@ -126,7 +126,7 @@ export default Vue.extend({
           maxPollutionValue
         );
         return breakPoints;
-      } else if (this.gnfrId === "COMBINED" && this.year === constants.latestYear) {
+      } else if (this.gnfrId === "COMBINED" && this.year === env.latestYear) {
         // current layer is combined emissions and latest year, thus breakpoints can be calculated by it
         const latestValues = this.layerSource
           .getFeatures()
@@ -145,11 +145,9 @@ export default Vue.extend({
         return breakPoints;
       } else {
         // combined pollutants from latest year need to be fetched for calculating breakpoints
-        console.log(
-          `Fetching features of ${constants.latestYear} and calculating breakpoints`
-        );
+        console.log(`Fetching features of ${env.latestYear} and calculating breakpoints`);
         const gd = await pollutantService.fetchGridData(
-          constants.latestYear,
+          env.latestYear,
           "COMBINED",
           this.pollutant.id,
           this.pollutant.coeffLegend

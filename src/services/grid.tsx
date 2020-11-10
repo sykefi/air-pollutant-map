@@ -1,11 +1,11 @@
 import * as cache from "./cache";
+import * as env from "./../env";
 
-const gsUri = process.env.VUE_APP_GEOSERVER_URI;
 const gridGeomTable = "p_grid_geom";
 const outputFormat = "&outputFormat=application/json";
 
 const getWfsGridUri = (): string => {
-  return `${gsUri}ows?service=WFS&version=1.0.0
+  return `${env.gsUri}ows?service=WFS&version=1.0.0
     &request=GetFeature&typeName=paastotkartalla:${gridGeomTable}
     &propertyName=id,geom${outputFormat}`.replace(/ /g, "");
 };

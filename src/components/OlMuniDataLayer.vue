@@ -16,7 +16,7 @@ import * as pollutantService from "./../services/pollutants";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import { Dispatch } from "@/store";
-import * as constants from "./../constants";
+import * as env from "./../env";
 
 const classCount = 7;
 
@@ -82,7 +82,7 @@ export default Vue.extend({
           maxPollutionValue
         );
         return breakPoints;
-      } else if (this.year === constants.latestYear && this.gnfrId === "COMBINED") {
+      } else if (this.year === env.latestYear && this.gnfrId === "COMBINED") {
         // current layer is combined pollutants and latest year, thus breakpoints can be calculated by it
         const latestValues = this.layerSource
           .getFeatures()
@@ -102,11 +102,9 @@ export default Vue.extend({
         return breakPoints;
       } else {
         // combined pollutants from latest year need to be fetched for calculating breakpoints
-        console.log(
-          `Fetching features of ${constants.latestYear} and calculating breakpoints`
-        );
+        console.log(`Fetching features of ${env.latestYear} and calculating breakpoints`);
         const fc = await pollutantService.fetchMuniFeatures(
-          constants.latestYear,
+          env.latestYear,
           "COMBINED",
           this.pollutant.id,
           this.pollutant.coeffLegend

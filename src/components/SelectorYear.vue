@@ -15,7 +15,7 @@
 import Vue from "vue";
 import { Option } from "@/types";
 import CustomDropdownSelector from "./CustomDropdownSelector.vue";
-import { yearOptions, initialYear } from "@/constants";
+import * as env from "./../env";
 
 export default Vue.extend({
   components: {
@@ -23,7 +23,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      years: yearOptions as number[],
+      years: env.yearOptions as number[],
       options: null as Option[] | null,
       initialOption: undefined as Option | undefined
     };
@@ -39,14 +39,14 @@ export default Vue.extend({
           showFirst: false
         } as Option;
       });
-      this.initialOption = this.options.find((o) => o.value === initialYear);
+      this.initialOption = this.options.find((o) => o.value === env.latestYear);
     }
   },
   mounted() {
     this.loadOptions();
   },
   destroyed() {
-    this.$emit("selected-year", initialYear);
+    this.$emit("selected-year", env.latestYear);
   }
 });
 </script>
