@@ -6,7 +6,7 @@
     <div class="lang-selector-wrapper">
       <div style="display: flex;">
         <div
-          id="selector-left"
+          class="selector-left"
           role="button"
           tabindex="0"
           :aria-pressed="lang === Lang.FI"
@@ -19,7 +19,7 @@
           FI
         </div>
         <div
-          id="selector-middle"
+          class="selector-middle"
           role="button"
           tabindex="0"
           :aria-pressed="lang === Lang.SV"
@@ -32,7 +32,7 @@
           SV
         </div>
         <div
-          id="selector-right"
+          class="selector-right"
           role="button"
           tabindex="0"
           :aria-pressed="lang === Lang.EN"
@@ -96,15 +96,15 @@ export default Vue.extend({
 .lang-button-hover:hover {
   color: black;
 }
-#selector-left {
+.selector-left {
   padding: 3px 8px 3px 7px;
   margin-right: -1px;
   border-radius: 5px 0 0 5px;
 }
-#selector-right {
+.selector-right {
   border-radius: 0 5px 5px 0;
 }
-#selector-middle {
+.selector-middle {
   margin-right: -1px;
 }
 .selected-lang {
