@@ -43,7 +43,7 @@ export default Vue.extend({
     roundPollutantValue(n: number) {
       const rounded = parseFloat(n.toPrecision(2));
       if (rounded >= 1000) {
-        return rounded.toLocaleString("fullwide", { useGrouping: true });
+        return rounded.toLocaleString("fi-FI", { useGrouping: true });
       }
       return rounded;
     }

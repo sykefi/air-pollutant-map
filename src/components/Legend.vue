@@ -54,7 +54,7 @@ export default {
   methods: {
     toLocaleNumber(n: number) {
       if (n >= 1000) {
-        return n.toLocaleString("fullwide", { useGrouping: true });
+        return n.toLocaleString("fi-FI", { useGrouping: true });
       }
       return n;
     }
