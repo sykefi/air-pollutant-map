@@ -4,19 +4,18 @@
 
 Also known as _Päästöt kartalla_
 
+Online preview: [paastokartta-demo.web.app/](https://paastokartta-demo.web.app/)
+
 ## Project setup
 
 ```
 npm install
 ```
 
-## Tests
+### Tests
 
 Open & run Cypress E2E tests with
-
-```
-npm run cypress
-```
+`npm run cypress`
 
 ### Compiles and hot-reloads for development
 
@@ -26,7 +25,7 @@ npm run cypress
 
 `npm run build-prod-syke` or `npm run build-prod-public`
 
-## Built with
+### Built with
 
 Vue.js & OpenLayers
 
