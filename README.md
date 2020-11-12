@@ -2,7 +2,7 @@
 
 # air-pollutant-map
 
-Also known as "Päästöt Kartalle"
+Also known as _Päästöt kartalla_
 
 ## Project setup
 
@@ -10,22 +10,24 @@ Also known as "Päästöt Kartalle"
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## Tests
+
+Open & run Cypress E2E tests with
 
 ```
-npm run serve
+npm run cypress
 ```
+
+### Compiles and hot-reloads for development
+
+`npm run serve-dev-syke` or `npm run serve-dev-public`
 
 ### Compiles and minifies for production
 
-```
-npm run build
-```
+`npm run build-prod-syke` or `npm run build-prod-public`
 
-### Lints and fixes files
+## Built with
 
-```
-npm run lint
-```
+Vue.js & OpenLayers
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
