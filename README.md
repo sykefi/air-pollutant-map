@@ -1,4 +1,4 @@
-[![Cypress tests status](https://github.com/sykefi/air-pollutant-map/workflows/Cypress%20tests/badge.svg)](https://github.com/sykefi/air-pollutant-map/actions)
+[![Tests & deploy dev status](https://github.com/sykefi/air-pollutant-map/workflows/Tests%20%26%20deploy%20dev/badge.svg)](https://github.com/sykefi/air-pollutant-map/actions)
 
 # air-pollutant-map
 
