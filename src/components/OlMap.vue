@@ -173,12 +173,16 @@ export default Vue.extend({
 #ol-map {
   height: calc(100vh - 260px);
   width: 100%;
-  background-color: #fbfbfb;
   z-index: 0;
 }
 @media (max-height: 900px) {
   #ol-map {
     height: 70vh;
+  }
+}
+@media (max-width: 508px) {
+  #ol-map {
+    background-color: #fbfbfb;
   }
 }
 #map-legend-container {
