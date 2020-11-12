@@ -120,6 +120,7 @@ cypress/integration/examples
 build-test-prod.sh
 dist_test/
 build-deploy-demo.sh
+drafts
 .firebase
 
 # grid/muni data files
