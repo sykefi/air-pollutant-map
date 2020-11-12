@@ -11,7 +11,7 @@ export enum Lang {
 }
 
 export enum Dispatch {
-  setDetectedLang = "setDetectedLang",
+  setPreviouslySelectedLang = "setPreviouslySelectedLang",
   setLang = "setLang",
   setLoading = "setLoading",
   setLoaded = "setLoaded"
@@ -41,22 +41,10 @@ const actions = {
   setLang(context, lang: Lang) {
     context.commit(Mutation.setLang, lang);
   },
-  setDetectedLang(context) {
-    const previouslySelectedLang = Cookies.get("air-pollutant-map-lang");
+  setPreviouslySelectedLang(context) {
+    const previouslySelectedLang = Cookies.get("air-pollutant-map-lang") as Lang;
     if (previouslySelectedLang) {
       context.commit(Mutation.setLang, previouslySelectedLang);
-    } else {
-      // try to detect language from browser
-      const detectedLangCode: string =
-        (navigator.languages && navigator.languages[0]) ||
-        navigator.language ||
-        //@ts-ignore deprecated but IE may still have it
-        navigator.userLanguage;
-      Object.values(Lang).forEach((lang) => {
-        if (detectedLangCode.substring(0, 2).toLowerCase().includes(lang)) {
-          context.commit(Mutation.setLang, lang);
-        }
-      });
     }
   },
   setLoading(context) {

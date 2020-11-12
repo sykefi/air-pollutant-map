@@ -70,7 +70,7 @@ export default Vue.extend({
     };
   },
   beforeCreate() {
-    this.$store.dispatch(Dispatch.setDetectedLang);
+    this.$store.dispatch(Dispatch.setPreviouslySelectedLang);
   }
 });
 </script>
