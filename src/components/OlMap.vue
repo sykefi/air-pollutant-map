@@ -21,6 +21,8 @@
         :year="year"
         :gnfrId="gnfrId"
         :pollutant="pollutant"
+        :popupVisible="muniPopupVisible"
+        :popupCoords="popupCoords"
         :map="map"
         @update-legend="updateLegend"
         @set-muni-feature-popup="setMuniFeaturePopup"
@@ -28,7 +30,7 @@
       />
     </div>
     <Legend id="map-legend-container" :legend="legend" :mapDataType="mapDataType" />
-    <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupFeat">
+    <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupVisible">
       <GridFeaturePopup
         v-if="gridPopupValue"
         :popupValue="gridPopupValue"
@@ -36,7 +38,7 @@
         @close-popup="closePopup"
       />
       <MuniFeaturePopup
-        v-if="muniPopupFeat"
+        v-if="muniPopupVisible"
         :featProps="muniPopupFeat"
         :pollutant="pollutant"
         @close-popup="closePopup"
@@ -89,23 +91,32 @@ export default Vue.extend({
       isReady: false as boolean,
       mapDataTypes: Object(MapDataType),
       overlay: null as Overlay | null,
+      popupCoords: undefined as Coordinate | undefined,
       gridPopupValue: null as number | null,
+      muniPopupVisible: false as boolean,
       muniPopupFeat: null as MuniFeatureProperties | null,
       legend: undefined as PollutantLegend | undefined
     };
   },
   watch: {
-    year: function () {
-      this.closePopup();
+    year() {
+      this.handlePopupOnLayerChange();
     },
-    gnfrId: function () {
-      this.closePopup();
+    gnfrId() {
+      this.handlePopupOnLayerChange();
     },
-    pollutant: function () {
-      this.closePopup();
+    pollutant() {
+      this.handlePopupOnLayerChange();
     }
   },
   methods: {
+    handlePopupOnLayerChange() {
+      if (this.mapDataType === MapDataType.GRID) {
+        this.closePopup();
+      } else {
+        this.muniPopupFeat = null;
+      }
+    },
     updateLegend(legend: PollutantLegend) {
       this.legend = legend;
     },
@@ -123,20 +134,26 @@ export default Vue.extend({
         this.map.addOverlay(this.overlay);
       }
     },
-    setGridFeaturePopup(coordinate: Coordinate, value: number) {
+    setGridFeaturePopup(coordinate: Coordinate | undefined, value: number | null) {
       this.gridPopupValue = value;
       setTimeout(() => {
         // Set the timer here, otherwise the pop-up window will appear for the first time, and the base map will be off-track
         if (this.overlay) {
           this.overlay.setPosition(coordinate);
+          this.popupCoords = coordinate;
         }
       }, 0);
     },
-    setMuniFeaturePopup(coordinate: Coordinate, value: MuniFeatureProperties) {
+    setMuniFeaturePopup(
+      coordinate: Coordinate | undefined,
+      value: MuniFeatureProperties | null
+    ) {
       this.muniPopupFeat = value;
+      this.muniPopupVisible = value ? true : false;
       setTimeout(() => {
         if (this.overlay) {
           this.overlay.setPosition(coordinate);
+          this.popupCoords = coordinate;
         }
       }, 0);
     },
@@ -145,6 +162,8 @@ export default Vue.extend({
       if (this.overlay) {
         this.overlay.setPosition(undefined);
       }
+      this.muniPopupVisible = false;
+      this.popupCoords = undefined;
       this.gridPopupValue = null;
       this.muniPopupFeat = null;
     }

@@ -1,8 +1,8 @@
 <template>
   <div class="olpopup-container">
     <div class="olpopup-closer" @click="closePopup">✖</div>
-    <div class="olpopup-content">
-      <div class="olpopup-title">{{ pollutant.name[lang] }} ({{ featProps.name[lang] }}):</div>
+    <div v-if="featProps" class="olpopup-content">
+      <div class="olpopup-title">{{ featProps.name[lang] }} ({{ pollutant.name[lang] }}):</div>
       <div class="olpopup-values">
         <div class="olpopup-value-row">
           <span class="olpopup-value">
@@ -33,7 +33,7 @@ import { mapState } from "vuex";
 export default Vue.extend({
   props: {
     pollutant: { type: Object as PropType<Pollutant> },
-    featProps: { type: Object as PropType<MuniFeatureProperties> }
+    featProps: { type: Object as PropType<MuniFeatureProperties | null> }
   },
   computed: mapState(["lang"]),
   methods: {

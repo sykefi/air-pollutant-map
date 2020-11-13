@@ -8,6 +8,7 @@ import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
 import { all as allStrategy } from "ol/loadingstrategy";
 import GeoJSON from "ol/format/GeoJSON";
+import { Coordinate } from "ol/coordinate";
 import { Fill, Style, Stroke } from "ol/style";
 import { StyleFunction } from "ol/style/Style";
 import Map from "ol/Map.js";
@@ -25,7 +26,9 @@ export default Vue.extend({
     map: { type: Object as PropType<Map> },
     year: Number,
     gnfrId: String,
-    pollutant: { type: Object as PropType<Pollutant> }
+    pollutant: { type: Object as PropType<Pollutant> },
+    popupVisible: Boolean,
+    popupCoords: { type: Array as PropType<Coordinate | undefined> }
   },
   data() {
     return {
@@ -144,12 +147,21 @@ export default Vue.extend({
       );
       this.$emit("update-total-pollution-stats", totalPollutionStats);
     },
-    async setFeaturePopup(event): Promise<void> {
-      const feats = await this.layerSource.getFeaturesAtCoordinate(event.coordinate);
+    async setPopup(coords: Coordinate): Promise<void> {
+      const feats = await this.layerSource.getFeaturesAtCoordinate(coords);
       if (feats.length > 0) {
-        this.$emit("set-muni-feature-popup", event.coordinate, feats[0].getProperties());
+        this.$emit("set-muni-feature-popup", coords, feats[0].getProperties());
       } else {
-        console.log("no features found on click -> cannot set popup");
+        console.log("no features found at coordinates -> closing popup");
+        this.$emit("set-muni-feature-popup", undefined, null);
+      }
+    },
+    setFeaturePopup(event) {
+      this.setPopup(event.coordinate);
+    },
+    maybeUpdatePopup() {
+      if (this.popupVisible && this.popupCoords) {
+        this.setPopup(this.popupCoords);
       }
     },
     enableShowFeaturePopupOnClick(): void {
@@ -188,6 +200,7 @@ export default Vue.extend({
           console.error("Could not update style for the current layer");
         }
         this.updateTotalPollutionStats();
+        this.maybeUpdatePopup();
       },
       strategy: allStrategy
     });
