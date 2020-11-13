@@ -23,7 +23,7 @@ export default Vue.extend({
     };
   },
   watch: {
-    visible: function (newVal) {
+    visible(newVal) {
       this.vectorLayer.setVisible(newVal);
     }
   },
