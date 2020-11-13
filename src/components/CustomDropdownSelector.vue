@@ -57,29 +57,32 @@
       <span :id="'select-info-' + uniqueSelectorId" class="hidden-visually">
         {{ `aria.${uniqueSelectorId}.selector.describe` | translate }}
       </span>
-      <span class="select-icons">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          focusable="false"
-          aria-hidden="true"
-          :id="'icon-circle-down-' + uniqueSelectorId"
-          v-bind:class="[
-            !showOptions ? '' : 'rotate',
-            !initialized ? 'hidden-all' : '',
-            'icon'
-          ]"
-          role="img"
-        >
-          <path
-            d="M23.245 4l-11.245 14.374-11.219-14.374-.781.619 12 15.381 12-15.391-.755-.609z"
-          />
-        </svg>
-      </span>
+      <div class="dropdown-icon-container">
+        <span class="select-icon">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            focusable="false"
+            aria-hidden="true"
+            :id="'icon-circle-down-' + uniqueSelectorId"
+            v-bind:class="[
+              !showOptions ? '' : 'rotate',
+              !initialized ? 'hidden-all' : '',
+              'icon'
+            ]"
+            role="img"
+          >
+            <path
+              d="M23.245 4l-11.245 14.374-11.219-14.374-.781.619 12 15.381 12-15.391-.755-.609z"
+            />
+          </svg>
+        </span>
+      </div>
+
       <ul
         v-bind:class="[
           showOptions && filteredOptions.length > 0 ? '' : 'hidden-all',
@@ -505,16 +508,22 @@ export default Vue.extend({
   pointer-events: none;
   background: none;
 }
-.select-icons {
-  pointer-events: none;
+.dropdown-icon-container {
   position: absolute;
-  top: 10px;
-  right: 9px;
+  right: 7px;
+  top: 0px;
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+.select-icon {
+  pointer-events: none;
+  margin-bottom: -8px;
   z-index: 20;
   background: transparent;
 }
 @media (max-width: 508px) {
-  .select-icons {
+  .select-icon {
     display: none;
   }
 }
