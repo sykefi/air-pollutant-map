@@ -1,11 +1,7 @@
 <template>
   <div>
     <div id="ol-map">
-      <OlMuniBasemapLayer
-        v-if="isReady"
-        :visible="mapDataType === mapDataTypes.GRID"
-        :map="map"
-      />
+      <OlMuniBasemapLayer v-if="isReady" :visible="true" :map="map" />
       <OlGridDataLayer
         v-if="gnfrId && pollutant && isReady && mapDataType === mapDataTypes.GRID"
         :year="year"
