@@ -289,7 +289,24 @@ describe("Municipality layer", () => {
 
   it("shows municipality layer popup (2015 combined: typen oksidit)", () => {
     cy.get("#map-container").click(325, 520);
-    cy.contains("Typen oksidit (Kuopio):");
+    cy.contains("Kuopio (Typen oksidit):");
+  });
+
+  it("updates municipality layer popup on layer change", () => {
+    // switch back to typen oksidit
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-input-pollutant").click();
+      cy.contains("Elohopea").click();
+    });
+    // check popup title
+    cy.contains("Kuopio (Elohopea):");
+
+    // switch back to typen oksidit
+    cy.get("#pollutant-selector-div").within(() => {
+      cy.get("#select-input-pollutant").click();
+      cy.contains("Typen oksidit").click();
+    });
+    cy.contains("Kuopio (Typen oksidit):");
   });
 
   it("closes popup", () => {
