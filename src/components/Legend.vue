@@ -81,7 +81,7 @@ export default {
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
 .legend-container {
-  padding: 11px 10px 11px 10px;
+  padding: 10px 11px 10px 10px;
 }
 .loading-wrapper {
   padding: 10px;
@@ -101,7 +101,6 @@ export default {
   width: 15px;
   height: 15px;
   margin: 0 5px 0 5px;
-  /* box-shadow: 1px 1px 0 1px rgba(0, 0, 0, 0.1); */
   border: 1px solid #ffffffad;
   border-radius: 2px;
 }

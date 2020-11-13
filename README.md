@@ -6,7 +6,7 @@ Also known as _Päästöt kartalla_
 
 Online preview: [paastokartta-demo.web.app/](https://paastokartta-demo.web.app/)
 
-## Project setup
+### Project setup
 
 ```
 npm install
