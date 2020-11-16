@@ -31,7 +31,7 @@
       </div>
     </div>
     <div v-if="!gnfrPollutantMetas || !totalPollutionStats" class="load-animation-container">
-      <LoadingAnimation color="black" :size="17" />
+      <LoadingAnimation color="#007ac9" :size="17" />
     </div>
   </div>
 </template>

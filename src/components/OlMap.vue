@@ -27,6 +27,9 @@
     </div>
     <Legend id="map-legend-container" :legend="legend" :mapDataType="mapDataType" />
     <div class="olpopup" ref="olpopup" v-show="gridPopupValue || muniPopupVisible">
+      <div class="popup-loading-wrapper" v-show="muniPopupLoading">
+        <LoadingAnimation color="#007ac9" :size="25" />
+      </div>
       <GridFeaturePopup
         v-if="gridPopupValue"
         :popupValue="gridPopupValue"
@@ -54,6 +57,7 @@ import OlMuniDataLayer from "./OlMuniDataLayer.vue";
 import OlMuniBasemapLayer from "./OlMuniBasemapLayer.vue";
 import GridFeaturePopup from "./GridFeaturePopup.vue";
 import MuniFeaturePopup from "./MuniFeaturePopup.vue";
+import LoadingAnimation from "./LoadingAnimation.vue";
 import Legend from "./Legend.vue";
 import { Pollutant, MapDataType, MuniFeatureProperties } from "@/types";
 import { PollutantLegend } from "../types";
@@ -73,6 +77,7 @@ export default Vue.extend({
     OlMuniBasemapLayer,
     GridFeaturePopup,
     MuniFeaturePopup,
+    LoadingAnimation,
     Legend
   },
   props: {
@@ -90,6 +95,7 @@ export default Vue.extend({
       popupCoords: undefined as Coordinate | undefined,
       gridPopupValue: null as number | null,
       muniPopupVisible: false as boolean,
+      muniPopupLoading: false as boolean,
       muniPopupFeat: null as MuniFeatureProperties | null,
       legend: undefined as PollutantLegend | undefined
     };
@@ -110,7 +116,9 @@ export default Vue.extend({
       if (this.mapDataType === MapDataType.GRID) {
         this.closePopup();
       } else {
+        // a popup update is triggered in muni data layer, thus set loading=true
         this.muniPopupFeat = null;
+        this.muniPopupLoading = true;
       }
     },
     updateLegend(legend: PollutantLegend) {
@@ -150,6 +158,7 @@ export default Vue.extend({
         if (this.overlay) {
           this.overlay.setPosition(coordinate);
           this.popupCoords = coordinate;
+          this.muniPopupLoading = false;
         }
       }, 0);
     },
@@ -205,6 +214,9 @@ export default Vue.extend({
   top: 10px;
   right: 10px;
   z-index: 2;
+}
+.popup-loading-wrapper {
+  padding: 12px 10px 9px 10px;
 }
 /* Pop-up window style */
 .olpopup {
