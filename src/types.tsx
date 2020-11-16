@@ -74,7 +74,7 @@ export interface GridFeatureCollection extends FeatureCollection {
 }
 
 export interface WfsMuniFeatureProperties extends PollutantValues {
-  id: number;
+  kuntanro: number;
   nimi: string;
   namn: string;
   area: number;
@@ -131,7 +131,7 @@ export interface Gnfr {
   useProd: boolean;
 }
 
-export interface DbPollutant {
+export interface DbPollutantProps {
   id: string;
   parloc_ryhma_tunnus: number;
   parloc_ryhma_nimi: string;
@@ -144,6 +144,11 @@ export interface DbPollutant {
   ryhma: string | null;
   use_dev: boolean;
   use_prod: boolean;
+}
+
+export interface DbPollutant {
+  id: string;
+  properties: DbPollutantProps;
 }
 
 export interface Pollutant {
