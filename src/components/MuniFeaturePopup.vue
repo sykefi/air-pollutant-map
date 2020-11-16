@@ -21,8 +21,7 @@
           <span>{{ pollutant.unitLegend }} / km<sup>2</sup> </span>
         </div>
       </div>
-      <button @click="downloadMuniData">Download data</button>
-      <button @click="downloadMuniDataMetadata">Download meta data</button>
+      <MuniDataDownloads :featProps="featProps" />
     </div>
   </div>
 </template>
@@ -31,14 +30,14 @@
 import Vue, { PropType } from "vue";
 import { Pollutant, MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
-import { downloadMuniDataCsv, downloadMuniDataMetaCsv } from "@/services/muniDataDownload";
-import { fetchPollutantMeta } from "@/services/meta";
+import MuniDataDownloads from "./MuniDataDownloads.vue";
 
 export default Vue.extend({
   props: {
     pollutant: { type: Object as PropType<Pollutant> },
     featProps: { type: Object as PropType<MuniFeatureProperties> }
   },
+  components: { MuniDataDownloads },
   computed: mapState(["lang"]),
   methods: {
     closePopup() {
@@ -50,22 +49,12 @@ export default Vue.extend({
         return rounded.toLocaleString("fi-FI", { useGrouping: true });
       }
       return rounded;
-    },
-    async downloadMuniData() {
-      const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta);
-      if (!success) {
-        console.log("Error in downloading municipality dataset");
-      }
-    },
-    async downloadMuniDataMetadata() {
-      await downloadMuniDataMetaCsv(fetchPollutantMeta);
     }
   }
 });
 </script>
 
 <style scoped>
-/* Close popup button */
 .olpopup-closer {
   position: absolute;
   right: 11px;
