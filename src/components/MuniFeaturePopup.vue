@@ -21,7 +21,8 @@
           <span>{{ pollutant.unitLegend }} / km<sup>2</sup> </span>
         </div>
       </div>
-      <button @click="fetchDownloadMuniData">Download data</button>
+      <button @click="downloadMuniData">Download data</button>
+      <button @click="downloadMuniDataMetadata">Download meta data</button>
     </div>
   </div>
 </template>
@@ -30,7 +31,7 @@
 import Vue, { PropType } from "vue";
 import { Pollutant, MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
-import { downloadMuniDataCsv } from "@/services/muniDataDownload";
+import { downloadMuniDataCsv, downloadMuniDataMetaCsv } from "@/services/muniDataDownload";
 import { fetchPollutantMeta } from "@/services/meta";
 
 export default Vue.extend({
@@ -50,11 +51,14 @@ export default Vue.extend({
       }
       return rounded;
     },
-    async fetchDownloadMuniData() {
-      const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta, true);
+    async downloadMuniData() {
+      const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta);
       if (!success) {
         console.log("Error in downloading municipality dataset");
       }
+    },
+    async downloadMuniDataMetadata() {
+      await downloadMuniDataMetaCsv(fetchPollutantMeta);
     }
   }
 });

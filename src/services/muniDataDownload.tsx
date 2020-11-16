@@ -44,7 +44,8 @@ const muniDataGnfrTable = env.useAggregatedGnfrs
   ? "p_muni_data_gnfr_prod"
   : "p_muni_data_gnfr_dev";
 
-const getWfsMuniDataGnfrUri = (muniId: number, pollutantIdNames: string): string => {
+const getWfsMuniDataGnfrUri = (muniId: number, pollutantIds: string[]): string => {
+  const pollutantIdNames = pollutantIds.join(",");
   return `${env.gsUri}ows?service=WFS&version=1.0.0
   &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}
   &propertyName=kuntanro,nimi,namn,vuosi,gnfr,area,${pollutantIdNames}${outputFormat}
@@ -55,8 +56,7 @@ const fetchMuniDataProps = async (
   muniId: number,
   pollutantIds: string[]
 ): Promise<MuniDataProperties[] | undefined> => {
-  const pollutantIdNames = pollutantIds.join(",");
-  const uri = getWfsMuniDataGnfrUri(muniId, pollutantIdNames);
+  const uri = getWfsMuniDataGnfrUri(muniId, pollutantIds);
   try {
     const response = await fetch(encodeURI(uri));
     const rawFc = await response.json();
@@ -103,20 +103,41 @@ const downloadCsvContent = (csvContent: string, filenamePrefix: string) => {
   element.style.display = "none";
   document.body.appendChild(element);
   element.click();
-  document.body.removeChild(element);
+  setTimeout(() => {
+    document.body.removeChild(element);
+  }, 1000);
 };
 
 export const downloadMuniDataCsv = async (
   municipality: MuniFeatureProperties,
-  fetchPollutantMeta: () => Promise<Pollutant[]>,
-  metadataCsv: boolean
+  fetchPollutantMeta: () => Promise<Pollutant[]>
 ): Promise<boolean> => {
   const pollutantMetas = await fetchPollutantMeta();
   const pollutantIds = pollutantMetas.map((props) => props.id);
   const csvContent = await getMuniDataCsvContent(municipality.id, pollutantIds);
   if (csvContent) {
-    downloadCsvContent(csvContent, "paastodata_ " + municipality.name.fi);
+    downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
     return true;
   }
   return false;
+};
+
+const getPollutantMetaCsv = (pollutantMetas: Pollutant[]): string => {
+  const firstRow = "id;nimi;name;yksikko";
+  return pollutantMetas.reduce((csvContent, pollutant, index) => {
+    if (index == 0) {
+      csvContent = firstRow + "\r\n";
+    }
+    const row = [pollutant.id, pollutant.name.fi, pollutant.name.en, pollutant.unit];
+    csvContent += row + "\r\n";
+    return csvContent;
+  }, "");
+};
+
+export const downloadMuniDataMetaCsv = async (
+  fetchPollutantMeta: () => Promise<Pollutant[]>
+): Promise<void> => {
+  const pollutantMetas = await fetchPollutantMeta();
+  const metaCsvContent = getPollutantMetaCsv(pollutantMetas);
+  downloadCsvContent(metaCsvContent, "paastodata_metadata");
 };
