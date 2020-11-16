@@ -1,10 +1,11 @@
 import {
   DbGnfr,
-  DbPollutant,
   Gnfr,
-  GnfrPollutantMeta,
+  DbPollutant,
+  DbPollutantProps,
+  Pollutant,
   DbGnfrPollutantMeta,
-  Pollutant
+  GnfrPollutantMeta
 } from "@/types";
 import * as env from "./../env";
 
@@ -35,7 +36,7 @@ export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
     });
 };
 
-const getPollutantObject = (featureId: string, props: DbPollutant): Pollutant => {
+const getPollutantObject = (featureId: string, props: DbPollutantProps): Pollutant => {
   // parse original id from the one created by GeoServer
   const id = featureId.split(".", 2)[1];
   return {
@@ -59,13 +60,14 @@ export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
   const response = await fetch(encodeURI(uri));
   const fc = await response.json();
   return fc.features
-    .map((feat) => getPollutantObject(feat.id as string, feat.properties as DbPollutant))
+    .map((feat: DbPollutant) => getPollutantObject(feat.id as string, feat.properties))
     .filter((pollutant: Pollutant) => {
       if (env.useProdPollutants) {
         return pollutant.useProd;
       }
       return pollutant.useDev;
-    });
+    })
+    .sort((a: Pollutant, b: Pollutant) => a.parlocGroupId - b.parlocGroupId);
 };
 
 const getGnfrPollutantMetaObject = (props: DbGnfrPollutantMeta): GnfrPollutantMeta => {

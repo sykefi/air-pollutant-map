@@ -21,6 +21,7 @@
           <span>{{ pollutant.unitLegend }} / km<sup>2</sup> </span>
         </div>
       </div>
+      <button @click="fetchDownloadMuniData">Download data</button>
     </div>
   </div>
 </template>
@@ -29,11 +30,13 @@
 import Vue, { PropType } from "vue";
 import { Pollutant, MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
+import { downloadMuniDataCsv } from "@/services/muniDataDownload";
+import { fetchPollutantMeta } from "@/services/meta";
 
 export default Vue.extend({
   props: {
     pollutant: { type: Object as PropType<Pollutant> },
-    featProps: { type: Object as PropType<MuniFeatureProperties | null> }
+    featProps: { type: Object as PropType<MuniFeatureProperties> }
   },
   computed: mapState(["lang"]),
   methods: {
@@ -46,6 +49,12 @@ export default Vue.extend({
         return rounded.toLocaleString("fi-FI", { useGrouping: true });
       }
       return rounded;
+    },
+    async fetchDownloadMuniData() {
+      const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta, true);
+      if (!success) {
+        console.log("Error in downloading municipality dataset");
+      }
     }
   }
 });

@@ -37,7 +37,7 @@
         @close-popup="closePopup"
       />
       <MuniFeaturePopup
-        v-if="muniPopupVisible"
+        v-if="muniPopupFeat"
         :featProps="muniPopupFeat"
         :pollutant="pollutant"
         @close-popup="closePopup"
