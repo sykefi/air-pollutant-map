@@ -20,7 +20,7 @@ import Vue, { PropType } from "vue";
 import { MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
 import { downloadMuniDataCsv } from "@/services/muniDataDownload";
-import { fetchPollutantMeta } from "@/services/meta";
+import { fetchPollutantMeta, fetchGnfrMeta } from "@/services/meta";
 import LoadingAnimation from "./LoadingAnimation.vue";
 
 export default Vue.extend({
@@ -43,7 +43,12 @@ export default Vue.extend({
   methods: {
     async downloadMuniData() {
       this.loadingMuniData = true;
-      const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta);
+      const success = await downloadMuniDataCsv(
+        this.featProps,
+        fetchGnfrMeta,
+        fetchPollutantMeta,
+        this.lang
+      );
       this.loadingMuniData = false;
       this.lastAttemptFailed = !success;
       this.getDownnloadMuniDataButton().blur();

@@ -107,7 +107,7 @@ export interface MuniFeatureCollection extends FeatureCollection {
   features: MuniFeature[];
 }
 
-interface LangStringMap {
+export interface LangStringMap {
   fi: string;
   sv: string;
   en: string;

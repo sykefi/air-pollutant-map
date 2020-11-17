@@ -1,5 +1,6 @@
 import { utfBom } from "@/constants";
-import { MuniFeatureProperties, Pollutant } from "@/types";
+import { Lang } from "@/store";
+import { Gnfr, LangStringMap, MuniFeatureProperties, Pollutant } from "@/types";
 import * as env from "./../env";
 
 interface PollutantValues {
@@ -34,6 +35,10 @@ interface MuniDataProperties extends PollutantValues {
   vuosi: number;
   gnfr: string;
   area: number;
+}
+
+interface LocalMuniDataProperties extends MuniDataProperties {
+  localGnfrName: string;
 }
 
 interface MuniDataFeature {
@@ -79,16 +84,31 @@ const fetchMuniDataProps = async (
   }
 };
 
-const sortMuniData = (a: MuniDataProperties, b: MuniDataProperties) => {
+const joinLocalGnfrNamesToMuniDataProps = (
+  muniDataProps: MuniDataProperties[],
+  gnfrNameById: Map<string, LangStringMap>,
+  lang: Lang
+): LocalMuniDataProperties[] => {
+  return muniDataProps.map((props) => {
+    const localGnfrName = gnfrNameById.has(props.gnfr)
+      ? gnfrNameById.get(props.gnfr)![lang]
+      : props.gnfr;
+    return { ...props, localGnfrName };
+  });
+};
+
+const sortMuniData = (a: LocalMuniDataProperties, b: LocalMuniDataProperties) => {
   if (a.vuosi !== b.vuosi) {
     return a.vuosi - b.vuosi;
   }
-  return a.gnfr.localeCompare(b.gnfr);
+  return a.localGnfrName.localeCompare(b.localGnfrName);
 };
 
 const getMuniDataCsvContent = async (
   muniId: number,
-  pollutantMetas: Pollutant[]
+  pollutantMetas: Pollutant[],
+  gnfrNameById: Map<string, LangStringMap>,
+  lang: Lang
 ): Promise<string | undefined> => {
   const pollutantIds = pollutantMetas.map((props) => props.id);
   const muniData = await fetchMuniDataProps(muniId, pollutantIds);
@@ -97,18 +117,27 @@ const getMuniDataCsvContent = async (
   const pollutantColNames = pollutantMetas.map(
     (p) => `${p.name.fi} - ${p.name.en} (${p.unit})`
   );
-  const sortedMuniData = muniData.sort(sortMuniData);
-  const firstRow = "kuntanro;nimi;namn;vuosi;luokka;" + pollutantColNames.join(";");
+  const sortedMuniData = joinLocalGnfrNamesToMuniDataProps(muniData, gnfrNameById, lang).sort(
+    sortMuniData
+  );
+
+  const headerRow = "kuntanro;nimi;namn;vuosi;luokka;" + pollutantColNames.join(";");
   return sortedMuniData.reduce((csvContent, props, index) => {
     if (index == 0) {
-      csvContent = firstRow + "\r\n";
+      csvContent = headerRow + "\r\n";
     }
-    const row = [props.kuntanro, props.nimi, props.namn, props.vuosi, props.gnfr]
+    const row = [props.kuntanro, props.nimi, props.namn, props.vuosi, props.localGnfrName]
       .concat(pollutantIds.map((id) => props[id]))
       .join(";");
     csvContent += row + "\r\n";
     return csvContent;
   }, "");
+};
+
+const getGnfrNameByGnfrIdMap = (gnfrMetas: Gnfr[]) => {
+  const gnfrNameById: Map<string, LangStringMap> = new Map();
+  gnfrMetas.forEach((gnfr) => gnfrNameById.set(gnfr.id, gnfr.name));
+  return gnfrNameById;
 };
 
 /**
@@ -117,11 +146,20 @@ const getMuniDataCsvContent = async (
  */
 export const downloadMuniDataCsv = async (
   municipality: MuniFeatureProperties,
-  fetchPollutantMeta: () => Promise<Pollutant[] | undefined>
+  fetchGnfrMeta: () => Promise<Gnfr[] | undefined>,
+  fetchPollutantMeta: () => Promise<Pollutant[] | undefined>,
+  lang: Lang
 ): Promise<boolean> => {
+  const gnfrMetas = await fetchGnfrMeta();
   const pollutantMetas = await fetchPollutantMeta();
-  if (!pollutantMetas) return false;
-  const csvContent = await getMuniDataCsvContent(municipality.id, pollutantMetas);
+  if (!pollutantMetas || !gnfrMetas) return false;
+  const gnfrNameById = getGnfrNameByGnfrIdMap(gnfrMetas);
+  const csvContent = await getMuniDataCsvContent(
+    municipality.id,
+    pollutantMetas,
+    gnfrNameById,
+    lang
+  );
   if (csvContent) {
     try {
       await downloadCsvContent(utfBom + csvContent, "paastodata_" + municipality.name.fi);
