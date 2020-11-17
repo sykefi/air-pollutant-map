@@ -12,13 +12,6 @@
     <div class="download-error-label" v-if="lastAttemptFailed">
       {{ "muni.popup.csv-data-download.download-error-text" | translate }}
     </div>
-    <button
-      class="download-button metadata-button"
-      ref="download-metadata-button"
-      @click="downloadMuniDataMetadata"
-    >
-      {{ "muni.popup.csv-data-download.download-metadata-label" | translate }} (.csv)
-    </button>
   </div>
 </template>
 
@@ -26,7 +19,7 @@
 import Vue, { PropType } from "vue";
 import { MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
-import { downloadMuniDataCsv, downloadPollutantMetaCsv } from "@/services/muniDataDownload";
+import { downloadMuniDataCsv } from "@/services/muniDataDownload";
 import { fetchPollutantMeta } from "@/services/meta";
 import LoadingAnimation from "./LoadingAnimation.vue";
 
@@ -55,15 +48,8 @@ export default Vue.extend({
       this.lastAttemptFailed = !success;
       this.getDownnloadMuniDataButton().blur();
     },
-    async downloadMuniDataMetadata() {
-      await downloadPollutantMetaCsv(fetchPollutantMeta);
-      this.getDownnloadMetadataButton().blur();
-    },
     getDownnloadMuniDataButton(): HTMLElement {
       return this.$refs["download-muni-data-button"] as HTMLElement;
-    },
-    getDownnloadMetadataButton(): HTMLElement {
-      return this.$refs["download-metadata-button"] as HTMLElement;
     }
   }
 });
@@ -98,14 +84,6 @@ export default Vue.extend({
   font-size: 12px;
   color: #e20000;
   margin: 0px 0px 4px 0px;
-}
-.metadata-button {
-  background-color: #979797;
-}
-.metadata-button:focus,
-.metadata-button:hover {
-  outline: 0 !important;
-  background-color: #a7a7a7;
 }
 .loading-container {
   display: flex;

@@ -87,13 +87,17 @@ const sortMuniData = (a: MuniDataProperties, b: MuniDataProperties) => {
 
 const getMuniDataCsvContent = async (
   muniId: number,
-  pollutantIds: string[]
+  pollutantMetas: Pollutant[]
 ): Promise<string | undefined> => {
+  const pollutantIds = pollutantMetas.map((props) => props.id);
   const muniData = await fetchMuniDataProps(muniId, pollutantIds);
   if (!muniData) return;
 
+  const pollutantColNames = pollutantMetas.map(
+    (p) => `${p.name.fi} - ${p.name.en} (${p.unit})`
+  );
   const sortedMuniData = muniData.sort(sortMuniData);
-  const firstRow = "kuntanro;nimi;namn;vuosi;luokka;" + pollutantIds.join(";");
+  const firstRow = "kuntanro;nimi;namn;vuosi;luokka;" + pollutantColNames.join(";");
   return sortedMuniData.reduce((csvContent, props, index) => {
     if (index == 0) {
       csvContent = firstRow + "\r\n";
@@ -116,8 +120,7 @@ export const downloadMuniDataCsv = async (
 ): Promise<boolean> => {
   const pollutantMetas = await fetchPollutantMeta();
   if (!pollutantMetas) return false;
-  const pollutantIds = pollutantMetas.map((props) => props.id);
-  const csvContent = await getMuniDataCsvContent(municipality.id, pollutantIds);
+  const csvContent = await getMuniDataCsvContent(municipality.id, pollutantMetas);
   if (csvContent) {
     try {
       await downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
@@ -128,25 +131,4 @@ export const downloadMuniDataCsv = async (
     }
   }
   return false;
-};
-
-const getPollutantMetaCsv = (pollutantMetas: Pollutant[]): string => {
-  const firstRow = "id;nimi;lyhenne;yksikko";
-  return pollutantMetas.reduce((csvContent, pollutant, index) => {
-    if (index == 0) {
-      csvContent = firstRow + "\r\n";
-    }
-    const row = [pollutant.id, pollutant.name.fi, pollutant.name.en, pollutant.unit];
-    csvContent += row + "\r\n";
-    return csvContent;
-  }, "");
-};
-
-export const downloadPollutantMetaCsv = async (
-  fetchPollutantMeta: () => Promise<Pollutant[] | undefined>
-): Promise<void> => {
-  const pollutantMetas = await fetchPollutantMeta();
-  if (!pollutantMetas) return;
-  const metaCsvContent = getPollutantMetaCsv(pollutantMetas);
-  downloadCsvContent(metaCsvContent, "paastodata_metadata");
 };
