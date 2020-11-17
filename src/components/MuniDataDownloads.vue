@@ -1,6 +1,6 @@
 <template>
   <div class="buttons-container">
-    <button class="download-button" @click="downloadMuniData">
+    <button class="download-button" ref="download-muni-data-button" @click="downloadMuniData">
       <span v-if="!loadingMuniData">
         {{ "muni.popup.csv-data-download.download-label" | translate }} (.csv)
       </span>
@@ -12,7 +12,11 @@
     <div class="download-error-label" v-if="lastAttemptFailed">
       {{ "muni.popup.csv-data-download.download-error-text" | translate }}
     </div>
-    <button class="download-button metadata-button" @click="downloadMuniDataMetadata">
+    <button
+      class="download-button metadata-button"
+      ref="download-metadata-button"
+      @click="downloadMuniDataMetadata"
+    >
       {{ "muni.popup.csv-data-download.download-metadata-label" | translate }} (.csv)
     </button>
   </div>
@@ -49,9 +53,17 @@ export default Vue.extend({
       const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta);
       this.loadingMuniData = false;
       this.lastAttemptFailed = !success;
+      this.getDownnloadMuniDataButton().blur();
     },
-    downloadMuniDataMetadata() {
-      downloadPollutantMetaCsv(fetchPollutantMeta);
+    async downloadMuniDataMetadata() {
+      await downloadPollutantMetaCsv(fetchPollutantMeta);
+      this.getDownnloadMetadataButton().blur();
+    },
+    getDownnloadMuniDataButton(): HTMLElement {
+      return this.$refs["download-muni-data-button"] as HTMLElement;
+    },
+    getDownnloadMetadataButton(): HTMLElement {
+      return this.$refs["download-metadata-button"] as HTMLElement;
     }
   }
 });
@@ -62,7 +74,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 4px 0px 0px 0px;
+  margin: 5px 0px 0px 0px;
 }
 .download-button {
   cursor: pointer;
@@ -77,9 +89,10 @@ export default Vue.extend({
   transition-duration: 0.2s;
   -webkit-transition-duration: 0.2s; /* Safari */
 }
-.download-button:focus {
+.download-button:focus,
+.download-button:hover {
   outline: 0 !important;
-  background-color: #046db3;
+  background-color: #2996df;
 }
 .download-error-label {
   font-size: 12px;
@@ -89,15 +102,16 @@ export default Vue.extend({
 .metadata-button {
   background-color: #979797;
 }
-.metadata-button:focus {
+.metadata-button:focus,
+.metadata-button:hover {
   outline: 0 !important;
-  background-color: #818181;
+  background-color: #a7a7a7;
 }
 .loading-container {
   display: flex;
 }
 .loading-wrapper {
-  margin: 0px 0px 0px 6px;
+  margin: -1px 0px 0px 6px;
   display: flex;
   align-items: center;
 }
