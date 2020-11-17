@@ -1,5 +1,5 @@
 <template>
-  <div class="buttons-container">
+  <div class="muni-csv-download-container">
     <button class="download-button" ref="download-muni-data-button" @click="downloadMuniData">
       <span v-if="!loadingMuniData">
         {{ "muni.popup.csv-data-download.download-label" | translate }} (.csv)
@@ -79,7 +79,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.buttons-container {
+.muni-csv-download-container {
   display: flex;
   flex-direction: column;
   align-items: center;
