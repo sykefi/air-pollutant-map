@@ -96,16 +96,16 @@ const getMuniDataCsvContent = async (
   }, "");
 };
 
-const downloadCsvContent = (csvContent: string, filenamePrefix: string) => {
+const downloadCsvContent = async (csvContent: string, filenamePrefix: string) => {
   const element = document.createElement("a");
   element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(csvContent));
   element.setAttribute("download", filenamePrefix + ".csv");
   element.style.display = "none";
   document.body.appendChild(element);
   element.click();
-  setTimeout(() => {
-    document.body.removeChild(element);
-  }, 1000);
+  await new Promise((resolve) =>
+    setTimeout(() => resolve(document.body.removeChild(element)), 700)
+  );
 };
 
 export const downloadMuniDataCsv = async (
@@ -116,14 +116,14 @@ export const downloadMuniDataCsv = async (
   const pollutantIds = pollutantMetas.map((props) => props.id);
   const csvContent = await getMuniDataCsvContent(municipality.id, pollutantIds);
   if (csvContent) {
-    downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
+    await downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
     return true;
   }
   return false;
 };
 
 const getPollutantMetaCsv = (pollutantMetas: Pollutant[]): string => {
-  const firstRow = "id;nimi;name;yksikko";
+  const firstRow = "id;nimi;lyhenne;yksikko";
   return pollutantMetas.reduce((csvContent, pollutant, index) => {
     if (index == 0) {
       csvContent = firstRow + "\r\n";
