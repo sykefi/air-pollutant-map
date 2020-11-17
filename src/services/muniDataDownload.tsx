@@ -1,3 +1,4 @@
+import { utfBom } from "@/constants";
 import { MuniFeatureProperties, Pollutant } from "@/types";
 import * as env from "./../env";
 
@@ -123,7 +124,7 @@ export const downloadMuniDataCsv = async (
   const csvContent = await getMuniDataCsvContent(municipality.id, pollutantMetas);
   if (csvContent) {
     try {
-      await downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
+      await downloadCsvContent(utfBom + csvContent, "paastodata_" + municipality.name.fi);
       return true;
     } catch (error) {
       console.error(error);
