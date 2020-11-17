@@ -46,7 +46,7 @@ export interface PollutantLegend {
   unit: string;
 }
 
-interface Polygon {
+export interface Polygon {
   coordinates: number[][];
   type: "Polgyon";
 }
@@ -56,8 +56,9 @@ interface MultiPolygon {
   type: "MultiPolygon";
 }
 
-interface FeatureCollection {
+export interface FeatureCollection {
   type: "FeatureCollection";
+  crs: { properties: { name: string; type: string } };
 }
 
 interface GridFeatureProperties extends PollutantValues {

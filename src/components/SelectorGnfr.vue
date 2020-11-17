@@ -30,6 +30,7 @@ export default Vue.extend({
   methods: {
     async loadGnfrOptions() {
       const gnfrOptions = await fetchGnfrMeta();
+      if (!gnfrOptions) return;
       this.options = gnfrOptions.map((gnfr) => {
         return {
           id: gnfr.id,

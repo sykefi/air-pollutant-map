@@ -143,9 +143,10 @@ const getPollutantMetaCsv = (pollutantMetas: Pollutant[]): string => {
 };
 
 export const downloadPollutantMetaCsv = async (
-  fetchPollutantMeta: () => Promise<Pollutant[]>
+  fetchPollutantMeta: () => Promise<Pollutant[] | undefined>
 ): Promise<void> => {
   const pollutantMetas = await fetchPollutantMeta();
+  if (!pollutantMetas) return;
   const metaCsvContent = getPollutantMetaCsv(pollutantMetas);
   downloadCsvContent(metaCsvContent, "paastodata_metadata");
 };
