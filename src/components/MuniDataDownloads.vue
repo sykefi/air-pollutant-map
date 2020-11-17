@@ -9,6 +9,9 @@
         <span class="loading-wrapper"><LoadingAnimation color="white" :size="14" /></span>
       </span>
     </button>
+    <div class="download-error-label" v-if="lastAttemptFailed">
+      {{ "muni.popup.csv-data-download.download-error-text" | translate }}
+    </div>
     <button class="download-button metadata-button" @click="downloadMuniDataMetadata">
       {{ "muni.popup.csv-data-download.download-metadata-label" | translate }} (.csv)
     </button>
@@ -19,7 +22,7 @@
 import Vue, { PropType } from "vue";
 import { MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
-import { downloadMuniDataCsv, downloadMuniDataMetaCsv } from "@/services/muniDataDownload";
+import { downloadMuniDataCsv, downloadPollutantMetaCsv } from "@/services/muniDataDownload";
 import { fetchPollutantMeta } from "@/services/meta";
 import LoadingAnimation from "./LoadingAnimation.vue";
 
@@ -31,20 +34,24 @@ export default Vue.extend({
   components: { LoadingAnimation },
   data() {
     return {
-      loadingMuniData: false as boolean
+      loadingMuniData: false as boolean,
+      lastAttemptFailed: false as boolean
     };
+  },
+  watch: {
+    featProps() {
+      this.lastAttemptFailed = false;
+    }
   },
   methods: {
     async downloadMuniData() {
       this.loadingMuniData = true;
       const success = await downloadMuniDataCsv(this.featProps, fetchPollutantMeta);
       this.loadingMuniData = false;
-      if (!success) {
-        console.log("Error in downloading municipality dataset");
-      }
+      this.lastAttemptFailed = !success;
     },
-    async downloadMuniDataMetadata() {
-      await downloadMuniDataMetaCsv(fetchPollutantMeta);
+    downloadMuniDataMetadata() {
+      downloadPollutantMetaCsv(fetchPollutantMeta);
     }
   }
 });
@@ -67,9 +74,24 @@ export default Vue.extend({
   padding: 4px 12px;
   margin: 3px 2px;
   display: flex;
+  transition-duration: 0.2s;
+  -webkit-transition-duration: 0.2s; /* Safari */
+}
+.download-button:focus {
+  outline: 0 !important;
+  background-color: #046db3;
+}
+.download-error-label {
+  font-size: 12px;
+  color: #e20000;
+  margin: 0px 0px 4px 0px;
 }
 .metadata-button {
-  background-color: #acacac;
+  background-color: #979797;
+}
+.metadata-button:focus {
+  outline: 0 !important;
+  background-color: #818181;
 }
 .loading-container {
   display: flex;

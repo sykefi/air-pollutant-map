@@ -39,6 +39,18 @@ interface MuniDataFeature {
   properties: MuniDataProperties;
 }
 
+const downloadCsvContent = async (csvContent: string, filenamePrefix: string) => {
+  const element = document.createElement("a");
+  element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(csvContent));
+  element.setAttribute("download", filenamePrefix + ".csv");
+  element.style.display = "none";
+  document.body.appendChild(element);
+  element.click();
+  await new Promise((resolve) =>
+    setTimeout(() => resolve(document.body.removeChild(element)), 700)
+  );
+};
+
 const outputFormat = "&outputFormat=application/json";
 const muniDataGnfrTable = env.useAggregatedGnfrs
   ? "p_muni_data_gnfr_prod"
@@ -60,8 +72,6 @@ const fetchMuniDataProps = async (
   try {
     const response = await fetch(encodeURI(uri));
     const rawFc = await response.json();
-    console.log("rawFc", rawFc);
-
     return rawFc.features.map((feat: MuniDataFeature) => feat.properties);
   } catch (error) {
     console.error(error);
@@ -83,7 +93,7 @@ const getMuniDataCsvContent = async (
   if (!muniData) return;
 
   const sortedMuniData = muniData.sort(sortMuniData);
-  const firstRow = "kuntanro;nimi;namn;vuosi;gnfr;" + pollutantIds.join(";");
+  const firstRow = "kuntanro;nimi;namn;vuosi;luokka;" + pollutantIds.join(";");
   return sortedMuniData.reduce((csvContent, props, index) => {
     if (index == 0) {
       csvContent = firstRow + "\r\n";
@@ -96,28 +106,26 @@ const getMuniDataCsvContent = async (
   }, "");
 };
 
-const downloadCsvContent = async (csvContent: string, filenamePrefix: string) => {
-  const element = document.createElement("a");
-  element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(csvContent));
-  element.setAttribute("download", filenamePrefix + ".csv");
-  element.style.display = "none";
-  document.body.appendChild(element);
-  element.click();
-  await new Promise((resolve) =>
-    setTimeout(() => resolve(document.body.removeChild(element)), 700)
-  );
-};
-
+/**
+ * Fetches and downloads all pollutant data of the given municipality as a CSV file.
+ * Returns a boolean indicating the success of the fetch & download.
+ */
 export const downloadMuniDataCsv = async (
   municipality: MuniFeatureProperties,
-  fetchPollutantMeta: () => Promise<Pollutant[]>
+  fetchPollutantMeta: () => Promise<Pollutant[] | undefined>
 ): Promise<boolean> => {
   const pollutantMetas = await fetchPollutantMeta();
+  if (!pollutantMetas) return false;
   const pollutantIds = pollutantMetas.map((props) => props.id);
   const csvContent = await getMuniDataCsvContent(municipality.id, pollutantIds);
   if (csvContent) {
-    await downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
-    return true;
+    try {
+      await downloadCsvContent(csvContent, "paastodata_" + municipality.name.fi);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
   return false;
 };
@@ -134,7 +142,7 @@ const getPollutantMetaCsv = (pollutantMetas: Pollutant[]): string => {
   }, "");
 };
 
-export const downloadMuniDataMetaCsv = async (
+export const downloadPollutantMetaCsv = async (
   fetchPollutantMeta: () => Promise<Pollutant[]>
 ): Promise<void> => {
   const pollutantMetas = await fetchPollutantMeta();
