@@ -26,7 +26,7 @@ module.exports = (on, config) => {
 
   on("before:browser:launch", (browser = {}, launchOptions) => {
     const downloadDirectory = path.join(__dirname, "..", "csvDownloads");
-    if (browser.family === "chromium") {
+    if (browser.family === "chromium" && browser.name !== "electron") {
       launchOptions.preferences.default["download"] = {
         default_directory: downloadDirectory
       };
