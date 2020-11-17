@@ -21,5 +21,10 @@
   "gnfr.description.gnfr-share-of-total": "Valitun luokan osuus kokonaispäästöistä on",
   "gnfr.description.share.of.reported_pre": " ja esitettävistä päästöistä",
   "gnfr.description.share.of.reported_after": "on toiminnanharjoittajien raportoimia.",
-  "gnfr.description.no_reported_emissions": ". Luokkaan ei kuulu toiminnanharjoittajien raportoimia päästöjä."
+  "gnfr.description.no_reported_emissions": ". Luokkaan ei kuulu toiminnanharjoittajien raportoimia päästöjä.",
+
+  "muni.popup.csv-data-download.download-label": "Lataa koko aineisto",
+  "muni.popup.csv-data-download.downloading-label": "Ladataan aineistoa",
+  "muni.popup.csv-data-download.download-error-text": "Lataus epäonnistui, yritä myöhemmin uudestaan.",
+  "muni.popup.csv-data-download.download-metadata-label": "Lataa metadata"
 }

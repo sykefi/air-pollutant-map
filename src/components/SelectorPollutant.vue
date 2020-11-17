@@ -30,6 +30,7 @@ export default Vue.extend({
   methods: {
     async loadPollutantOptions() {
       const pollutantOptions = await fetchPollutantMeta();
+      if (!pollutantOptions) return;
       this.options = pollutantOptions.map((p) => {
         return {
           id: p.id,
