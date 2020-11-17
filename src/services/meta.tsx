@@ -21,19 +21,23 @@ const getGnfrObject = (featureId: string, props: DbGnfr): Gnfr => {
   return { id, name, desc, useDev: props.use_dev, useProd: props.use_prod };
 };
 
-export const fetchGnfrMeta = async (): Promise<Gnfr[]> => {
+export const fetchGnfrMeta = async (): Promise<Gnfr[] | undefined> => {
   const uri = `${env.gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${gnfrMetaTable}&outputFormat=application/json`.replace(/ /g, "");
-  const response = await fetch(encodeURI(uri));
-  const fc = await response.json();
-  return fc.features
-    .map((feat) => getGnfrObject(feat.id as string, feat.properties as DbGnfr))
-    .filter((gnfr: Gnfr) => {
-      if (env.useAggregatedGnfrs) {
-        return gnfr.useProd;
-      }
-      return gnfr.useDev;
-    });
+  try {
+    const response = await fetch(encodeURI(uri));
+    const fc = await response.json();
+    return fc.features
+      .map((feat) => getGnfrObject(feat.id as string, feat.properties as DbGnfr))
+      .filter((gnfr: Gnfr) => {
+        if (env.useAggregatedGnfrs) {
+          return gnfr.useProd;
+        }
+        return gnfr.useDev;
+      });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getPollutantObject = (featureId: string, props: DbPollutantProps): Pollutant => {
@@ -53,21 +57,25 @@ const getPollutantObject = (featureId: string, props: DbPollutantProps): Polluta
   };
 };
 
-export const fetchPollutantMeta = async (): Promise<Pollutant[]> => {
+export const fetchPollutantMeta = async (): Promise<Pollutant[] | undefined> => {
   const uri = `${env.gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${pollutantMetaTable}
   &outputFormat=application/json`.replace(/ /g, "");
-  const response = await fetch(encodeURI(uri));
-  const fc = await response.json();
-  return fc.features
-    .map((feat: DbPollutant) => getPollutantObject(feat.id as string, feat.properties))
-    .filter((pollutant: Pollutant) => {
-      if (env.useProdPollutants) {
-        return pollutant.useProd;
-      }
-      return pollutant.useDev;
-    })
-    .sort((a: Pollutant, b: Pollutant) => a.parlocGroupId - b.parlocGroupId);
+  try {
+    const response = await fetch(encodeURI(uri));
+    const fc = await response.json();
+    return fc.features
+      .map((feat: DbPollutant) => getPollutantObject(feat.id as string, feat.properties))
+      .filter((pollutant: Pollutant) => {
+        if (env.useProdPollutants) {
+          return pollutant.useProd;
+        }
+        return pollutant.useDev;
+      })
+      .sort((a: Pollutant, b: Pollutant) => a.parlocGroupId - b.parlocGroupId);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getGnfrPollutantMetaObject = (props: DbGnfrPollutantMeta): GnfrPollutantMeta => {
@@ -80,11 +88,15 @@ const getGnfrPollutantMetaObject = (props: DbGnfrPollutantMeta): GnfrPollutantMe
   };
 };
 
-export const fetchGnfrPollutantMetas = async (): Promise<GnfrPollutantMeta[]> => {
+export const fetchGnfrPollutantMetas = async (): Promise<GnfrPollutantMeta[] | undefined> => {
   const uri = `${env.gsUri}ows?service=WFS&version=1.0.0&request=GetFeature
   &typeName=paastotkartalla:${pollutantGnfrMetaTable}
   &outputFormat=application/json`.replace(/ /g, "");
-  const response = await fetch(encodeURI(uri));
-  const fc = await response.json();
-  return fc.features.map((feat) => getGnfrPollutantMetaObject(feat.properties));
+  try {
+    const response = await fetch(encodeURI(uri));
+    const fc = await response.json();
+    return fc.features.map((feat) => getGnfrPollutantMetaObject(feat.properties));
+  } catch (error) {
+    console.error(error);
+  }
 };
