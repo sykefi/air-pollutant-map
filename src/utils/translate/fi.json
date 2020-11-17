@@ -23,6 +23,8 @@
   "gnfr.description.share.of.reported_after": "on toiminnanharjoittajien raportoimia.",
   "gnfr.description.no_reported_emissions": ". Luokkaan ei kuulu toiminnanharjoittajien raportoimia päästöjä.",
 
+  "muni.popup.csv-data-download.filename-prefix": "paastodata",
+  "muni.popup.csv-data-download.header-row": "Kuntanumero;Nimi;Namn;Vuosi;Luokka;",
   "muni.popup.csv-data-download.download-label": "Lataa päästödata",
   "muni.popup.csv-data-download.downloading-label": "Ladataan päästödataa",
   "muni.popup.csv-data-download.download-error-text": "Lataus epäonnistui, yritä myöhemmin uudestaan."

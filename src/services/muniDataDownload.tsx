@@ -84,7 +84,7 @@ const fetchMuniDataProps = async (
   }
 };
 
-const joinLocalGnfrNamesToMuniDataProps = (
+const joinLocalGnfrNameToMuniDataProps = (
   muniDataProps: MuniDataProperties[],
   gnfrNameById: Map<string, LangStringMap>,
   lang: Lang
@@ -105,6 +105,7 @@ const sortMuniData = (a: LocalMuniDataProperties, b: LocalMuniDataProperties) =>
 };
 
 const getMuniDataCsvContent = async (
+  headerRowPrefix: string,
   muniId: number,
   pollutantMetas: Pollutant[],
   gnfrNameById: Map<string, LangStringMap>,
@@ -117,11 +118,11 @@ const getMuniDataCsvContent = async (
   const pollutantColNames = pollutantMetas.map(
     (p) => `${p.name.fi} - ${p.name.en} (${p.unit})`
   );
-  const sortedMuniData = joinLocalGnfrNamesToMuniDataProps(muniData, gnfrNameById, lang).sort(
+  const sortedMuniData = joinLocalGnfrNameToMuniDataProps(muniData, gnfrNameById, lang).sort(
     sortMuniData
   );
 
-  const headerRow = "kuntanro;nimi;namn;vuosi;luokka;" + pollutantColNames.join(";");
+  const headerRow = headerRowPrefix + pollutantColNames.join(";");
   return sortedMuniData.reduce((csvContent, props, index) => {
     if (index == 0) {
       csvContent = headerRow + "\r\n";
@@ -134,7 +135,7 @@ const getMuniDataCsvContent = async (
   }, "");
 };
 
-const getGnfrNameByGnfrIdMap = (gnfrMetas: Gnfr[]) => {
+const mapGnfrNameById = (gnfrMetas: Gnfr[]) => {
   const gnfrNameById: Map<string, LangStringMap> = new Map();
   gnfrMetas.forEach((gnfr) => gnfrNameById.set(gnfr.id, gnfr.name));
   return gnfrNameById;
@@ -142,9 +143,11 @@ const getGnfrNameByGnfrIdMap = (gnfrMetas: Gnfr[]) => {
 
 /**
  * Fetches and downloads all pollutant data of the given municipality as a CSV file.
- * Returns a boolean indicating the success of the fetch & download.
+ * Returns a boolean indicating the success (or failure) of the fetch & download.
  */
 export const downloadMuniDataCsv = async (
+  filenamePrefix: string,
+  headerRowPrefix: string,
   municipality: MuniFeatureProperties,
   fetchGnfrMeta: () => Promise<Gnfr[] | undefined>,
   fetchPollutantMeta: () => Promise<Pollutant[] | undefined>,
@@ -153,16 +156,22 @@ export const downloadMuniDataCsv = async (
   const gnfrMetas = await fetchGnfrMeta();
   const pollutantMetas = await fetchPollutantMeta();
   if (!pollutantMetas || !gnfrMetas) return false;
-  const gnfrNameById = getGnfrNameByGnfrIdMap(gnfrMetas);
+
+  const gnfrNameById = mapGnfrNameById(gnfrMetas);
   const csvContent = await getMuniDataCsvContent(
+    headerRowPrefix,
     municipality.id,
     pollutantMetas,
     gnfrNameById,
     lang
   );
+
   if (csvContent) {
     try {
-      await downloadCsvContent(utfBom + csvContent, "paastodata_" + municipality.name.fi);
+      await downloadCsvContent(
+        utfBom + csvContent,
+        filenamePrefix + "_" + municipality.name[lang]
+      );
       return true;
     } catch (error) {
       console.error(error);

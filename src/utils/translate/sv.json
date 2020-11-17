@@ -23,6 +23,8 @@
   "gnfr.description.share.of.reported_after": "är rapporterade av versamhetsutövare.",
   "gnfr.description.no_reported_emissions": ". Kategorin innehåller inte utsläpp rapporterade av verksamhetsutövare.",
 
+  "muni.popup.csv-data-download.filename-prefix": "utsläpp_data",
+  "muni.popup.csv-data-download.header-row": "Kommunnummer;Namn FI;Namn SV;År;Kategori;",
   "muni.popup.csv-data-download.download-label": "Ladda utsläppsdata",
   "muni.popup.csv-data-download.downloading-label": "Ladda utsläppsdata",
   "muni.popup.csv-data-download.download-error-text": "Download failed, please try again later."
