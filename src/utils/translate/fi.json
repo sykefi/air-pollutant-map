@@ -25,5 +25,6 @@
 
   "muni.popup.csv-data-download.download-label": "Lataa koko aineisto",
   "muni.popup.csv-data-download.downloading-label": "Lataa aineistoa...",
+  "muni.popup.csv-data-download.download-error-text": "Lataus epäonnistui, yritä myöhemmin uudestaan.",
   "muni.popup.csv-data-download.download-metadata-label": "Lataa metadata"
 }
