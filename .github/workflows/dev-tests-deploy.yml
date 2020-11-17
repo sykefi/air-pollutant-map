@@ -13,6 +13,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          browser: chrome
           spec: cypress/integration/syke-tests.spec.js
           start: npm run serve-prod-syke
           # quote the url to be safe against YML parsing surprises

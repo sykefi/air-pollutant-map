@@ -1,3 +1,5 @@
+const path = require("path");
+
 describe("Page load and initial UI", () => {
   it("renders main div", () => {
     cy.visit("http://localhost:8080/");
@@ -369,6 +371,33 @@ describe("Municipality layer", () => {
     // wait until total emissions and legend are shown
     cy.contains("Päästöt yhteensä");
     cy.get(".legend-container").contains("Päästömäärä");
+  });
+});
+
+describe("Municipality CSV data downloads", () => {
+  it("toggles municipality layer visible", () => {
+    cy.contains("Kunnat").click();
+    cy.contains("Kokonaisp");
+    cy.contains("Päästömäärä (t / km2)");
+  });
+
+  it("download CSV data of the selected municipality", () => {
+    cy.get("#map-container").click(325, 520);
+    cy.contains("(Rikkidioksidi)");
+    cy.contains("Lataa päästödata").click();
+    cy.wait(500);
+
+    const filename = "paastodata_Kuopio.csv";
+    const filePath = path.join(__dirname, "..", "csvDownloads", filename).substring(1);
+
+    // check that file contains first row and
+    cy.readFile(filePath).then((str) => {
+      expect(str.length).to.above(50000);
+      const firstRow = str.split("\n").shift();
+      expect(firstRow.length).to.above(400);
+      expect(firstRow).to.contain("Kuntanumero");
+      expect(firstRow).to.contain("Hiilimonoksidi");
+    });
   });
 });
 
