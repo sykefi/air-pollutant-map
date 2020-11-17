@@ -21,7 +21,7 @@
           <span>{{ pollutant.unitLegend }} / km<sup>2</sup> </span>
         </div>
       </div>
-      <MuniDataDownloads :featProps="featProps" />
+      <MuniDataDownload :featProps="featProps" />
     </div>
   </div>
 </template>
@@ -30,14 +30,14 @@
 import Vue, { PropType } from "vue";
 import { Pollutant, MuniFeatureProperties } from "@/types";
 import { mapState } from "vuex";
-import MuniDataDownloads from "./MuniDataDownloads.vue";
+import MuniDataDownload from "./MuniDataDownload.vue";
 
 export default Vue.extend({
   props: {
     pollutant: { type: Object as PropType<Pollutant> },
     featProps: { type: Object as PropType<MuniFeatureProperties> }
   },
-  components: { MuniDataDownloads },
+  components: { MuniDataDownload },
   computed: mapState(["lang"]),
   methods: {
     closePopup() {
