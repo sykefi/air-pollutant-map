@@ -10,7 +10,8 @@
     "build-prod-syke": "vue-cli-service build --mode prod-syke",
     "build-prod-public": "vue-cli-service build --mode prod-public",
     "lint": "vue-cli-service lint",
-    "cypress": "npx cypress open"
+    "clean-test-cache": "rm -rf cypress/csvDownloads",
+    "cypress": "npm run clean-test-cache && npx cypress open"
   },
   "dependencies": {
     "core-js": "^3.6.5",
