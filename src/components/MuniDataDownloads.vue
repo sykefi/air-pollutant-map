@@ -1,14 +1,16 @@
 <template>
   <div class="buttons-container">
     <button class="download-button" @click="downloadMuniData">
-      <span v-if="!loadingMuniData">Download data</span>
+      <span v-if="!loadingMuniData">
+        {{ "muni.popup.csv-data-download.download-label" | translate }} (.csv)
+      </span>
       <span v-else class="loading-container">
-        <span> Downloading data </span>
+        <span> {{ "muni.popup.csv-data-download.downloading-label" | translate }}</span>
         <span class="loading-wrapper"><LoadingAnimation color="white" :size="14" /></span>
       </span>
     </button>
     <button class="download-button metadata-button" @click="downloadMuniDataMetadata">
-      Download metadata
+      {{ "muni.popup.csv-data-download.download-metadata-label" | translate }} (.csv)
     </button>
   </div>
 </template>
