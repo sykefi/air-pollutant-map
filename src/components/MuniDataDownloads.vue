@@ -41,20 +41,38 @@ export default Vue.extend({
     }
   },
   methods: {
+    getDownnloadMuniDataButton(): HTMLElement {
+      return this.$refs["download-muni-data-button"] as HTMLElement;
+    },
+    translateOrDefault(key: string, defaultString: string): string {
+      const translated = this.$options.filters
+        ? this.$options.filters.translate(key)
+        : defaultString;
+      return translated !== key ? translated : defaultString;
+    },
     async downloadMuniData() {
       this.loadingMuniData = true;
+      const filenamePrefix = this.translateOrDefault(
+        "muni.popup.csv-data-download.filename-prefix",
+        "paastodata"
+      );
+      const headerRowPrefix = this.translateOrDefault(
+        "muni.popup.csv-data-download.header-row",
+        "kuntanro;nimi;namn;vuosi;luokka;"
+      );
+
       const success = await downloadMuniDataCsv(
+        filenamePrefix,
+        headerRowPrefix,
         this.featProps,
         fetchGnfrMeta,
         fetchPollutantMeta,
         this.lang
       );
+
       this.loadingMuniData = false;
       this.lastAttemptFailed = !success;
       this.getDownnloadMuniDataButton().blur();
-    },
-    getDownnloadMuniDataButton(): HTMLElement {
-      return this.$refs["download-muni-data-button"] as HTMLElement;
     }
   }
 });
