@@ -21,5 +21,10 @@
   "gnfr.description.gnfr-share-of-total": "Share of the selected class is",
   "gnfr.description.share.of.reported_pre": " and of the visible emissions",
   "gnfr.description.share.of.reported_after": "are reported by the facilities.",
-  "gnfr.description.no_reported_emissions": ". This class does not contain any reported emissions."
+  "gnfr.description.no_reported_emissions": ". This class does not contain any reported emissions.",
+
+  "muni.popup.csv-data-download.download-label": "Download full dataset",
+  "muni.popup.csv-data-download.downloading-label": "Downloading data",
+  "muni.popup.csv-data-download.download-error-text": "Download failed, please try again later.",
+  "muni.popup.csv-data-download.download-metadata-label": "Download metadata"
 }

@@ -88,13 +88,13 @@ const getMuniDataCacheKey = (
 
 const getWfsMuniDataGnfrUri = (year: number, gnfrId: string, pollutantId: string): string => {
   return `${env.gsUri}ows?service=WFS&version=1.0.0
-  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,nimi,namn,area,${pollutantId}
+  &request=GetFeature&typeName=paastotkartalla:${muniDataGnfrTable}&propertyName=geom,kuntanro,nimi,namn,area,${pollutantId}
   ${outputFormat}&viewparams=year:${year};gnfr:${gnfrId}`.replace(/ /g, "");
 };
 
 const getWfsMuniDataTotalsUri = (year: number, pollutantId: string): string => {
   return `${env.gsUri}ows?service=WFS&version=1.0.0
-    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,nimi,namn,area,${pollutantId}
+    &request=GetFeature&typeName=paastotkartalla:${muniDataTotalsTable}&propertyName=geom,kuntanro,nimi,namn,area,${pollutantId}
     ${outputFormat}&viewparams=year:${year}`.replace(/ /g, "");
 };
 
@@ -123,7 +123,7 @@ export const fetchMuniFeatures = async (
         sv: feat.properties.namn,
         en: feat.properties.nimi
       };
-      const properties = { id: feat.properties.id, name, area: feat.properties.area };
+      const properties = { id: feat.properties.kuntanro, name, area: feat.properties.area };
       const pollution = feat.properties[pollutantId] * unitCoefficient;
       properties[pollutantId] = pollution;
       properties[pollutantId + "-density"] = pollution / (feat.properties.area * m2tokm2);
