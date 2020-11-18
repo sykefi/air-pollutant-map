@@ -60,14 +60,16 @@ export default Vue.extend({
         "muni.popup.csv-data-download.header-row",
         "kuntanro;nimi;namn;vuosi;luokka;"
       );
+      const filenameSuffix = this.featProps.name[this.lang];
 
       const success = await downloadMuniDataCsv(
         filenamePrefix,
+        filenameSuffix,
         headerRowPrefix,
-        this.featProps,
+        this.lang,
         fetchGnfrMeta,
         fetchPollutantMeta,
-        this.lang
+        this.featProps.id
       );
 
       this.loadingMuniData = false;
