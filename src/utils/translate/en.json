@@ -23,9 +23,11 @@
   "gnfr.description.share.of.reported_after": "are reported by the facilities.",
   "gnfr.description.no_reported_emissions": ". This class does not contain any reported emissions.",
 
-  "muni.popup.csv-data-download.filename-prefix": "emission_data",
-  "muni.popup.csv-data-download.header-row": "Municipality num.;Name FI;Name SV;Year;Sector;",
-  "muni.popup.csv-data-download.download-label": "Download emission data",
-  "muni.popup.csv-data-download.downloading-label": "Downloading emission data",
-  "muni.popup.csv-data-download.download-error-text": "Download failed, please try again later."
+  "csv-data-download.all.button.label": "Lataa koko päästödata kunnittain",
+  "csv-data-download.municipality.button.label": "Download emission data",
+
+  "csv-data-download.filename-prefix": "emission_data",
+  "csv-data-download.header-row-prefix": "Municipality num.;Name FI;Name SV;Year;Sector;",
+  "csv-data-download.loading-label": "Downloading emission data",
+  "csv-data-download.failed-try-again.label": "Download failed, please try again later."
 }

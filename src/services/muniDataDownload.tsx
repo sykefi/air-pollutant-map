@@ -47,7 +47,10 @@ interface MuniDataFeature {
 
 const downloadCsvContent = async (csvContent: string, filenamePrefix: string) => {
   const element = document.createElement("a");
-  element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(csvContent));
+  element.setAttribute(
+    "href",
+    "data:text/csv;charset=utf-8," + encodeURI(utfBom + csvContent)
+  );
   element.setAttribute("download", filenamePrefix + ".csv");
   element.style.display = "none";
   document.body.appendChild(element);
@@ -172,8 +175,9 @@ export const downloadMuniDataCsv = async (
   );
 
   if (csvContent) {
+    const filename = filenamePrefix + (filenameSuffix ? "_" + filenameSuffix : "");
     try {
-      await downloadCsvContent(utfBom + csvContent, filenamePrefix + "_" + filenameSuffix);
+      await downloadCsvContent(csvContent, filename);
       return true;
     } catch (error) {
       console.error(error);
