@@ -1,8 +1,12 @@
 <template>
-  <div class="muni-csv-download-container">
-    <button class="download-button" ref="download-muni-data-button" @click="downloadMuniData">
+  <div class="muni-csv-download-all-container">
+    <button
+      class="download-button"
+      ref="download-all-muni-data-button"
+      @click="downloadMuniData"
+    >
       <span v-if="!loadingMuniData">
-        {{ "csv-data-download.municipality.button.label" | translate }} (.csv)
+        {{ "csv-data-download.all.button.label" | translate }} (.csv)
       </span>
       <span v-else class="loading-container">
         <span> {{ "csv-data-download.loading-label" | translate }}</span>
@@ -42,7 +46,7 @@ export default Vue.extend({
   },
   methods: {
     getDownnloadMuniDataButton(): HTMLElement {
-      return this.$refs["download-muni-data-button"] as HTMLElement;
+      return this.$refs["download-all-muni-data-button"] as HTMLElement;
     },
     translateOrDefault(key: string, defaultString: string): string {
       const translated = this.$options.filters
@@ -60,7 +64,7 @@ export default Vue.extend({
         "csv-data-download.header-row-prefix",
         "kuntanro;nimi;namn;vuosi;luokka;"
       );
-      const filenameSuffix = this.featProps.name[this.lang];
+      const filenameSuffix = "";
 
       const success = await downloadMuniDataCsv(
         filenamePrefix,
@@ -68,8 +72,7 @@ export default Vue.extend({
         headerRowPrefix,
         this.lang,
         fetchGnfrMeta,
-        fetchPollutantMeta,
-        this.featProps.id
+        fetchPollutantMeta
       );
 
       this.loadingMuniData = false;
@@ -81,11 +84,11 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.muni-csv-download-container {
+.muni-csv-download-all-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 5px 0px 0px 0px;
+  margin: 10px 0px 0px 0px;
 }
 .download-button {
   cursor: pointer;

@@ -33,6 +33,7 @@
           <ToggleLanguageButtons />
         </div>
       </div>
+      <MuniDataDownloadAll v-if="downloadFullDataEnabled" />
     </div>
   </div>
 </template>
@@ -46,6 +47,7 @@ import SelectorPollutant from "./components/SelectorPollutant.vue";
 import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import GnfrDescription from "./components/GnfrDescription.vue";
+import MuniDataDownloadAll from "./components/MuniDataDownloadAll.vue";
 import { Pollutant, MapDataType, Gnfr, TotalPollutionStats } from "./types";
 import { Dispatch } from "./store";
 import * as env from "./env";
@@ -58,7 +60,8 @@ export default Vue.extend({
     SelectorPollutant,
     ToggleDataType,
     ToggleLanguageButtons,
-    GnfrDescription
+    GnfrDescription,
+    MuniDataDownloadAll
   },
   data() {
     return {
@@ -66,7 +69,8 @@ export default Vue.extend({
       gnfr: undefined as Gnfr | undefined,
       pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType,
-      totalPollutionStats: undefined as TotalPollutionStats | undefined
+      totalPollutionStats: undefined as TotalPollutionStats | undefined,
+      downloadFullDataEnabled: env.downloadFullDataEnabled as boolean
     };
   },
   beforeCreate() {
