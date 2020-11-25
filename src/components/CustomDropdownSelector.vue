@@ -545,9 +545,10 @@ export default Vue.extend({
   box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 4px 11px;
   overflow: auto;
 }
-@media (max-width: 508px) {
+@media (max-height: 580px) {
   .select-options {
-    max-height: calc(100vh - 340px);
+    max-height: calc(100vh - 170px);
+    min-height: 250px;
   }
 }
 .select-options li {

@@ -1,21 +1,23 @@
 <template>
   <div id="app-wrapper">
     <div id="app-container">
-      <div id="settings-panel">
-        <SelectorYear @selected-year="(year) => (this.year = year)" />
-        <SelectorGnfr
-          :mapDataType="mapDataType"
-          @selected-gnfr="(gnfr) => (this.gnfr = gnfr)"
-        />
-        <SelectorPollutant @selected-pollutant="(p) => (this.pollutant = p)" />
-      </div>
-      <div v-if="gnfr" id="gnfr-desc">
-        <GnfrDescription
-          :year="year"
-          :gnfr="gnfr"
-          :pollutant="pollutant"
-          :totalPollutionStats="totalPollutionStats"
-        />
+      <div id="info-panel">
+        <div id="selector-panel">
+          <SelectorYear @selected-year="(year) => (this.year = year)" />
+          <SelectorGnfr
+            :mapDataType="mapDataType"
+            @selected-gnfr="(gnfr) => (this.gnfr = gnfr)"
+          />
+          <SelectorPollutant @selected-pollutant="(p) => (this.pollutant = p)" />
+        </div>
+        <div v-if="gnfr" id="gnfr-desc">
+          <GnfrDescription
+            :year="year"
+            :gnfr="gnfr"
+            :pollutant="pollutant"
+            :totalPollutionStats="totalPollutionStats"
+          />
+        </div>
       </div>
       <div id="map-container">
         <OlMap
@@ -97,13 +99,23 @@ export default Vue.extend({
   width: 100%;
   max-width: 556px;
 }
-#settings-panel {
+@media (min-width: 1200px) {
+  #app-container {
+    flex-direction: row;
+    max-width: unset;
+    margin: 10px;
+  }
+}
+#info-panel {
+  max-width: 600px;
+}
+#selector-panel {
   width: 100%;
   display: flex;
   z-index: 5;
 }
 @media (max-width: 508px) {
-  #settings-panel {
+  #selector-panel {
     flex-wrap: wrap;
   }
 }
@@ -119,6 +131,12 @@ export default Vue.extend({
   text-align: center;
   color: #2c3e50;
   box-shadow: 0px 3px 4px 2px rgba(0, 0, 0, 0.05);
+}
+@media (min-width: 1200px) {
+  #map-container {
+    margin-top: 7px;
+    max-width: calc(100% - 600px);
+  }
 }
 #map-controls-container {
   position: absolute;
