@@ -217,6 +217,11 @@ export default Vue.extend({
     background-color: #fbfbfb;
   }
 }
+@media (min-width: 1200px) {
+  #ol-map {
+    height: calc(100vh - 40px);
+  }
+}
 #map-legend-container {
   position: absolute;
   top: 10px;
