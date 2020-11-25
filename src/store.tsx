@@ -11,7 +11,7 @@ export enum Lang {
 }
 
 export enum Dispatch {
-  setPreviouslySelectedLang = "setPreviouslySelectedLang",
+  loadSetInitialLang = "loadSetInitialLang",
   setLang = "setLang",
   setLoading = "setLoading",
   setLoaded = "setLoaded"
@@ -41,10 +41,20 @@ const actions = {
   setLang(context, lang: Lang) {
     context.commit(Mutation.setLang, lang);
   },
-  setPreviouslySelectedLang(context) {
-    const previouslySelectedLang = Cookies.get("air-pollutant-map-lang") as Lang;
-    if (previouslySelectedLang) {
-      context.commit(Mutation.setLang, previouslySelectedLang);
+  loadSetInitialLang(context) {
+    // try to load initial language from URL search parameters
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("lang")) {
+      const langParam = params.get("lang") as Lang;
+      if (langParam && Object.values(Lang).includes(langParam)) {
+        context.commit(Mutation.setLang, langParam);
+      }
+    } else {
+      // try to load previously selected language from Cookies
+      const previouslySelectedLang = Cookies.get("air-pollutant-map-lang") as Lang;
+      if (previouslySelectedLang) {
+        context.commit(Mutation.setLang, previouslySelectedLang);
+      }
     }
   },
   setLoading(context) {
