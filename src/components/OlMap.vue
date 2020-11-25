@@ -52,6 +52,7 @@ import Map from "ol/Map.js";
 import View from "ol/View.js";
 import Overlay from "ol/Overlay";
 import { Coordinate } from "ol/coordinate";
+import { Extent } from "ol/extent";
 import OlGridDataLayer from "./OlGridDataLayer.vue";
 import OlMuniDataLayer from "./OlMuniDataLayer.vue";
 import OlMuniBasemapLayer from "./OlMuniBasemapLayer.vue";
@@ -180,11 +181,18 @@ export default Vue.extend({
       view: new View({
         projection,
         center: [435385.0836878328, 7247696.528687431],
-        zoom: 1.54
+        zoom: 1.5
       })
     });
     this.map.once("postrender", () => {
       this.isReady = true;
+      const extent = [
+        -32010.40984326898,
+        6590316.535987211,
+        902780.5772189347,
+        7905076.52138765
+      ] as Extent;
+      this.map!.getView().fit(extent, { padding: [15, 0, 0, 0] });
     });
     this.initializePopup();
     console.log("map", this.map);

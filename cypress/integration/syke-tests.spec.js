@@ -61,7 +61,7 @@ describe("Year selector", () => {
   it("toggles year options hidden by clicking outside the input", () => {
     cy.get("#year-selector-div").within(() => cy.get("#select-container-year").click());
     cy.contains("2015");
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.get("#year-selector-div").within(() => {
       cy.get("#select-list-year").should("have.class", "hidden-all");
     });
@@ -93,7 +93,7 @@ describe("GNFR selector", () => {
   it("toggles GNFR options hidden by clicking outside the input", () => {
     cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
     cy.contains("Shipping");
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-list-gnfr").should("have.class", "hidden-all");
     });
@@ -160,7 +160,7 @@ describe("Pollutant selector", () => {
       cy.get("#select-container-pollutant").click()
     );
     cy.contains("Rikkidioksidi");
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-list-pollutant").should("have.class", "hidden-all");
     });
@@ -219,7 +219,7 @@ describe("Grid data layer", () => {
   });
 
   it("shows grid layer popup on click", () => {
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.get(".olpopup-content").contains("Rikkidioksidi (t):");
   });
 
@@ -290,7 +290,7 @@ describe("Municipality layer", () => {
   });
 
   it("shows municipality layer popup (2015 combined: typen oksidit)", () => {
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.contains("Kuopio (Typen oksidit):");
   });
 
@@ -382,7 +382,7 @@ describe("Municipality CSV data downloads", () => {
   });
 
   it("download CSV data of the selected municipality", () => {
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.contains("(Rikkidioksidi)");
     cy.contains("Lataa päästödata").click();
     cy.wait(500);
@@ -408,7 +408,7 @@ describe("Toggle back to grid data layer", () => {
   });
 
   it("popups keep working", () => {
-    cy.get("#map-container").click(325, 520);
+    cy.get("#map-container").click(325, 525);
     cy.contains("Rikkidioksidi (t):");
     cy.get(".olpopup-closer").click();
   });
