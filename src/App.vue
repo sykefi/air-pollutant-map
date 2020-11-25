@@ -103,7 +103,7 @@ export default Vue.extend({
   #app-container {
     flex-direction: row;
     max-width: unset;
-    margin: 10px;
+    padding-top: 10px;
   }
 }
 #info-panel {
@@ -135,7 +135,9 @@ export default Vue.extend({
 @media (min-width: 1200px) {
   #map-container {
     margin-top: 7px;
-    max-width: calc(100% - 600px);
+    width: calc(100% - 600px);
+    max-width: 900px;
+    box-shadow: 0px 3px 4px 2px rgba(0, 0, 0, 0.1);
   }
 }
 #map-controls-container {
