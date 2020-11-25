@@ -547,8 +547,7 @@ export default Vue.extend({
 }
 @media (max-height: 580px) {
   .select-options {
-    max-height: calc(100vh - 170px);
-    min-height: 250px;
+    max-height: max(calc(100vh - 170px), 250px);
   }
 }
 .select-options li {

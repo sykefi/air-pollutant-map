@@ -209,7 +209,7 @@ export default Vue.extend({
 }
 @media (max-height: 900px) {
   #ol-map {
-    height: 70vh;
+    height: max(70vh, 400px);
   }
 }
 @media (max-width: 508px) {
@@ -219,7 +219,7 @@ export default Vue.extend({
 }
 @media (min-width: 1200px) {
   #ol-map {
-    height: calc(100vh - 40px);
+    height: calc(100vh - 44px);
   }
 }
 #map-legend-container {
