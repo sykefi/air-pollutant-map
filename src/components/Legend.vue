@@ -2,16 +2,15 @@
   <div class="legend-wrapper">
     <div v-if="!loading && legend" class="legend-box legend-container">
       <div id="legend-title">
-        <span>
-          {{ "map.legend.title-without-unit" | translate }}
-        </span>
         <span v-if="mapDataType === mapDataTypes.GRID">
-          <br />{{ "map.legend.per-grid-cell" | translate }}</span
-        >
+          {{ "map.legend.title.emissions.label" | translate }}
+          <br />{{ "map.legend.per-grid-cell" | translate }}
+          <span> ({{ legend.unit }})</span>
+        </span>
         <span v-if="mapDataType === mapDataTypes.MUNICIPALITY">
+          {{ "map.legend.title.emission-density.label" | translate }}
           <br />({{ legend.unit }} / km<sup>2</sup>)
         </span>
-        <span v-else> ({{ legend.unit }})</span>
       </div>
       <div class="legend-class-row" v-for="className in legend.classNames" :key="className">
         <div
