@@ -437,7 +437,7 @@ export default Vue.extend({
   max-width: 100%;
   margin: 0em 1em 1em 0em;
 }
-@media (max-width: 508px) {
+@media (max-width: 516px) {
   .selector-div {
     margin: 5px 5px 8px 5px;
   }
@@ -522,7 +522,7 @@ export default Vue.extend({
   z-index: 20;
   background: transparent;
 }
-@media (max-width: 508px) {
+@media (max-width: 516px) {
   .select-icon {
     display: none;
   }

@@ -212,7 +212,7 @@ export default Vue.extend({
     height: max(70vh, 400px);
   }
 }
-@media (max-width: 508px) {
+@media (max-width: 516px) {
   #ol-map {
     background-color: #fbfbfb;
   }
