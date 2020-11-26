@@ -5,7 +5,8 @@
   "selector.map.datatype.grid": "Grid",
   "selector.map.datatype.muni": "Municipalities",
 
-  "map.legend.title-without-unit": "Pollution",
+  "map.legend.title.emissions.label": "Emissions",
+  "map.legend.title.emission-density.label": "Emission density",
   "map.legend.per-grid-cell": "in grid cell",
 
   "aria.year.selector.status.text": "options (years) available",

@@ -5,7 +5,8 @@
   "selector.map.datatype.grid": "Ruudukko",
   "selector.map.datatype.muni": "Kunnat",
 
-  "map.legend.title-without-unit": "Päästömäärä",
+  "map.legend.title.emissions.label": "Päästömäärä",
+  "map.legend.title.emission-density.label": "Päästömäärä",
   "map.legend.per-grid-cell": "ruudussa",
 
   "aria.year.selector.status.text": "vaihtoehtoa (vuotta) valittavana",

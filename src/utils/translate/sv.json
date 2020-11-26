@@ -5,7 +5,8 @@
   "selector.map.datatype.grid": "Rutnät",
   "selector.map.datatype.muni": "Kommuner",
 
-  "map.legend.title-without-unit": "Utsläppsmängd",
+  "map.legend.title.emissions.label": "Utsläppsmängd",
+  "map.legend.title.emission-density.label": "Utsläppsmängd",
   "map.legend.per-grid-cell": "i rutan",
 
   "aria.year.selector.status.text": "Tillgängliga alternativ (år)",
