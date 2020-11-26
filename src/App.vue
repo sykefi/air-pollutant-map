@@ -114,7 +114,7 @@ export default Vue.extend({
   display: flex;
   z-index: 5;
 }
-@media (max-width: 508px) {
+@media (max-width: 516px) {
   #selector-panel {
     flex-wrap: wrap;
   }
@@ -122,6 +122,12 @@ export default Vue.extend({
 #gnfr-desc {
   width: 100%;
   display: flex;
+}
+@media (min-width: 1200px) {
+  #gnfr-desc {
+    width: calc(100% - 18px);
+    padding-left: 2px;
+  }
 }
 #map-container {
   position: relative;

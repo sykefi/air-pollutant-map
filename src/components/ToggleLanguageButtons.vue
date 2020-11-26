@@ -77,7 +77,7 @@ export default Vue.extend({
   font-size: 12px;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
   height: min-content;
-  margin: 0px 10px 0px 10px;
+  margin: 0px 6px 0px 10px;
 }
 .lang-button {
   background-color: white;

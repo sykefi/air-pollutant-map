@@ -67,9 +67,10 @@ export default Vue.extend({
   font-size: 15px;
   box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.07);
 }
-@media (max-width: 508px) {
+@media (max-width: 516px) {
   .map-data-type-selector-wrapper {
     font-size: 13px;
+    margin-bottom: 5px;
   }
 }
 .map-data-type-selector-container {

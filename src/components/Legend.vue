@@ -65,7 +65,7 @@ export default {
 .legend-wrapper {
   font-size: 13px;
 }
-@media (max-width: 508px) {
+@media (max-width: 505px) {
   .legend-wrapper {
     font-size: 12px;
     margin-top: 20px;
