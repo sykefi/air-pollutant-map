@@ -1,4 +1,4 @@
-const webpack = require('webpack')
+const webpack = require("webpack");
 module.exports = {
   configureWebpack: {
     plugins: [
@@ -7,8 +7,8 @@ module.exports = {
       })
     ]
   },
-  chainWebpack:
-    config => {
-      config.optimization.delete('splitChunks')
-    }
-}
+  chainWebpack: (config) => {
+    config.optimization.delete("splitChunks");
+  },
+  publicPath: "./"
+};
