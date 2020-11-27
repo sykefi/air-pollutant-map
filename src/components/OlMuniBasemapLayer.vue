@@ -9,7 +9,7 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style, Stroke } from "ol/style";
 import Map from "ol/Map.js";
-import * as pollutantService from "./../services/pollutants";
+import * as emissionService from "./../services/emissions";
 
 export default Vue.extend({
   props: {
@@ -41,8 +41,8 @@ export default Vue.extend({
       });
     },
     async loadSourceData() {
-      // let's just fetch any municipality pollution layer as the basemap featureset
-      const fc = await pollutantService.fetchMuniFeatures(2018, "COMBINED", "s16");
+      // let's just fetch any municipality emission layer as the basemap featureset
+      const fc = await emissionService.fetchMuniFeatures(2018, "COMBINED", "s16");
       this.layerSource.addFeatures(
         // @ts-ignore
         this.layerSource.getFormat().readFeatures(fc)

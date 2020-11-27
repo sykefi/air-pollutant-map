@@ -30,11 +30,11 @@ describe("Page load and initial UI", () => {
     cy.contains("esittää kaikkien inventoitujen");
   });
 
-  it("shows total pollution statistics", () => {
+  it("shows total emission statistics", () => {
     cy.contains("Päästöt yhteensä:");
   });
 
-  it("shows correct total pollution (2018 combined: typen oksidit)", () => {
+  it("shows correct total emission (2018 combined: typen oksidit)", () => {
     cy.contains("126595.3 t");
   });
 });
@@ -290,7 +290,7 @@ describe("Grid data layer", () => {
     });
   });
 
-  it("shows correct total pollution statistics (2018 road/transport: typen oksidit)", () => {
+  it("shows correct total emission statistics (2018 road/transport: typen oksidit)", () => {
     cy.contains("Valitun luokan osuus kokonaispäästöistä");
     cy.contains("24 % (30429.7 t)");
   });

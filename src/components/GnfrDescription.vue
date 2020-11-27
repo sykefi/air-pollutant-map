@@ -4,21 +4,21 @@
       <span class="gnfr-name">{{ gnfr && gnfr.name[lang] }}</span>
       {{ gnfr && gnfr.desc[lang] }}
       <div class="stats">
-        <span v-if="totalPollutionStats">
-          <span v-if="totalPollutionStats.gnfrId === 'COMBINED'">
+        <span v-if="totalEmissionStats">
+          <span v-if="totalEmissionStats.gnfrId === 'COMBINED'">
             {{ "gnfr.description.combined-emissions" | translate }}
             <span class="formatted-number">
-              {{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
-              {{ totalPollutionStats.unit }}
+              {{ roundTotalEmissions(totalEmissionStats.gnfrEmissions) }}
+              {{ totalEmissionStats.unit }}
             </span></span
           ><span v-else>
             {{ "gnfr.description.gnfr-share-of-total" | translate }}
             <span class="formatted-number">
-              {{ getShareOfGnfrPollution(totalPollutionStats) }} %
+              {{ getShareOfGnfrEmissions(totalEmissionStats) }} %
             </span>
             (<span class="formatted-number"
-              >{{ roundTotalPollution(totalPollutionStats.gnfrPollution) }}
-              {{ totalPollutionStats.unit }}</span
+              >{{ roundTotalEmissions(totalEmissionStats.gnfrEmissions) }}
+              {{ totalEmissionStats.unit }}</span
             >)</span
           ></span
         ><span v-if="gnfr && gnfr.id !== 'COMBINED' && getCalcRepShareObject()">
@@ -30,14 +30,14 @@
         </span>
       </div>
     </div>
-    <div v-if="!gnfrPollutantMetas || !totalPollutionStats" class="load-animation-container">
+    <div v-if="!gnfrPollutantMetas || !totalEmissionStats" class="load-animation-container">
       <LoadingAnimation color="#007ac9" :size="17" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Gnfr, GnfrPollutantMeta, Pollutant, TotalPollutionStats } from "@/types";
+import { Gnfr, GnfrPollutantMeta, Pollutant, TotalEmissionStats } from "@/types";
 import Vue, { PropType } from "vue";
 import { mapState } from "vuex";
 import { fetchGnfrPollutantMetas } from "../services/meta";
@@ -48,7 +48,7 @@ export default Vue.extend({
     year: Number,
     gnfr: { type: Object as PropType<Gnfr> },
     pollutant: { type: Object as PropType<Pollutant | undefined> },
-    totalPollutionStats: { type: Object as PropType<TotalPollutionStats | undefined> }
+    totalEmissionStats: { type: Object as PropType<TotalEmissionStats | undefined> }
   },
   computed: mapState(["lang"]),
   components: {
@@ -86,7 +86,7 @@ export default Vue.extend({
       }
       return "?";
     },
-    roundTotalPollution(n: number) {
+    roundTotalEmissions(n: number) {
       const rounded = parseFloat(n.toPrecision(3));
       if (rounded >= 1000) {
         return rounded.toLocaleString("fi-FI", { useGrouping: true });
@@ -103,8 +103,8 @@ export default Vue.extend({
       }
       return n;
     },
-    getShareOfGnfrPollution(tpi: TotalPollutionStats) {
-      return this.roundPercentage((tpi.gnfrPollution / tpi.totalPollution) * 100);
+    getShareOfGnfrEmissions(tes: TotalEmissionStats) {
+      return this.roundPercentage((tes.gnfrEmissions / tes.totalEmissions) * 100);
     }
   },
   async mounted() {

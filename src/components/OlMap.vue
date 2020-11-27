@@ -10,7 +10,7 @@
         :map="map"
         @update-legend="updateLegend"
         @set-grid-feature-popup="setGridFeaturePopup"
-        @update-total-pollution-stats="(tps) => $emit('update-total-pollution-stats', tps)"
+        @update-total-emission-stats="(tps) => $emit('update-total-emission-stats', tps)"
       />
       <OlMuniDataLayer
         v-if="pollutant && isReady && mapDataType === mapDataTypes.MUNICIPALITY"
@@ -22,7 +22,7 @@
         :map="map"
         @update-legend="updateLegend"
         @set-muni-feature-popup="setMuniFeaturePopup"
-        @update-total-pollution-stats="(tps) => $emit('update-total-pollution-stats', tps)"
+        @update-total-emission-stats="(tps) => $emit('update-total-emission-stats', tps)"
       />
     </div>
     <Legend id="map-legend-container" :legend="legend" :mapDataType="mapDataType" />

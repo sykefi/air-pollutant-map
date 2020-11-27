@@ -32,7 +32,7 @@ describe("Page load and initial UI", () => {
     cy.contains("esittää kaikkien inventoitujen");
   });
 
-  it("shows total pollution statistics", () => {
+  it("shows total emission statistics", () => {
     cy.contains("Päästöt yhteensä:");
   });
 });
