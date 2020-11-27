@@ -4,10 +4,9 @@
       {{ "aria.mapdatatype.selector.label" | translate }}
     </label>
     <div class="map-data-type-selector-container">
-      <div
+      <button
         id="selector-grid"
-        role="button"
-        tabindex="0"
+        :disabled="mapDataType === mapDataTypes.GRID"
         :aria-pressed="mapDataType === mapDataTypes.GRID"
         v-on:click="() => selectMapDataType(mapDataTypes.GRID)"
         v-bind:class="[
@@ -18,11 +17,10 @@
         ]"
       >
         {{ "selector.map.datatype.grid" | translate }}
-      </div>
-      <div
+      </button>
+      <button
         id="selector-municipalities"
-        role="button"
-        tabindex="0"
+        :disabled="mapDataType === mapDataTypes.MUNICIPALITY"
         :aria-pressed="mapDataType === mapDataTypes.MUNICIPALITY"
         v-on:click="() => selectMapDataType(mapDataTypes.MUNICIPALITY)"
         v-bind:class="[
@@ -33,7 +31,7 @@
         ]"
       >
         {{ "selector.map.datatype.muni" | translate }}
-      </div>
+      </button>
     </div>
   </div>
 </template>
@@ -87,11 +85,13 @@ export default Vue.extend({
   transition-duration: 0.15s;
   -webkit-transition-duration: 0.15s; /* Safari */
 }
-.data-type-selector-button:focus {
+.data-type-selector-button:focus,
+.data-type-selector-button:hover {
   outline: none;
-}
-.data-type-selector-hover:hover {
   color: black;
+  box-shadow: 0pt 0pt 1pt 0pt black;
+  border-color: black;
+  z-index: 5;
 }
 #selector-municipalities {
   border-radius: 0 5px 5px 0;
@@ -100,12 +100,14 @@ export default Vue.extend({
   margin-right: -1px;
   border-radius: 5px 0 0 5px;
 }
-.selected-data-type {
-  z-index: 3;
+.selected-data-type,
+.selected-data-type:hover {
   cursor: auto;
   color: white;
+  box-shadow: none;
   border-color: #3969a1;
   background-color: rgba(0, 60, 136, 0.5);
+  z-index: 3;
 }
 .visually-hidden {
   clip: rect(0 0 0 0);
