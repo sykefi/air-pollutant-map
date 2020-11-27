@@ -5,10 +5,9 @@
     </label>
     <div class="lang-selector-wrapper">
       <div style="display: flex;">
-        <div
+        <button
           class="selector-left"
-          role="button"
-          tabindex="0"
+          :disabled="lang === Lang.FI"
           :aria-pressed="lang === Lang.FI"
           v-on:click="() => setLanguage(Lang.FI)"
           v-bind:class="[
@@ -17,11 +16,10 @@
           ]"
         >
           FI
-        </div>
-        <div
+        </button>
+        <button
           class="selector-middle"
-          role="button"
-          tabindex="0"
+          :disabled="lang === Lang.SV"
           :aria-pressed="lang === Lang.SV"
           v-on:click="() => setLanguage(Lang.SV)"
           v-bind:class="[
@@ -30,11 +28,10 @@
           ]"
         >
           SV
-        </div>
-        <div
+        </button>
+        <button
           class="selector-right"
-          role="button"
-          tabindex="0"
+          :disabled="lang === Lang.EN"
           :aria-pressed="lang === Lang.EN"
           v-on:click="() => setLanguage(Lang.EN)"
           v-bind:class="[
@@ -43,7 +40,7 @@
           ]"
         >
           EN
-        </div>
+        </button>
       </div>
     </div>
   </div>
@@ -90,11 +87,13 @@ export default Vue.extend({
   transition-duration: 0.15s;
   -webkit-transition-duration: 0.15s; /* Safari */
 }
-.lang-button:focus {
-  outline: none;
-}
-.lang-button-hover:hover {
+.lang-button:focus,
+.lang-button:hover {
   color: black;
+  outline: none;
+  box-shadow: 0pt 0pt 1pt 0pt black;
+  border-color: black;
+  z-index: 5;
 }
 .selector-left {
   padding: 3px 8px 3px 7px;
@@ -107,12 +106,14 @@ export default Vue.extend({
 .selector-middle {
   margin-right: -1px;
 }
-.selected-lang {
+.selected-lang,
+.selected-lang:hover {
   z-index: 3;
   cursor: auto;
   color: white;
   border-color: #3969a1;
   background-color: rgba(0, 60, 136, 0.5);
+  box-shadow: none;
 }
 .visually-hidden {
   clip: rect(0 0 0 0);

@@ -2,12 +2,8 @@ const path = require("path");
 
 describe("Page load and initial UI", () => {
   it("renders main div", () => {
-    cy.visit("http://localhost:8080/");
+    cy.visit("http://localhost:8080/?lang=fi");
     cy.get("div#app-wrapper");
-  });
-
-  it("sets language to FI", () => {
-    cy.get(".lang-selector-wrapper").contains("FI").click();
   });
 
   it("shows year selector", () => {
@@ -200,8 +196,7 @@ describe("Pollutant selector", () => {
 
 describe("Grid data layer", () => {
   it("opens rikkidioksidi layer (2015)", () => {
-    cy.visit("http://localhost:8080/");
-    cy.get(".lang-selector-wrapper").contains("FI").click();
+    cy.visit("http://localhost:8080/?lang=fi");
     cy.get("#year-selector-div").within(() => {
       cy.get("#select-input-year").click();
       cy.contains("li", "2015").click();
@@ -357,7 +352,7 @@ describe("Municipality layer", () => {
     cy.get(".legend-container").contains("Päästömäärä");
   });
 
-  it("switches to layer: 2015 combined & rikkidioksidi)", () => {
+  it("switches to layer: 2015 combined & rikkidioksidi", () => {
     // switch back to year 2018
     cy.get("#year-selector-div").within(() => {
       cy.get("#select-input-year").click();
@@ -375,13 +370,7 @@ describe("Municipality layer", () => {
 });
 
 describe("Municipality CSV data downloads", () => {
-  it("toggles municipality layer visible", () => {
-    cy.contains("Kunnat").click();
-    cy.contains("Kokonaisp");
-    cy.contains("Päästömäärä (t / km2)");
-  });
-
-  it("download CSV data of the selected municipality", () => {
+  it("downloads CSV data of the selected municipality", () => {
     cy.get("#map-container").click(325, 525);
     cy.contains("(Rikkidioksidi)");
     cy.contains("Lataa päästödata").click();
