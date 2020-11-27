@@ -3,7 +3,7 @@
     <div class="desc">
       <span class="gnfr-name">{{ gnfr && gnfr.name[lang] }}</span>
       {{ gnfr && gnfr.desc[lang] }}
-      <div class="stats">
+      <div v-if="gnfrPollutantMetas && totalEmissionStats" class="stats">
         <span v-if="totalEmissionStats">
           <span v-if="totalEmissionStats.gnfrId === 'COMBINED'">
             {{ "gnfr.description.combined-emissions" | translate }}
@@ -26,8 +26,10 @@
             {{ "gnfr.description.share.of.reported_pre" | translate }}
             <span class="formatted-number"> {{ getRepRatio() }} %</span>
             {{ "gnfr.description.share.of.reported_after" | translate }} </span
-          ><span v-else>{{ "gnfr.description.no_reported_emissions" | translate }}</span>
-        </span>
+          ><span v-else
+            ><span>. </span>{{ "gnfr.description.no_reported_emissions" | translate }}</span
+          ></span
+        >
       </div>
     </div>
     <div v-if="!gnfrPollutantMetas || !totalEmissionStats" class="load-animation-container">
@@ -120,6 +122,16 @@ export default Vue.extend({
   min-height: 9em;
   background-color: #fff;
 }
+@media (min-width: 1200px) {
+  .desc-box {
+    padding: 1em 1.3em;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px 0px;
+    border-radius: 1px;
+    border-left: 4px solid;
+    border-image: linear-gradient(to bottom, #8c96c6, #bfd3e6) 1 100%;
+    min-height: unset;
+  }
+}
 .gnfr-name {
   font-weight: 550;
   margin-right: 1px;
@@ -135,6 +147,6 @@ export default Vue.extend({
   color: #007ac9;
 }
 .load-animation-container {
-  margin: 5px 0px -2px 2px;
+  margin: 8px 0px -2px 2px;
 }
 </style>

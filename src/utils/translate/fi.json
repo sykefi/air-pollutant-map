@@ -22,7 +22,7 @@
   "gnfr.description.gnfr-share-of-total": "Valitun luokan osuus kokonaispäästöistä on",
   "gnfr.description.share.of.reported_pre": " ja esitettävistä päästöistä",
   "gnfr.description.share.of.reported_after": "on toiminnanharjoittajien raportoimia.",
-  "gnfr.description.no_reported_emissions": ". Luokkaan ei kuulu toiminnanharjoittajien raportoimia päästöjä.",
+  "gnfr.description.no_reported_emissions": "Luokkaan ei kuulu toiminnanharjoittajien raportoimia päästöjä.",
 
   "csv-data-download.all.button.label": "Lataa koko päästödata kunnittain",
   "csv-data-download.municipality.button.label": "Lataa päästödata",

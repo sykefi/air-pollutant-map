@@ -81,7 +81,7 @@ export default Vue.extend({
   border: 2px solid #949494;
   color: #949494;
   cursor: pointer;
-  padding: 3px 7px;
+  padding: 3px 7px 2px 7px;
   font-weight: 550;
   z-index: 2;
   transition-duration: 0.15s;
@@ -96,7 +96,7 @@ export default Vue.extend({
   z-index: 5;
 }
 .selector-left {
-  padding: 3px 8px 3px 7px;
+  padding: 3px 8px 2px 7px;
   margin-right: -1px;
   border-radius: 5px 0 0 5px;
 }
