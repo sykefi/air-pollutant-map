@@ -107,7 +107,7 @@ export default Vue.extend({
   }
 }
 #info-panel {
-  max-width: 600px;
+  max-width: 610px;
 }
 #selector-panel {
   width: 100%;
@@ -117,6 +117,11 @@ export default Vue.extend({
 @media (max-width: 516px) {
   #selector-panel {
     flex-wrap: wrap;
+  }
+}
+@media (min-width: 1200px) {
+  #selector-panel {
+    padding: 0px 0px 0px 5px;
   }
 }
 #gnfr-desc {

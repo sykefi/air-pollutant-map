@@ -8,6 +8,7 @@
       :initialOption="initialOption"
       @selected-option="(option) => $emit('selected-pollutant', option.value)"
     />
+    <div v-else class="loading-container"><LoadingAnimation color="#007ac9" :size="22" /></div>
   </div>
 </template>
 
@@ -16,10 +17,12 @@ import Vue from "vue";
 import { Option } from "./../types";
 import { fetchPollutantMeta } from "./../services/meta";
 import CustomDropdownSelector from "./CustomDropdownSelector.vue";
+import LoadingAnimation from "./LoadingAnimation.vue";
 
 export default Vue.extend({
   components: {
-    CustomDropdownSelector
+    CustomDropdownSelector,
+    LoadingAnimation
   },
   data() {
     return {
@@ -54,5 +57,8 @@ export default Vue.extend({
 <style scoped>
 .select-wrapper {
   width: 265px;
+}
+.loading-container {
+  margin-top: 27px;
 }
 </style>
