@@ -13,7 +13,7 @@ import { Fill, Style, Stroke } from "ol/style";
 import { StyleFunction } from "ol/style/Style";
 import Map from "ol/Map.js";
 import * as styleUtils from "./../utils/pollutantStyles";
-import * as pollutantService from "./../services/pollutants";
+import * as emissionService from "./../services/emissions";
 import { Pollutant, PollutantLegend, MapDataType } from "../types";
 import { FeatureLike } from "ol/Feature";
 import { Dispatch } from "@/store";
@@ -68,12 +68,12 @@ export default Vue.extend({
           })
         });
     },
-    getMaxPollutionValue(): number {
+    getMaxEmissionValue(): number {
       return Math.ceil(
         Math.max(...this.layerSource.getFeatures().map((feat) => feat.get(this.densityProp)))
       );
     },
-    async updateStyle(maxPollutionValue: number): Promise<number[] | undefined> {
+    async updateStyle(maxEmissionValue: number): Promise<number[] | undefined> {
       if (styleUtils.hasBreakPoints(MapDataType.MUNICIPALITY, this.densityProp)) {
         const breakPoints = styleUtils.getBreakPoints(
           MapDataType.MUNICIPALITY,
@@ -82,7 +82,7 @@ export default Vue.extend({
         this.colorFunction = styleUtils.getColorFunction(
           this.densityProp,
           breakPoints!,
-          maxPollutionValue
+          maxEmissionValue
         );
         return breakPoints;
       } else if (this.year === env.latestYear && this.gnfrId === "COMBINED") {
@@ -100,13 +100,13 @@ export default Vue.extend({
         this.colorFunction = styleUtils.getColorFunction(
           this.densityProp,
           breakPoints,
-          maxPollutionValue
+          maxEmissionValue
         );
         return breakPoints;
       } else {
         // combined pollutants from latest year need to be fetched for calculating breakpoints
         console.log(`Fetching features of ${env.latestYear} and calculating breakpoints`);
-        const fc = await pollutantService.fetchMuniFeatures(
+        const fc = await emissionService.fetchMuniFeatures(
           env.latestYear,
           "COMBINED",
           this.pollutant.id,
@@ -123,29 +123,29 @@ export default Vue.extend({
         this.colorFunction = styleUtils.getColorFunction(
           this.densityProp,
           breakPoints,
-          maxPollutionValue
+          maxEmissionValue
         );
         // for some reason this async style update needs to be triggered manually
         this.vectorLayer.setStyle(this.getOlStyle());
         return breakPoints;
       }
     },
-    updateLegend(breakPoints: number[], maxPollutionValue: number): void {
+    updateLegend(breakPoints: number[], maxEmissionValue: number): void {
       // finally update legend to match the new style
       this.legend = styleUtils.getPollutantLegend(
         this.pollutant,
         breakPoints,
-        maxPollutionValue
+        maxEmissionValue
       );
       this.$emit("update-legend", this.legend);
     },
-    async updateTotalPollutionStats(): Promise<void> {
-      const totalPollutionStats = await pollutantService.getTotalPollutionStats(
+    async updateTotalEmissionStats(): Promise<void> {
+      const totalEmissionStats = await emissionService.getTotalEmissionStats(
         this.year,
         this.gnfrId,
         this.pollutant
       );
-      this.$emit("update-total-pollution-stats", totalPollutionStats);
+      this.$emit("update-total-emission-stats", totalEmissionStats);
     },
     async setPopup(coords: Coordinate): Promise<void> {
       const feats = await this.layerSource.getFeaturesAtCoordinate(coords);
@@ -177,9 +177,9 @@ export default Vue.extend({
     this.layerSource = new VectorSource({
       format: new GeoJSON(),
       loader: async () => {
-        this.$emit("update-total-pollution-stats", undefined);
+        this.$emit("update-total-emission-stats", undefined);
         this.$store.dispatch(Dispatch.setLoading);
-        const fc = await pollutantService.fetchMuniFeatures(
+        const fc = await emissionService.fetchMuniFeatures(
           this.year,
           this.gnfrId,
           this.pollutant.id,
@@ -191,15 +191,15 @@ export default Vue.extend({
           // @ts-ignore
           this.layerSource.getFormat().readFeatures(fc)
         );
-        const maxPollutionValue = this.getMaxPollutionValue();
-        const breakPoints = await this.updateStyle(maxPollutionValue);
+        const maxEmissionValue = this.getMaxEmissionValue();
+        const breakPoints = await this.updateStyle(maxEmissionValue);
         if (breakPoints) {
-          this.updateLegend(breakPoints, maxPollutionValue);
+          this.updateLegend(breakPoints, maxEmissionValue);
           this.$store.dispatch(Dispatch.setLoaded);
         } else {
           console.error("Could not update style for the current layer");
         }
-        this.updateTotalPollutionStats();
+        this.updateTotalEmissionStats();
         this.maybeUpdatePopup();
       },
       strategy: allStrategy

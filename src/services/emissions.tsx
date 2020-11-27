@@ -5,11 +5,11 @@ import {
   MuniFeature,
   GridFeatureCollection,
   PollutantValues,
-  TotalPollutionStats
+  TotalEmissionStats
 } from "@/types";
 import * as cache from "./cache";
-import { m2tokm2 } from "./../constants";
-import * as env from "./../env";
+import { m2tokm2 } from "../constants";
+import * as env from "../env";
 
 const gridDataGnfrTable = env.useAggregatedGnfrs
   ? "p_grid_data_gnfr_prod"
@@ -60,18 +60,18 @@ export const fetchGridData = async (
   if (cached) {
     return cached;
   }
-  const pollutionMap: Map<number, number> = new Map();
+  const emissionMap: Map<number, number> = new Map();
   try {
     const response = await fetch(encodeURI(uri));
     const fc = (await response.json()) as GridFeatureCollection;
     fc.features
       .map((feat) => feat.properties)
       .forEach((props) => {
-        const pollution = props[pollutantId] * unitCoefficient;
-        pollutionMap.set(props.grid_id, pollution);
+        const emission = props[pollutantId] * unitCoefficient;
+        emissionMap.set(props.grid_id, emission);
       });
-    cache.setToCache(cacheKey, pollutionMap);
-    return pollutionMap;
+    cache.setToCache(cacheKey, emissionMap);
+    return emissionMap;
   } catch (error) {
     console.error(error);
   }
@@ -124,9 +124,9 @@ export const fetchMuniFeatures = async (
         en: feat.properties.nimi
       };
       const properties = { id: feat.properties.kuntanro, name, area: feat.properties.area };
-      const pollution = feat.properties[pollutantId] * unitCoefficient;
-      properties[pollutantId] = pollution;
-      properties[pollutantId + "-density"] = pollution / (feat.properties.area * m2tokm2);
+      const emission = feat.properties[pollutantId] * unitCoefficient;
+      properties[pollutantId] = emission;
+      properties[pollutantId + "-density"] = emission / (feat.properties.area * m2tokm2);
       const feature = { geometry: feat.geometry, type: feat.type, properties };
       return feature;
     });
@@ -141,7 +141,7 @@ export const fetchMuniFeatures = async (
   }
 };
 
-const calculateTotalPollution = (fc: MuniFeatureCollection, pollutantId: string): number => {
+const calculateTotalEmissions = (fc: MuniFeatureCollection, pollutantId: string): number => {
   return fc.features
     .map((feat) => feat.properties)
     .reduce((sum: number, props: PollutantValues) => {
@@ -149,33 +149,33 @@ const calculateTotalPollution = (fc: MuniFeatureCollection, pollutantId: string)
     }, 0);
 };
 
-const getTotalPollution = async (
+const getTotalEmissions = async (
   year: number,
   gnfrId: string,
   pollutantId: string
 ): Promise<number | undefined> => {
-  const totalPollutionId = `${year}_${gnfrId}_${pollutantId}_total`;
+  const totalEmissionsId = `${year}_${gnfrId}_${pollutantId}_total`;
 
-  if (cache.hasKey(totalPollutionId)) {
-    return cache.getFromCache(totalPollutionId);
+  if (cache.hasKey(totalEmissionsId)) {
+    return cache.getFromCache(totalEmissionsId);
   }
   const fc = await fetchMuniFeatures(year, gnfrId, pollutantId);
   if (fc) {
-    const totalPollution = calculateTotalPollution(fc, pollutantId);
-    cache.setToCache(totalPollutionId, totalPollution);
-    return totalPollution;
+    const totalEmissions = calculateTotalEmissions(fc, pollutantId);
+    cache.setToCache(totalEmissionsId, totalEmissions);
+    return totalEmissions;
   }
 };
 
-export const getTotalPollutionStats = async (
+export const getTotalEmissionStats = async (
   year: number,
   gnfrId: string,
   pollutant: Pollutant
-): Promise<TotalPollutionStats | undefined> => {
-  const gnfrPollution = await getTotalPollution(year, gnfrId, pollutant.id);
-  const totalPollution = await getTotalPollution(year, "COMBINED", pollutant.id);
-  if ((gnfrPollution || gnfrPollution === 0) && totalPollution) {
-    return { gnfrId, gnfrPollution, totalPollution, unit: pollutant.unit };
+): Promise<TotalEmissionStats | undefined> => {
+  const gnfrEmissions = await getTotalEmissions(year, gnfrId, pollutant.id);
+  const totalEmissions = await getTotalEmissions(year, "COMBINED", pollutant.id);
+  if ((gnfrEmissions || gnfrEmissions === 0) && totalEmissions) {
+    return { gnfrId, gnfrEmissions, totalEmissions, unit: pollutant.unit };
   }
   return undefined;
 };

@@ -15,7 +15,7 @@
             :year="year"
             :gnfr="gnfr"
             :pollutant="pollutant"
-            :totalPollutionStats="totalPollutionStats"
+            :totalEmissionStats="totalEmissionStats"
           />
         </div>
       </div>
@@ -25,7 +25,7 @@
           :gnfrId="gnfr ? gnfr.id : undefined"
           :pollutant="pollutant"
           :mapDataType="mapDataType"
-          @update-total-pollution-stats="(tps) => (this.totalPollutionStats = tps)"
+          @update-total-emission-stats="(tes) => (this.totalEmissionStats = tes)"
         />
         <div id="map-controls-container">
           <ToggleDataType
@@ -50,7 +50,7 @@ import SelectorGnfr from "./components/SelectorGnfr.vue";
 import ToggleLanguageButtons from "./components/ToggleLanguageButtons.vue";
 import GnfrDescription from "./components/GnfrDescription.vue";
 import MuniDataDownloadAll from "./components/MuniDataDownloadAll.vue";
-import { Pollutant, MapDataType, Gnfr, TotalPollutionStats } from "./types";
+import { Pollutant, MapDataType, Gnfr, TotalEmissionStats } from "./types";
 import { Dispatch } from "./store";
 import * as env from "./env";
 
@@ -71,7 +71,7 @@ export default Vue.extend({
       gnfr: undefined as Gnfr | undefined,
       pollutant: undefined as Pollutant | undefined,
       mapDataType: MapDataType.GRID as MapDataType,
-      totalPollutionStats: undefined as TotalPollutionStats | undefined,
+      totalEmissionStats: undefined as TotalEmissionStats | undefined,
       downloadFullDataEnabled: env.downloadFullDataEnabled as boolean
     };
   },
@@ -136,14 +136,14 @@ export default Vue.extend({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  box-shadow: 0px 3px 4px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 12px 0px;
 }
 @media (min-width: 1200px) {
   #map-container {
     margin-top: 7px;
     width: calc(100% - 600px);
     max-width: 900px;
-    box-shadow: 0px 3px 4px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 12px 0px;
   }
 }
 #map-controls-container {

@@ -181,11 +181,11 @@ export interface GnfrPollutantMeta {
   calcShare: number;
 }
 
-export interface TotalPollutionStats {
+export interface TotalEmissionStats {
   gnfrId: string;
   unit: string;
-  gnfrPollution: number;
-  totalPollution: number;
+  gnfrEmissions: number;
+  totalEmissions: number;
 }
 
 export interface Option {
