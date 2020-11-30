@@ -497,9 +497,13 @@ export default Vue.extend({
   z-index: 10;
   pointer-events: none;
   background-color: #fff;
+  -webkit-text-fill-color: #000000;
+  opacity: 1; /* required on iOS */
 }
 .hidden-text {
   color: white;
+  -webkit-text-fill-color: white;
+  opacity: 0;
 }
 .pseudo-input {
   color: white;

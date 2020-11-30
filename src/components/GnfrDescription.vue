@@ -129,6 +129,7 @@ export default Vue.extend({
     border-radius: 1px;
     border-left: 4px solid;
     border-image: linear-gradient(to bottom, #8c96c6, #bfd3e6) 1 100%;
+    border-width: 0px 0px 0px 4px;
     min-height: unset;
   }
 }
