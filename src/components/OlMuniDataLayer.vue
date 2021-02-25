@@ -207,7 +207,8 @@ export default Vue.extend({
 
     this.vectorLayer = new VectorLayer({
       source: this.layerSource,
-      style: this.getOlStyle()
+      style: this.getOlStyle(),
+      zIndex: 11
     });
     this.map.addLayer(this.vectorLayer);
     this.enableShowFeaturePopupOnClick();

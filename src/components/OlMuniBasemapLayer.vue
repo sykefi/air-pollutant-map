@@ -19,7 +19,7 @@ export default Vue.extend({
   data() {
     return {
       layerSource: new VectorSource({ format: new GeoJSON() }) as VectorSource,
-      vectorLayer: new VectorLayer() as VectorLayer
+      vectorLayer: new VectorLayer({ zIndex: 1 }) as VectorLayer
     };
   },
   watch: {
