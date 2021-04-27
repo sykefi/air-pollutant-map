@@ -1,4 +1,4 @@
-### 1. Import (raw) grid data to table: grid_data (replace with new data from CSV)
+### 1. Import (raw) grid data to temporary table: grid_data_master (replace all rows with new data from CSV)
 
 1. Run the SQL script: [create_grid_data_master_table.sql](./create_grid_data_master_table.sql) to drop the old table and create a new one (empty public.grid_data_master).
 2. Ensure that the column order, delimiter (`;`) and encoding (`utf-8`) in the CSV file match the ones in the copy clause (below). Column names do not need to match.
