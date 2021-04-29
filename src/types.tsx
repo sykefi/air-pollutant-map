@@ -114,7 +114,6 @@ export interface LangStringMap {
 }
 
 export interface DbGnfr {
-  id: string;
   nimi: string;
   namn: string;
   name: string;
