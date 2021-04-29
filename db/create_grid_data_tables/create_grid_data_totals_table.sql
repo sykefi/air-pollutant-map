@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS grid_data_totals_backup;
+SELECT * INTO grid_data_totals_backup FROM grid_data_totals;
+
+
 DROP TABLE IF EXISTS grid_data_totals;
 
 CREATE TABLE grid_data_totals AS (
@@ -7,3 +11,7 @@ CREATE TABLE grid_data_totals AS (
 );
 
 CREATE INDEX grid_data_totals_year_idx ON grid_data_totals (vuosi);
+GRANT SELECT ON grid_data_totals TO paastotkartalla;
+
+
+DROP TABLE IF EXISTS grid_data_totals_backup;

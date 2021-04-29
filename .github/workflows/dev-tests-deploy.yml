@@ -1,6 +1,12 @@
 name: Tests & deploy dev
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - "master"
+    paths-ignore:
+      - "db/**"
+      - "**.md"
 
 jobs:
   cypress-tests:

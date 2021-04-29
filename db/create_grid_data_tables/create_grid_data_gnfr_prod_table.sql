@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS grid_data_gnfr_prod_backup;
+SELECT * INTO grid_data_gnfr_prod_backup FROM grid_data_gnfr_prod;
+
+
 DROP TABLE IF EXISTS public.gnfr_dev_prod_map;
 
 CREATE TABLE public.gnfr_dev_prod_map (
@@ -33,6 +37,10 @@ CREATE TABLE public.grid_data_gnfr_prod AS (
 );
 
 CREATE INDEX gnfr_prod_year_gnfr_idx ON grid_data_gnfr_prod (vuosi, gnfr);
+GRANT SELECT ON grid_data_gnfr_prod TO paastotkartalla;
 
--- drop temporary table
+
+-- drop temporary tables
 DROP TABLE gnfr_dev_prod_map;
+
+DROP TABLE IF EXISTS grid_data_gnfr_prod_backup;

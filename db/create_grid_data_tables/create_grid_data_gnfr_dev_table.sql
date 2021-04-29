@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS grid_data_gnfr_dev_backup;
+SELECT * INTO grid_data_gnfr_dev_backup FROM grid_data_gnfr_dev;
+
+
 DROP TABLE IF EXISTS grid_data_gnfr_dev;
 
 CREATE TABLE grid_data_gnfr_dev AS (
@@ -5,3 +9,7 @@ CREATE TABLE grid_data_gnfr_dev AS (
 );
 
 CREATE INDEX gnfr_dev_year_gnfr_idx ON grid_data_gnfr_dev (vuosi, gnfr);
+GRANT SELECT ON grid_data_gnfr_dev TO paastotkartalla;
+
+
+DROP TABLE IF EXISTS grid_data_gnfr_dev_backup;
