@@ -130,3 +130,6 @@ db/create_muni_data_tables/kuntadata5.csv
 cypress/csvDownloads/*
 db/create_grid_data_tables/*.csv
 db/db_dumps/*
+
+# db v2
+db_v2/import_grid_data/csv_data/griddata3.csv
