@@ -4,10 +4,13 @@ $psql = "C:\'Program Files\pgAdmin 4\v4\runtime\psql.exe'"
 
 # these need to be set
 $dbHost = ''
-$dbUser = ''
 $dbName = ''
+$dbUser = ''
 
-Read-Host -Prompt "`nConnecting to db $dbName at $dbHost as $dbUser. Press any key to continue"
+# $csvFile = 'csv_data/griddata3.csv'
+$csvFile = 'csv_data/PaastotRuuduittain1990-2019.csv'
+
+Read-Host -Prompt "`nConnecting to db $dbName at $dbHost as $dbUser. Updating grid data from $csvFile. Press any key to continue"
 
 Write-Output "`n1/6 Backups all grid data tables used by APIs"
 iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/backup_grid_data_tables.sql"
@@ -17,7 +20,7 @@ iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/create_table_grid_data_impo
 
 Write-Output "`n3/6 Imports new grid data to grid_data_import_temp from csv."
 $copyCsvSql = @'
-"\copy public.grid_data_import_temp (vuosi,grid_id,long,lat,gnfr,s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40) FROM 'csv_data/griddata3.csv' with (format csv, header true, delimiter ';', encoding 'utf-8');"
+"\copy public.grid_data_import_temp (vuosi,grid_id,long,lat,gnfr,s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40) FROM '$csvFile' with (format csv, header true, delimiter ';', encoding 'utf-8');"
 '@
 iex "& $psql -h $dbHost -d $dbName -U $dbUser -c $copyCsvSql"
 Read-Host -Prompt "`nPress CTRL+C if the import was not successful or any key to continue"

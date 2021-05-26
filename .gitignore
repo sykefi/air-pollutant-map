@@ -133,3 +133,4 @@ db/db_dumps/*
 
 # db v2
 db_v2/import_grid_data/csv_data/griddata3.csv
+db_v2/import_grid_data/csv_data/PaastotRuuduittain1990-2019.csv
