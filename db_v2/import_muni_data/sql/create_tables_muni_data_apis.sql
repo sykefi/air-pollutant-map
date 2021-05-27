@@ -5,8 +5,8 @@ DROP TABLE IF EXISTS public.muni_data_gnfr_dev;
 CREATE TABLE public.muni_data_gnfr_dev AS (
   SELECT K100.kuntanimi as nimi, K100.kuntanimir as namn, MD.kuntanro, vuosi, gnfr, K45.geom, K100.shape_star as area, s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40
   FROM public.muni_data_import_temp AS MD
-  INNER JOIN public.hall100kunta2020 AS K100 ON K100.kuntanro = MD.kuntanro
-  INNER JOIN public.hall4_5miljkunta2020 AS K45 ON K45.kuntanro = MD.kuntanro  
+  INNER JOIN public.hall100kunta2021 AS K100 ON K100.kuntanro = MD.kuntanro
+  INNER JOIN public.hall4_5miljkunta2021 AS K45 ON K45.kuntanro = MD.kuntanro  
 );
 
 GRANT SELECT ON public.muni_data_gnfr_dev TO paastotkartalla;
@@ -51,8 +51,8 @@ DROP TABLE IF EXISTS public.muni_data_gnfr_prod;
 CREATE TABLE public.muni_data_gnfr_prod AS (
   SELECT K100.kuntanimi as nimi, K100.kuntanimir as namn, MD_GROUPS.kuntanro, vuosi, gnfr_prod as gnfr, K45.geom, K100.shape_star as area, s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40
   FROM public.muni_data_gnfr_prod_groups AS MD_GROUPS
-  INNER JOIN public.hall100kunta2020 AS K100 ON K100.kuntanro = MD_GROUPS.kuntanro
-  INNER JOIN public.hall4_5miljkunta2020 AS K45 ON K45.kuntanro = MD_GROUPS.kuntanro
+  INNER JOIN public.hall100kunta2021 AS K100 ON K100.kuntanro = MD_GROUPS.kuntanro
+  INNER JOIN public.hall4_5miljkunta2021 AS K45 ON K45.kuntanro = MD_GROUPS.kuntanro
 );
 
 -- drop temporary tables
@@ -75,8 +75,8 @@ CREATE TABLE muni_data_totals AS (
         FROM muni_data_import_temp as MD
         GROUP BY vuosi,kuntanro
         ) AS MD
-    INNER JOIN hall4_5miljkunta2020 AS K45 ON K45.kuntanro = MD.kuntanro
-    INNER JOIN hall100kunta2020 AS K100 ON K100.kuntanro = MD.kuntanro
+    INNER JOIN hall4_5miljkunta2021 AS K45 ON K45.kuntanro = MD.kuntanro
+    INNER JOIN hall100kunta2021 AS K100 ON K100.kuntanro = MD.kuntanro
 );
 
 GRANT SELECT ON muni_data_totals TO paastotkartalla;
