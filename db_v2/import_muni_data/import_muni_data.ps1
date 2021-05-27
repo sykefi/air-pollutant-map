@@ -7,8 +7,8 @@ $dbHost = ''
 $dbName = ''
 $dbUser = ''
 
-$csvFile = 'csv_data/kuntadata5.csv'
-# $csvFile = 'csv_data/PaastotKunnittain1990-2019.csv'
+# $csvFile = 'csv_data/kuntadata5.csv'
+$csvFile = 'csv_data/PaastotKunnittain1990-2019.csv'
 
 Read-Host -Prompt "`nConnecting to db $dbName at $dbHost as $dbUser. Updating muni data from $csvFile. Press any key to continue"
 
