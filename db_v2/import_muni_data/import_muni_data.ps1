@@ -13,30 +13,24 @@ $csvFile = 'csv_data/kuntadata5.csv'
 Read-Host -Prompt "`nConnecting to db $dbName at $dbHost as $dbUser. Updating muni data from $csvFile. Press any key to continue"
 
 
-Write-Output "`n1/6 Backups all muni data tables used by APIs"
+Write-Output "`n1/4 Backups all muni data tables used by APIs"
 iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/backup_muni_data_tables.sql"
 
 
-Write-Output "`n2/6 Creates an empty table muni_data_import_temp"
+Write-Output "`n2/4 Creates an empty table muni_data_import_temp"
 iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/create_table_muni_data_import.sql"
 
 
-Write-Output "`n3/6 Imports new muni data to muni_data_import_temp from csv."
+Write-Output "`n3/4 Imports new muni data to muni_data_import_temp from csv."
 $copyCsvSql = @'
 "\copy public.muni_data_import_temp (vuosi,kuntanro,nimi,gnfr,s16,s15,s22,s13,s28,s29,s27,s43,s5,s18,s3,s12,s1,s7,s8,s14,s37,s25,s19,s17,s38,s40) FROM '$csvFile' with (format csv, header true, delimiter ';', encoding 'utf-8');"
 '@
 iex "& $psql -h $dbHost -d $dbName -U $dbUser -c $copyCsvSql"
 Read-Host -Prompt "`nPress CTRL+C if the import was not successful or any key to continue"
 
+Write-Output "`n4/4 Updates new muni data to tables for APIs (from muni_data_import_temp)."
+iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/create_tables_muni_data_apis.sql"
 
-Write-Output "`n4/6 Updates new muni data to table muni_data_gnfr_dev (from muni_data_import_temp)."
-iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/create_table_muni_data_gnfr_dev.sql"
-
-Write-Output "`n5/6 Updates new muni data to table muni_data_gnfr_prod (from muni_data_import_temp)."
-iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/create_table_muni_data_gnfr_prod.sql"
-
-Write-Output "`n6/6 Updates new muni data to table muni_data_totals (from muni_data_import_temp)."
-iex "& $psql -h $dbHost -d $dbName -U $dbUser -f sql/create_table_muni_data_totals.sql"
 
 Write-Output "`nAll muni data tables updated."
 
