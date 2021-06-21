@@ -42,7 +42,7 @@ export default Vue.extend({
     },
     async loadSourceData() {
       // let's just fetch any municipality emission layer as the basemap featureset
-      const fc = await emissionService.fetchMuniFeatures(2018, "COMBINED", "s16");
+      const fc = await emissionService.fetchMuniFeatures(2015, "COMBINED", "s16");
       this.layerSource.addFeatures(
         // @ts-ignore
         this.layerSource.getFormat().readFeatures(fc)
