@@ -381,7 +381,7 @@ describe("Municipality CSV data downloads", () => {
 
     // check that file contains first row and
     cy.readFile(filePath).then((str) => {
-      expect(str.length).to.above(50000);
+      expect(str.length).to.above(10000);
       const firstRow = str.split("\n").shift();
       expect(firstRow.length).to.above(400);
       expect(firstRow).to.contain("Kuntanumero");
