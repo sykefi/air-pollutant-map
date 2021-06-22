@@ -132,9 +132,6 @@ db/create_grid_data_tables/*.csv
 db/db_dumps/*
 
 # db v2
-db_v2/import_grid_data/csv_data/griddata3.csv
-db_v2/import_grid_data/csv_data/PaastotRuuduittain1990-2019.csv
-db_v2/import_muni_data/csv_data/kuntadata5.csv
-db_v2/import_muni_data/csv_data/PaastotKunnittain1990-2019.csv
-db_v2/import_muni_data/csv_data/bu/
-db_v2/update_prod_db/dev_dumps/
+db/import_grid_data/csv_data/
+db/import_muni_data/csv_data/
+db/update_prod_db/dev_dumps/
