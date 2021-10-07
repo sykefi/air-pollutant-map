@@ -54,7 +54,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build-prod-public
+        run: npm run build-prod
 
       - name: Deploy dev
         uses: w9jds/firebase-action@master
