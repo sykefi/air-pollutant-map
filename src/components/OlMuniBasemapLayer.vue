@@ -6,6 +6,7 @@
 import Vue, { PropType } from "vue";
 import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
+import Polygon from 'ol/geom/Polygon';
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style, Stroke } from "ol/style";
 import Map from "ol/Map.js";
@@ -18,8 +19,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      layerSource: new VectorSource({ format: new GeoJSON() }) as VectorSource,
-      vectorLayer: new VectorLayer({ zIndex: 1 }) as VectorLayer
+      layerSource: new VectorSource({ format: new GeoJSON() }) as VectorSource<Polygon>,
+      vectorLayer: new VectorLayer({ zIndex: 1 }) as VectorLayer<VectorSource<Polygon>>
     };
   },
   watch: {

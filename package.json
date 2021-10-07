@@ -18,13 +18,13 @@
   "dependencies": {
     "core-js": "^3.18.2",
     "js-cookie": "^2.2.1",
-    "ol": "^6.5.0",
+    "ol": "^6.8.1",
     "vue": "^2.6.14",
     "vuex": "^3.6.2",
     "webpack": "^4.46.0"
   },
   "devDependencies": {
-    "@types/ol": "^6.5.1",
+    "@types/ol": "^6.5.3",
     "@types/webpack-env": "^1.16.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
