@@ -20,8 +20,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
-          spec: cypress/integration/syke-tests.spec.js
-          start: npm run serve-prod-syke
+          spec: cypress/integration/tests.spec.js
+          start: npm run serve-prod
           # quote the url to be safe against YML parsing surprises
           wait-on: "http://localhost:8080"
 

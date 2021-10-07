@@ -76,7 +76,7 @@ describe("Year selector", () => {
 describe("GNFR selector", () => {
   it("toggles GNFR options visible", () => {
     cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
-    cy.get("#select-list-gnfr").within(() => cy.contains("li", "Shipping"));
+    cy.get("#select-list-gnfr").within(() => cy.contains("li", "Liikenne"));
   });
 
   it("toggles GNFR options hidden by clicking the input", () => {
@@ -88,19 +88,19 @@ describe("GNFR selector", () => {
 
   it("toggles GNFR options hidden by clicking outside the input", () => {
     cy.get("#gnfr-selector-div").within(() => cy.get("#select-container-gnfr").click());
-    cy.contains("Shipping");
+    cy.contains("Liikenne");
     cy.get("#map-container").click(325, 525);
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-list-gnfr").should("have.class", "hidden-all");
     });
   });
 
-  it("selects GNFR by clicking an option (public power)", () => {
+  it("selects GNFR by clicking an option (power)", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-container-gnfr").click();
-      cy.contains("li", "Public").click();
+      cy.contains("li", "Energiantuotanto").click();
       cy.get("#select-list-gnfr").should("have.class", "hidden-all");
-      cy.contains("Public");
+      cy.contains("Energiantuotanto");
     });
   });
 
@@ -115,16 +115,16 @@ describe("GNFR selector", () => {
 
   it("finds & selects option by input value (road & transport)", () => {
     cy.get("#gnfr-selector-div").within(() => {
-      cy.get("#select-input-gnfr").click().clear().type("roadTranspor");
+      cy.get("#select-input-gnfr").click().clear().type("Liiken");
       cy.get("li").click();
-      cy.get("#selection-input-gnfr").should("have.value", "F_RoadTransport_fi");
+      cy.get("#selection-input-gnfr").should("have.value", "Liikenne");
     });
   });
 
   it("shows previously selected GNFR after exiting selector", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-input-gnfr").click().clear().type("kokonais{esc}");
-      cy.get("#selection-input-gnfr").should("have.value", "F_RoadTransport_fi");
+      cy.get("#selection-input-gnfr").should("have.value", "Liikenne");
     });
   });
 
@@ -242,20 +242,20 @@ describe("Grid data layer", () => {
     cy.get(".legend-container").contains("Päästömäärä");
   });
 
-  it("switches to layer: 2010 aviation & typen oksidit", () => {
+  it("switches to layer: 2010 transport & typen oksidit", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-container-gnfr").click();
-      cy.contains("li", "Aviation").click();
+      cy.contains("li", "Liikenne").click();
     });
     // wait until total emissions and legend are shown
     cy.contains("Valitun luokan osuus");
     cy.get(".legend-container").contains("Päästömäärä");
   });
 
-  it("switches to layer: 2015 road/transport & typen oksidit", () => {
+  it("switches to layer: 2015 agriculture & typen oksidit", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-container-gnfr").click();
-      cy.contains("li", "Road").click();
+      cy.contains("li", "Maatalous").click();
     });
     cy.get("#year-selector-div").within(() => {
       cy.get("#select-input-year").click();
@@ -313,7 +313,7 @@ describe("Municipality layer", () => {
   it("switches to layer: 2015 road/transport & rikkidioksidi", () => {
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-input-gnfr").click();
-      cy.contains("li", "Road").click();
+      cy.contains("li", "Transport").click();
     });
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click();
@@ -324,7 +324,7 @@ describe("Municipality layer", () => {
     cy.get(".legend-container").contains("Päästömäärä");
   });
 
-  it("switches to layer: 2010 aviation & typen oksidit", () => {
+  it("switches to layer: 2010 agriculture & typen oksidit", () => {
     cy.get("#pollutant-selector-div").within(() => {
       cy.get("#select-input-pollutant").click();
       cy.contains("Typen oksidit").click();
@@ -335,7 +335,7 @@ describe("Municipality layer", () => {
     });
     cy.get("#gnfr-selector-div").within(() => {
       cy.get("#select-input-gnfr").click();
-      cy.contains("li", "Aviation").click();
+      cy.contains("li", "Maatalous").click();
     });
     // wait until total emissions and legend are shown
     cy.contains("Valitun luokan osuus");

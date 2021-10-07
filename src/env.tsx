@@ -15,7 +15,7 @@ export const useAggregatedGnfrs: boolean = parseBooleanFromEnv(
 );
 
 export const useProdPollutants: boolean = parseBooleanFromEnv(
-  process.env.VUE_APP_USE_PROD_POLLUTANTS
+  process.env.VUE_APP_USE_PROD_POLLUTANT_LIST
 );
 
 export const downloadFullDataEnabled: boolean = parseBooleanFromEnv(

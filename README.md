@@ -12,18 +12,22 @@ Online preview: [paastokartta-demo.web.app](https://paastokartta-demo.web.app/)
 npm install
 ```
 
+Add file `.env.local` with the following content to use dev GeoServer: 
+`VUE_APP_GEOSERVER_URI=http://your-dev-geoserver-address:port/geoserver/paastotkartalla/`
+
+
+### Compiles and hot-reloads for development
+
+`npm run serve-dev`
+
+### Compiles and minifies for production
+
+`npm run build-prod`
+
 ### Tests
 
 Open & run Cypress E2E tests with
 `npm run cypress`
-
-### Compiles and hot-reloads for development
-
-`npm run serve-dev-syke` or `npm run serve-dev-public`
-
-### Compiles and minifies for production
-
-`npm run build-prod-syke` or `npm run build-prod-public`
 
 ### Built with
 
