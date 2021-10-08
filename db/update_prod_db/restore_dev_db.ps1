@@ -1,3 +1,5 @@
+# this is just a sample script for restoring one table to (dev) db
+
 $pg_restore = "C:\'Program Files\pgAdmin 4\v4\runtime\pg_restore.exe'"
 
 $dump_file = "'dev_dumps\dev.dump'"
