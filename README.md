@@ -8,6 +8,12 @@ Online preview: [paastokartta-demo.web.app](https://paastokartta-demo.web.app/)
 
 ### Project setup
 
+The project requires installation of [vue-cli](https://cli.vuejs.org/):
+```
+npm install -g @vue/cli
+```
+
+To install project dependencies with npm, run:
 ```
 npm install
 ```
