@@ -12,7 +12,7 @@ Online preview: [paastokartta-demo.web.app](https://paastokartta-demo.web.app/)
 npm install
 ```
 
-Add file `.env.local` with the following content to use dev GeoServer: 
+To use dev GeoServer, add file `.env.local` with the following environment variable: 
 `VUE_APP_GEOSERVER_URI=http://your-dev-geoserver-address:port/geoserver/paastotkartalla/`
 
 
