@@ -123,10 +123,9 @@ build-deploy-demo.sh
 drafts
 .firebase
 
-# grid/muni data files
-db/create_grid_data_tables/griddata3.csv
-db/create_muni_data_tables/kuntadata3.csv
-db/create_muni_data_tables/kuntadata5.csv
 cypress/csvDownloads/*
-db/create_grid_data_tables/*.csv
-db/db_dumps/*
+
+# db v2
+db/import_grid_data/csv_data/
+db/import_muni_data/csv_data/
+db/update_prod_db/dev_dumps/

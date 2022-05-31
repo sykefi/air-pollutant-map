@@ -11,7 +11,7 @@ on:
 jobs:
   cypress-tests:
     name: Install & run Cypress tests
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -20,8 +20,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
-          spec: cypress/integration/syke-tests.spec.js
-          start: npm run serve-prod-syke
+          spec: cypress/integration/tests.spec.js
+          start: npm run serve-prod
           # quote the url to be safe against YML parsing surprises
           wait-on: "http://localhost:8080"
 
@@ -54,7 +54,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build-prod-public
+        run: npm run build-prod
 
       - name: Deploy dev
         uses: w9jds/firebase-action@master

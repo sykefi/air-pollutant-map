@@ -6,6 +6,7 @@
 import Vue, { PropType } from "vue";
 import { Vector as VectorLayer } from "ol/layer";
 import VectorSource from "ol/source/Vector";
+import Polygon from 'ol/geom/Polygon';
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Style, Stroke } from "ol/style";
 import Map from "ol/Map.js";
@@ -18,8 +19,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      layerSource: new VectorSource({ format: new GeoJSON() }) as VectorSource,
-      vectorLayer: new VectorLayer({ zIndex: 1 }) as VectorLayer
+      layerSource: new VectorSource({ format: new GeoJSON() }) as VectorSource<Polygon>,
+      vectorLayer: new VectorLayer({ zIndex: 1 }) as VectorLayer<VectorSource<Polygon>>
     };
   },
   watch: {
@@ -42,7 +43,7 @@ export default Vue.extend({
     },
     async loadSourceData() {
       // let's just fetch any municipality emission layer as the basemap featureset
-      const fc = await emissionService.fetchMuniFeatures(2018, "COMBINED", "s16");
+      const fc = await emissionService.fetchMuniFeatures(2015, "COMBINED", "s16");
       this.layerSource.addFeatures(
         // @ts-ignore
         this.layerSource.getFormat().readFeatures(fc)
